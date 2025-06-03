@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord - dailyMenu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --rouge-brique: #8B2323;
+            --rouge-doux: #A24E4E;
+            --rose-pale: #E7D3D3;
+            --jaune-creme: #FFF1CF;
+            --bleu-clair: #CCE5FF;
+        }
+        .bg-rouge-brique { background-color: var(--rouge-brique); }
+        .bg-rouge-doux { background-color: var(--rouge-doux); }
+        .bg-rose-pale { background-color: var(--rose-pale); }
+        .bg-jaune-creme { background-color: var(--jaune-creme); }
+        .bg-bleu-clair { background-color: var(--bleu-clair); }
+        .text-rouge-brique { color: var(--rouge-brique); }
+        .text-rouge-doux { color: var(--rouge-doux); }
+        .border-rouge-doux { border-color: var(--rouge-doux); }
+        .border-rouge-brique { border-color: var(--rouge-brique); }
+        .hover-rouge-brique:hover { background-color: var(--rouge-brique); }
+        .hover-rouge-doux:hover { background-color: var(--rouge-doux); }
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--jaune-creme) 0%, var(--rose-pale) 50%, var(--bleu-clair) 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(139, 35, 35, 0.1), 0 5px 10px -5px rgba(139, 35, 35, 0.04);
+        }
+        .nav-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .nav-item:hover {
+            background-color: var(--rose-pale);
+            transform: translateX(5px);
+        }
+        .nav-item.active {
+            background-color: var(--rouge-doux);
+            color: white;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, var(--rouge-brique), var(--rouge-doux));
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(139, 35, 35, 0.3);
+        }
+        .stat-card {
+            background: linear-gradient(135deg, white 0%, var(--jaune-creme) 100%);
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .menu-item {
+            background: white;
+            border-left: 4px solid var(--rouge-doux);
+            transition: all 0.3s ease;
+        }
+        .menu-item:hover {
+            border-left-color: var(--rouge-brique);
+            transform: translateX(5px);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal {
+            backdrop-filter: blur(10px);
+            background-color: rgba(139, 35, 35, 0.1);
+        }
+        .drag-drop-area {
+            border: 2px dashed var(--rouge-doux);
+            transition: all 0.3s ease;
+        }
+        .drag-drop-area:hover, .drag-drop-area.dragover {
+            border-color: var(--rouge-brique);
+            background-color: var(--rose-pale);
+        }
+        .sortable-list {
+            min-height: 100px;
+        }
+        .sortable-item {
+            cursor: move;
+            transition: all 0.2s;
+        }
+        .sortable-item.dragging {
+            opacity: 0.7;
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <!-- Navigation latérale -->
+    <div class="flex">
+        <nav class="w-64 bg-white card-shadow h-screen fixed left-0 top-0 overflow-y-auto">
+            <div class="p-6 border-b border-rose-pale">
+                <div class="flex items-center space-x-3">
+                    <div class="text-3xl">🍽️</div>
+                    <div>
+                        <h1 class="text-lg font-bold text-rouge-brique">dailyMenu</h1>
+                        <p class="text-sm text-rouge-doux">Tableau de bord</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4">
+                <ul class="space-y-2">
+                    <li class="nav-item active p-3 rounded-lg" data-section="overview">
+                        <div class="flex items-center space-x-3"><span>📊</span><span>Vue d'ensemble</span></div>
+                    </li>
+                    <li class="nav-item p-3 rounded-lg" data-section="profile">
+                        <div class="flex items-center space-x-3"><span>🏪</span><span>Profil Établissement</span></div>
+                    </li>
+                    <li class="nav-item p-3 rounded-lg" data-section="items">
+                        <div class="flex items-center space-x-3"><span>🍕</span><span>Gestion des Items</span></div>
+                    </li>
+                    <li class="nav-item p-3 rounded-lg" data-section="menus">
+                        <div class="flex items-center space-x-3"><span>📋</span><span>Gestion des Menus</span></div>
+                    </li>
+                    <li class="nav-item p-3 rounded-lg" data-section="qr-codes">
+                        <div class="flex items-center space-x-3"><span>📱</span><span>QR Codes</span></div>
+                    </li>
+                    <li class="nav-item p-3 rounded-lg" data-section="reviews">
+                        <div class="flex items-center space-x-3"><span>⭐</span><span>Avis Clients</span></div>
+                    </li>
+                    <li class="nav-item p-3 rounded-lg" data-section="stats">
+                        <div class="flex items-center space-x-3"><span>📈</span><span>Statistiques</span></div>
+                    </li>
+                    <li class="nav-item p-3 rounded-lg" onclick="logout()">
+                        <div class="flex items-center space-x-3"><span>🚪</span><span>Déconnexion</span></div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Contenu principal -->
+        <main class="ml-64 flex-1 p-6">
+            <!-- Message Alert -->
+            <div id="message" class="hidden bg-bleu-clair text-rouge-brique p-4 rounded-lg mb-6 text-center"></div>
+
+            <!-- Vue d'ensemble -->
+            <div id="overview-section" class="section fade-in">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-rouge-brique mb-2">Vue d'ensemble</h2>
+                    <p class="text-rouge-doux">Bienvenue sur votre tableau de bord</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="stat-card p-6 rounded-xl card-shadow">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-rouge-doux text-sm font-medium">Items créés</p>
+                                <p id="items-count" class="text-2xl font-bold text-rouge-brique">0</p>
+                            </div>
+                            <div class="text-3xl">🍕</div>
+                        </div>
+                    </div>
+                    <div class="stat-card p-6 rounded-xl card-shadow">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-rouge-doux text-sm font-medium">Menus actifs</p>
+                                <p id="menus-count" class="text-2xl font-bold text-rouge-brique">0</p>
+                            </div>
+                            <div class="text-3xl">📋</div>
+                        </div>
+                    </div>
+                    <div class="stat-card p-6 rounded-xl card-shadow">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-rouge-doux text-sm font-medium">QR scannés</p>
+                                <p id="qr-scans" class="text-2xl font-bold text-rouge-brique">0</p>
+                            </div>
+                            <div class="text-3xl">📱</div>
+                        </div>
+                    </div>
+                    <div class="stat-card p-6 rounded-xl card-shadow">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-rouge-doux text-sm font-medium">Note moyenne</p>
+                                <p id="avg-rating" class="text-2xl font-bold text-rouge-brique">0</p>
+                            </div>
+                            <div class="text-3xl">⭐</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-6 card-shadow">
+                    <h3 class="text-xl font-bold text-rouge-brique mb-4">Actions rapides</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <button class="btn-primary text-white p-4 rounded-lg font-semibold" onclick="showSection('items')">Créer un nouvel item</button>
+                        <button class="btn-primary text-white p-4 rounded-lg font-semibold" onclick="showSection('menus')">Créer un nouveau menu</button>
+                        <button class="btn-primary text-white p-4 rounded-lg font-semibold" onclick="showSection('qr-codes')">Générer QR Code</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profil Établissement -->
+            <div id="profile-section" class="section hidden fade-in">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-rouge-brique mb-2">Profil Établissement</h2>
+                    <p class="text-rouge-doux">Gérez les informations de votre établissement</p>
+                </div>
+                <div class="bg-white rounded-xl p-6 card-shadow">
+                    <form id="profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-rouge-brique font-semibold mb-2">Nom</label>
+                            <input type="text" id="profile-name" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                        </div>
+                        <div>
+                            <label class="block text-rouge-brique font-semibold mb-2">Email</label>
+                            <input type="email" id="profile-email" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                        </div>
+                        <div>
+                            <label class="block text-rouge-brique font-semibold mb-2">Téléphone</label>
+                            <input type="tel" id="profile-phone" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                        </div>
+                        <div>
+                            <label class="block text-rouge-brique font-semibold mb-2">Adresse</label>
+                            <input type="text" id="profile-address" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                        </div>
+                        <div>
+                            <label class="block text-rouge-brique font-semibold mb-2">Latitude</label>
+                            <input type="number" step="any" id="profile-latitude" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                        </div>
+                        <div>
+                            <label class="block text-rouge-brique font-semibold mb-2">Longitude</label>
+                            <input type="number" step="any" id="profile-longitude" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                        </div>
+                        <div class="md:col-span-2">
+                            <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold">Mettre à jour</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Gestion des Items -->
+            <div id="items-section" class="section hidden fade-in">
+                <div class="mb-6 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold text-rouge-brique mb-2">Gestion des Items</h2>
+                        <p class="text-rouge-doux">Créez et gérez vos plats et boissons</p>
+                    </div>
+                    <button class="btn-primary text-white px-6 py-3 rounded-lg font-semibold" onclick="openModal('create-item-modal')">+ Nouvel Item</button>
+                </div>
+                <div class="bg-white rounded-xl p-4 card-shadow mb-6">
+                    <div class="flex flex-wrap gap-4 items-center">
+                        <input type="text" id="item-search" placeholder="Rechercher un item..." class="flex-1 p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                        <select id="item-category-filter" class="p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                            <option value="">Toutes catégories</option>
+                        </select>
+                        <select id="item-day-filter" class="p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                            <option value="">Tous les jours</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="items-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- Gestion des Menus -->
+            <div id="menus-section" class="section hidden fade-in">
+                <div class="mb-6 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold text-rouge-brique mb-2">Gestion des Menus</h2>
+                        <p class="text-rouge-doux">Créez et organisez vos menus</p>
+                    </div>
+                    <button class="btn-primary text-white px-6 py-3 rounded-lg font-semibold" onclick="openModal('create-menu-modal')">+ Nouveau Menu</button>
+                </div>
+                <div id="menus-list" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+            </div>
+
+            <!-- QR Codes -->
+            <div id="qr-codes-section" class="section hidden fade-in">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-rouge-brique mb-2">Gestion des QR Codes</h2>
+                    <p class="text-rouge-doux">Générez et gérez vos QR codes pour les menus</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-xl p-6 card-shadow">
+                        <h3 class="text-xl font-bold text-rouge-brique mb-4">QR Codes Actifs</h3>
+                        <div id="qr-codes-list" class="space-y-4"></div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 card-shadow">
+                        <h3 class="text-xl font-bold text-rouge-brique mb-4">Générer nouveau QR</h3>
+                        <form id="qr-code-form" class="space-y-4">
+                            <div>
+                                <label class="block text-rouge-brique font-semibold mb-2">Menu</label>
+                                <select id="qr-menu" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme"></select>
+                            </div>
+                            <div>
+                                <label class="block text-rouge-brique font-semibold mb-2">Nom du QR Code</label>
+                                <input type="text" id="qr-name" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme" placeholder="Ex: Table 5">
+                            </div>
+                            <button type="submit" class="w-full btn-primary text-white p-3 rounded-lg font-semibold">Générer</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Avis Clients -->
+            <div id="reviews-section" class="section hidden fade-in">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-rouge-brique mb-2">Avis Clients</h2>
+                    <p class="text-rouge-doux">Consultez les retours de vos clients</p>
+                </div>
+                <div class="bg-white rounded-xl p-6 card-shadow mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+                        <div>
+                            <div id="avg-rating-stats" class="text-3xl font-bold text-rouge-brique">0</div>
+                            <div class="text-rouge-doux">Note moyenne</div>
+                        </div>
+                        <div>
+                            <div id="total-reviews" class="text-3xl font-bold text-rouge-brique">0</div>
+                            <div class="text-rouge-doux">Total avis</div>
+                        </div>
+                        <div>
+                            <div id="positive-reviews" class="text-3xl font-bold text-rouge-brique">0</div>
+                            <div class="text-rouge-doux">Avis positifs</div>
+                        </div>
+                        <div>
+                            <div id="improve-reviews" class="text-3xl font-bold text-rouge-brique">0</div>
+                            <div class="text-rouge-doux">À améliorer</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="reviews-list" class="space-y-4"></div>
+            </div>
+
+            <!-- Statistiques -->
+            <div id="stats-section" class="section hidden fade-in">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold text-rouge-brique mb-2">Statistiques</h2>
+                    <p class="text-rouge-doux">Analysez les performances de votre établissement</p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-xl p-6 card-shadow">
+                        <h3 class="text-xl font-bold text-rouge-brique mb-4">Scans QR par jour</h3>
+                        <div id="qr-scans-chart" class="h-64 bg-jaune-creme rounded-lg flex items-center justify-center">
+                            <span class="text-rouge-doux">Graphique à implémenter</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-6 card-shadow">
+                        <h3 class="text-xl font-bold text-rouge-brique mb-4">Items les plus consultés</h3>
+                        <div id="popular-items" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+<div id="create-item-modal" class="modal hidden fixed inset-0 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-full max-w-2xl card-shadow max-h-screen overflow-y-auto">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-rouge-brique">Créer un Item</h3>
+            <button onclick="closeModal('create-item-modal')" class="text-rouge-doux text-2xl">&times;</button>
+        </div>
+          <form id="create-item-form" class="space-y-4">
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Nom</label>
+                    <input type="text" id="item-name" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme" required>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Description</label>
+                    <textarea id="item-description" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme h-24"></textarea>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Prix (FCFA)</label>
+                    <input type="number" step="0.01" id="item-price" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme" required>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Temps de préparation (min)</label>
+                    <input type="number" id="item-prep-time" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme" required>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Disponibilité</label>
+                    <select id="item-availability" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                        <option value="true">Oui</option>
+                        <option value="false">Non</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Catégories</label>
+                    <select id="item-categories" multiple class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme"></select>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Tags</label>
+                    <select id="item-tags" multiple class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme"></select>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Jours de disponibilité</label>
+                    <select id="item-days" multiple class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme"></select>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Ingrédients</label>
+                    <div id="item-ingredients" class="sortable-list bg-rose-pale p-4 rounded-lg"></div>
+                    <select id="ingredient-select" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme mt-2"></select>
+                    <input type="text" id="ingredient-quantity" placeholder="Quantité (ex: 100g)" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme mt-2">
+                    <button type="button" onclick="addIngredient()" class="btn-primary text-white px-4 py-2 rounded-lg mt-2">Ajouter Ingrédient</button>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Images</label>
+                    <div class="drag-drop-area p-6 rounded-lg text-center" ondragover="event.preventDefault(); this.classList.add('dragover');" ondragleave="this.classList.remove('dragover');" ondrop="handleDrop(event)">
+                        <p>Glissez-déposez vos images ici ou cliquez pour sélectionner</p>
+                        <input type="file" id="item-images" accept="image/*" multiple class="hidden" onchange="handleFileSelect(event)">
+                        <button type="button" onclick="document.getElementById('item-images').click()" class="btn-primary text-white px-4 py-2 rounded-lg mt-2">Choisir</button>
+                    </div>
+                    <div id="image-preview" class="grid grid-cols-3 gap-2 mt-4"></div>
+                </div>
+                <button type="submit" class="w-full btn-primary text-white p-3 rounded-lg font-semibold">Créer</button>
+            </form>
+    </div>
+</div>
+   
+    <!-- Modal Création Menu -->
+    <div id="create-menu-modal" class="modal hidden fixed inset-0 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-6 w-full max-w-2xl card-shadow">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-rouge-brique">Créer un Menu</h3>
+                <button onclick="closeModal('create-menu-modal')" class="text-rouge-doux text-2xl">&times;</button>
+            </div>
+            <div class="max-h-[80vh] overflow-y-auto pr-3">
+            <form id="create-menu-form" class="space-y-4">
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Nom</label>
+                    <input type="text" id="menu-name" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme" required>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Description</label>
+                    <textarea id="menu-description" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme h-24"></textarea>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Items</label>
+                    <div id="menu-items" class="sortable-list bg-rose-pale p-4 rounded-lg"></div>
+                    <select id="item-select" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme mt-2"></select>
+                    <button type="button" onclick="addMenuItem()" class="btn-primary text-white px-4 py-2 rounded-lg mt-2">Ajouter Item</button>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Prévisualisation</label>
+                    <div id="menu-preview" class="bg-white p-4 rounded-lg border-2 border-rose-pale"></div>
+                </div>
+                <button type="submit" class="w-full btn-primary text-white p-3 rounded-lg font-semibold">Créer</button>
+            </form>
+        </div>
+        </div>
+    </div>
+
+    <script>
+        
+const frontendUrls = "http://127.0.0.1:8000/";
+//const frontendUrls = "http://127.0.0.1:8000/";
+let token = localStorage.getItem("token");
+let selectedImages = [];
+let selectedIngredients = [];
+let selectedMenuItems = [];
+
+// Navigation
+document.querySelectorAll(".nav-item").forEach(item => {
+    item.addEventListener("click", () => {
+        if (item.dataset.section) {
+            showSection(item.dataset.section);
+            document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
+            item.classList.add("active");
+        }
+    });
+});
+
+function showSection(sectionId) {
+    document.querySelectorAll(".section").forEach(section => section.classList.add("hidden"));
+    document.getElementById(`${sectionId}-section`).classList.remove("hidden");
+    if (token) {
+        if (sectionId === "overview") loadOverview();
+        if (sectionId === "profile") loadProfile();
+        if (sectionId === "items") loadItems();
+        if (sectionId === "menus") loadMenus();
+        if (sectionId === "qr-codes") loadQRCodes();
+        if (sectionId === "reviews") loadReviews();
+        if (sectionId === "stats") loadStats();
+    } else {
+        window.location.href = frontendUrls + "start/";
+    }
+}
+
+function showMessage(message, isError = false) {
+    const msgDiv = document.getElementById("message");
+    msgDiv.textContent = message;
+    msgDiv.classList.remove("bg-bleu-clair", "bg-red-500");
+    msgDiv.classList.add(isError ? "bg-red-500" : "bg-bleu-clair");
+    msgDiv.classList.remove("hidden");
+    setTimeout(() => msgDiv.classList.add("hidden"), 5000);
+}
+
+function logout() {
+    localStorage.removeItem("token");
+    token = null;
+    window.location.href = frontendUrls + "start/";
+}
+
+// Modals
+function openModal(modalId) {
+    document.getElementById(modalId).classList.remove("hidden");
+    if (modalId === "create-item-modal") loadItemModalData();
+    if (modalId === "create-menu-modal") loadMenuModalData();
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).classList.add("hidden");
+    if (modalId === "create-item-modal") {
+        selectedImages = [];
+
+        document.getElementById("image-preview").innerHTML = "";
+        document.getElementById("item-ingredients").innerHTML = "";
+    }
+    if (modalId === "create-menu-modal") {
+        selectedMenuItems = [];
+        document.getElementById("menu-items").innerHTML = "";
+        document.getElementById("menu-preview").innerHTML = "";
+    }
+}
+
+// Drag and Drop
+function handleDrop(event) {
+    event.preventDefault();
+    event.currentTarget.classList.remove("dragover");
+    const files = event.dataTransfer.files;
+    handleFiles(files);
+}
+
+function handleFileSelect(event) {
+    handleFiles(event.target.files);
+}
+
+function handleFiles(files) {
+    for (let file of files) {
+        if (file.type.startsWith("image/")) {
+            selectedImages.push(file);
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = document.createElement("img");
+                img.src = e.target.result;
+                img.className = "w-full h-24 object-cover rounded";
+                document.getElementById("image-preview").appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+}
+
+// Ingredients
+async function loadItemModalData() {
+    try {
+        const [categories, tags, days, ingredients] = await Promise.all([
+            fetch(frontendUrls + "api/categories", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
+            fetch(frontendUrls + "api/tags", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
+            fetch(frontendUrls + "api/jours").then(r => r.json()),
+            fetch(frontendUrls + "api/ingredients").then(r => r.json())
+        ]);
+        const catSelect = document.getElementById("item-categories");
+        catSelect.innerHTML = categories.map(c => `<option value="${c.id_category}">${c.name}</option>`).join("");
+        const tagSelect = document.getElementById("item-tags");
+        tagSelect.innerHTML = tags.map(t => `<option value="${t.id_tag}">${t.name}</option>`).join("");
+        const daySelect = document.getElementById("item-days");
+        daySelect.innerHTML = days.map(d => `<option value="${d.id_jour}">${d.nom}</option>`).join("");
+        const ingSelect = document.getElementById("ingredient-select");
+        ingSelect.innerHTML = ingredients.map(i => `<option value="${i.id_ingredient}">${i.nom_ingredient}</option>`).join("");
+    } catch (error) {
+        showMessage("Erreur lors du chargement des données", true);
+    }
+}
+
+function addItemIngredient() {
+    const select = document.getElementById("ingredient-select");
+    const quantity = document.getElementById("ingredient-quantity").value;
+    if (select.value && quantity) {
+        selectedIngredients.push({ id: select.value, quantity });
+        const div = document.createElement("div");
+        div.className = "sortable-item flex justify-between items-center p-2 bg-jaune-creme rounded mb-2";
+        div.innerHTML = `<span>${select.options[select.selectedIndex].text} - ${quantity}</span><button type="button" onclick="this.parentElement.remove(); selectedIngredients = selectedIngredients.filter(i => i.id !== '${select.value}')" class="text-red-500">X</button>`;
+        document.getElementById("item-ingredients").appendChild(div);
+        document.getElementById("ingredient-quantity").value = "";
+    }
+}
+
+// Menu Items
+async function loadMenuModalData() {
+    try {
+        const items = await fetch(frontendUrls + "api/items", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
+        const select = document.getElementById("item-select");
+        select.innerHTML = items.map(i => `<option value="${i.id_item}">${i.nom_plat}</option>`).join("");
+    } catch (error) {
+        showMessage("Erreur lors du chargement des items", true);
+    }
+}
+
+function addMenuItem() {
+    const select = document.getElementById("item-select");
+    if (select.value) {
+        selectedMenuItems.push(select.value);
+        const div = document.createElement("div");
+        div.className = "sortable-item flex justify-between items-center p-2 bg-jaune-creme rounded mb-2";
+        div.innerHTML = `<span>${select.options[select.selectedIndex].text}</span><button type="button" onclick="this.parentElement.remove(); selectedMenuItems = selectedMenuItems.filter(i => i !== '${select.value}')" class="text-red-500">X</button>`;
+        document.getElementById("menu-items").appendChild(div);
+        updateMenuPreview();
+    }
+}
+
+function updateMenuPreview() {
+    const preview = document.getElementById("menu-preview");
+    preview.innerHTML = selectedMenuItems.map(id => {
+        const item = document.getElementById("item-select").querySelector(`option[value="${id}"]`);
+        return `<div class="p-2">${item ? item.text : "Item"}</div>`;
+    }).join("");
+}
+
+// Sortable Lists
+function makeSortable(id) {
+    const list = document.getElementById(id);
+    list.addEventListener("dragstart", e => {
+        e.target.classList.add("dragging");
+        e.dataTransfer.setData("text/plain", e.target.dataset.id);
+    });
+    list.addEventListener("dragend", e => e.target.classList.remove("dragging"));
+    list.addEventListener("dragover", e => e.preventDefault());
+    list.addEventListener("drop", e => {
+        e.preventDefault();
+        const draggedId = e.dataTransfer.getData("text/plain");
+        const dragged = list.querySelector(`[data-id="${draggedId}"]`);
+        const target = e.target.closest(".sortable-item");
+        if (target && dragged !== target) {
+            const allItems = Array.from(list.querySelectorAll(".sortable-item"));
+            const fromIndex = allItems.indexOf(dragged);
+            const toIndex = allItems.indexOf(target);
+            if (id === "item-ingredients") {
+                selectedIngredients.splice(toIndex, 0, selectedIngredients.splice(fromIndex, 1)[0]);
+            } else if (id === "menu-items") {
+                selectedMenuItems.splice(toIndex, 0, selectedMenuItems.splice(fromIndex, 1)[0]);
+            }
+            list.insertBefore(dragged, toIndex > fromIndex ? target.nextSibling : target);
+        }
+    });
+}
+
+// Overview
+async function loadOverview() {
+    try {
+        const [items, menus, qrCodes, reviews] = await Promise.all([
+            fetch(frontendUrls + "api/items", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
+            fetch(frontendUrls + "api/menus", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
+            fetch(frontendUrls + "api/qrcodes", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
+            fetch(frontendUrls + "api/avis", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json())
+        ]);
+        document.getElementById("items-count").textContent = items.length;
+        document.getElementById("menus-count").textContent = menus.length;
+        document.getElementById("qr-scans").textContent = qrCodes.reduce((sum, qr) => sum + qr.scans, 0);
+        document.getElementById("avg-rating").textContent = reviews.length ? (reviews.reduce((sum, r) => sum + r.note, 0) / reviews.length).toFixed(1) : "0";
+    } catch (error) {
+        showMessage("Erreur lors du chargement des données", true);
+    }
+}
+
+// Profile
+async function loadProfile() {
+    try {
+        const profile = await fetch(frontendUrls + "api/etablissement/me", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
+        document.getElementById("profile-name").value = profile.nom_etablissement;
+        document.getElementById("profile-email").value = profile.email_pro;
+        document.getElementById("profile-phone").value = profile.numtel;
+        document.getElementById("profile-address").value = profile.adresse_physique;
+        document.getElementById("profile-latitude").value = profile.latitude;
+        document.getElementById("profile-longitude").value = profile.longitude;
+    } catch (error) {
+        showMessage("Erreur lors du chargement du profil", true);
+    }
+}
+
+document.getElementById("profile-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const data = {
+        nom_etablissement: document.getElementById("profile-name").value,
+        email_pro: document.getElementById("profile-email").value,
+        numtel: document.getElementById("profile-phone").value,
+        adresse_physique: document.getElementById("profile-address").value,
+        latitude: parseFloat(document.getElementById("profile-latitude").value),
+        longitude: parseFloat(document.getElementById("profile-longitude").value)
+    };
+    try {
+        const response = await fetch(frontendUrls + "api/etablissement/me", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+            body: JSON.stringify(data)
+        });
+        if (response.ok) {
+            showMessage("Profil mis à jour !");
+        } else {
+            showMessage((await response.json()).error, true);
+        }
+    } catch (error) {
+        showMessage("Erreur serveur", true);
+    }
+});
+
+// Items
+async function loadItems() {
+    try {
+        const [items, categories, days] = await Promise.all([
+            fetch(frontendUrls + "api/items", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
+            fetch(frontendUrls + "api/categories", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
+            fetch(frontendUrls + "api/jours").then(r => r.json())
+        ]);
+        const list = document.getElementById("items-list");
+        list.innerHTML = items.map(item => `
+            <div class="menu-item p-4 rounded-lg card-shadow">
+                <div class="h-40 bg-rose-pale rounded-lg mb-4 flex items-center justify-center">
+                    ${item.images.length ? `<img src="${item.images[0].url_image}" class="w-full h-full object-cover rounded-lg">` : `<span class="text-4xl">🍕</span>`}
+                </div>
+                <h3 class="font-bold text-rouge-brique mb-2">${item.nom_plat}</h3>
+                <p class="text-rouge-doux text-sm mb-2">${item.description || "Sans description"}</p>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="font-bold text-rouge-brique">${item.price} FCFA</span>
+                    <span class="text-sm text-rouge-doux">⏱️ ${item.prep_time} min</span>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="bg-rouge-doux text-white px-3 py-1 rounded text-sm" onclick="editItem('${item.id_item}')">Modifier</button>
+                    <button class="bg-rose-pale text-rouge-brique px-3 py-1 rounded text-sm" onclick="duplicateItem('${item.id_item}')">Dupliquer</button>
+                    <button class="bg-red-500 text-white px-3 py-1 rounded text-sm" onclick="deleteItem('${item.id_item}')">Supprimer</button>
+                </div>
+            </div>
+        `).join("");
+        const catFilter = document.getElementById("item-category-filter");
+        catFilter.innerHTML = `<option value="">Toutes catégories</option>` + categories.map(c => `<option value="${c.id_category}">${c.name}</option>`).join("");
+        const dayFilter = document.getElementById("item-day-filter");
+        dayFilter.innerHTML = `<option value="">Tous les jours</option>` + days.map(d => `<option value="${d.id_jour}">${d.nom}</option>`).join("");
+    } catch (error) {
+        showMessage("Erreur lors du chargement des items", true);
+    }
+}
+document.getElementById("create-item-form").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const formData = new FormData();
+
+    // Ajout des champs de base
+    formData.append("nom_plat", document.getElementById("item-name").value);
+    formData.append("description", document.getElementById("item-description").value);
+    formData.append("price", document.getElementById("item-price").value);
+    formData.append("prep_time", document.getElementById("item-prep-time").value);
+    formData.append("disponibilite", document.getElementById("item-availability").value === "true");
+
+    // Ajouter les catégories sélectionnées
+    Array.from(document.getElementById("item-categories").selectedOptions).forEach(o => {
+        formData.append("category_ids", o.value);  // Ajouter chaque catégorie
+    });
+
+    // Ajouter les tags sélectionnés
+    Array.from(document.getElementById("item-tags").selectedOptions).forEach(o => {
+        formData.append("tag_ids", o.value);  // Ajouter chaque tag
+    });
+
+    // Ajouter les jours de disponibilité sélectionnés
+    Array.from(document.getElementById("item-days").selectedOptions).forEach(o => {
+        formData.append("jour_ids", o.value);  // Ajouter chaque jour
+    });
+
+ const uniqueIngredients = [];
+const added = new Set();
+selectedIngredients.forEach(i => {
+    if (!added.has(i.id)) {
+        added.add(i.id);
+        uniqueIngredients.push(i);
+    }
+});
+uniqueIngredients.forEach(i => {
+    formData.append("ingredient_ids", i.id);
+    formData.append("quantites", i.quantity);
+});
+    // Ajouter les images sélectionnées
+    selectedImages.forEach(img => {
+        formData.append("image_files", img);
+    });
+
+    // Afficher ce qui est dans le formData (facultatif pour débogage)
+    for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
+
+    try {
+        const response = await fetch(frontendUrls + "api/items", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: formData
+        });
+
+        if (response.ok) {
+            showMessage("Item créé avec succès !");
+            closeModal("create-item-modal");
+            showSection("items")
+        } else {
+            const errorData = await response.json();
+            showMessage(errorData.error || "Erreur lors de la création", true);
+        }
+
+    } catch (err) {
+        showMessage("Erreur serveur", true);
+    }
+});
+
+
+async function editItem(id) {
+    showMessage("Modification non implémentée", true);
+}
+
+async function duplicateItem(id) {
+    try {
+        const item = await fetch(frontendUrls + `api/items/${id}`, { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
+        const formData = new FormData();
+        formData.append("json", JSON.stringify({
+            nom_plat: `${item.nom_plat} (Copie)`,
+            description: item.description,
+            price: item.price,
+            prep_time: item.prep_time,
+            disponibilite: item.disponibilite,
+            category_ids: item.categories.map(c => c.id_category),
+            tag_ids: item.tags.map(t => t.id_tag),
+            jour_ids: item.jours_disponibilite.map(j => j.id_jour),
+            ingredient_ids: item.ingredients.map(i => i.id_ingredient),
+            quantites: item.ingredients.map((_, idx) => "N/A")
+        }));
+        const response = await fetch(frontendUrls + "api/items", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}` },
+            body: formData
+        });
+        if (response.ok) {
+            showMessage("Item dupliqué !");
+            loadItems();
+        } else {
+            showMessage((await response.json()).error, true);
+        }
+    } catch (error) {
+        showMessage("Erreur serveur", true);
+    }
+}
+
+async function deleteItem(id) {
+    if (!confirm("Supprimer cet item ?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(frontendUrls + `api/items/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem("token") // ou ton système d'auth
+            }
+        });
+
+        if (response.ok) {
+            showMessage("Item supprimé avec succès");
+            // Optionnel : actualiser la liste
+            showSection("items")
+        } else {
+            const data = await response.json();
+            showMessage("Erreur : " + (data.error || "suppression échouée"), true);
+        }
+    } catch (error) {
+        console.error("Erreur réseau :", error);
+        showMessage("Erreur réseau pendant la suppression", true);
+    }
+}
+
+
+
+function addIngredient() {
+    const select = document.getElementById("ingredient-select");
+    const quantity = document.getElementById("ingredient-quantity").value;
+
+    const selectedOption = select.options[select.selectedIndex];
+    const ingredientId = selectedOption.value;
+    const ingredientName = selectedOption.text;
+
+    if (!ingredientId || !quantity) {
+        alert("Veuillez sélectionner un ingrédient et entrer une quantité.");
+        return;
+    }
+
+    // Ajouter dans la liste globale
+    selectedIngredients.push({
+        id: parseInt(ingredientId),
+        name: ingredientName,
+        quantity: quantity
+    });
+
+
+    // Mettre à jour l'affichage
+    const container = document.getElementById("item-ingredients");
+    const div = document.createElement("div");
+    div.className = "flex justify-between items-center bg-white p-2 rounded shadow mb-2";
+    div.innerHTML = `
+        <span>${ingredientName} - ${quantity}</span>
+        <button onclick="removeIngredient(${ingredientId}, this)" class="text-red-500 font-bold">×</button>
+    `;
+    container.appendChild(div);
+
+    // Reset des champs
+    select.selectedIndex = 0;
+    document.getElementById("ingredient-quantity").value = "";
+}
+
+function removeIngredient(id, button) {
+    const index = selectedIngredients.findIndex(i => i.id === id);
+    if (index !== -1) {
+        selectedIngredients.splice(index, 1);
+        button.parentElement.remove();
+    }
+}
+
+// Menus
+async function loadMenus() {
+    try {
+        const menus = await fetch(frontendUrls + "api/menus", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
+        const list = document.getElementById("menus-list");
+        list.innerHTML = menus.map(menu => `
+            <div class="bg-white rounded-xl p-6 card-shadow">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-rouge-brique">${menu.nom}</h3>
+                    <div class="flex space-x-2">
+                        <button class="bg-rouge-doux text-white px-3 py-2 rounded text-sm" onclick="editMenu('${menu.id_menu}')">Modifier</button>
+                        <button class="bg-rose-pale text-rouge-brique px-3 py-2 rounded text-sm" onclick="generateQR('${menu.id_menu}')">Générer QR</button>
+                        <button class="bg-rose-pale text-rouge-brique px-3 py-2 rounded text-sm" onclick="exportPDF('${menu.id_menu}')">Exporter PDF</button>
+                        <button class="bg-rose-pale text-rouge-brique px-3 py-2 rounded text-sm" onclick="shareMenu('${menu.id_menu}')">Partager</button>
+                    </div>
+                </div>
+                <p class="text-rouge-doux mb-4">${menu.items.length} items • Créé le ${new Date().toLocaleDateString()}</p>
+                <div class="space-y-2">
+                    ${menu.items.map(item => `<div class="flex justify-between"><span>${item.nom_plat}</span><span class="text-rouge-doux">${item.price} FCFA</span></div>`).join("")}
+                </div>
+            </div>
+        `).join("");
+    } catch (error) {
+        showMessage("Erreur lors du chargement des menus", true);
+    }
+}
+
+document.getElementById("create-menu-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const data = {
+        nom: document.getElementById("menu-name").value,
+        description: document.getElementById("menu-description").value,
+        item_ids: selectedMenuItems
+    };
+    try {
+        const response = await fetch(frontendUrls + "api/menus", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+            body: JSON.stringify(data)
+        });
+        if (response.ok) {
+            showMessage("Menu créé !");
+            closeModal("create-menu-modal");
+            loadMenus();
+        } else {
+            showMessage((await response.json()).error, true);
+        }
+    } catch (error) {
+        showMessage("Erreur serveur", true);
+    }
+});
+
+async function editMenu(id) {
+    showMessage("Modification non implémentée", true);
+}
+
+async function generateQR(menuId) {
+    try {
+        const response = await fetch(frontendUrls + "api/qrcodes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+            body: JSON.stringify({ menu_id: menuId })
+        });
+        
+        if (response.ok) {
+            showMessage("QR Code généré !");
+            loadQRCodes();
+        } else {
+            showMessage((await response.json()).error, true);
+        }
+    } catch (error) {
+        showMessage("Erreur", true);
+    }
+}
+
+async function exportPDF(menuId) {
+    try {
+        const response = await fetch(frontendUrls + `api/menus/${menuId}/export-pdf`, {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `menu_${menuId}.pdf`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            showMessage("PDF exporté !");
+        } else {
+            showMessage((await response.json()).error, true);
+        }
+    } catch (error) {
+        showMessage("Erreur lors de l'exportation", true);
+    }
+}
+
+async function shareMenu(menuId) {
+    const url = frontendUrls + `menus/${menuId}`;
+    navigator.clipboard.writeText(url);
+    showMessage("Lien copié ! Partagez-le sur les réseaux sociaux.");
+}
+
+// QR Codes
+async function loadQRCodes() {
+    try {
+        const qrCodes = await fetch(frontendUrls + "api/qrcodes", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
+        const list = document.getElementById("qr-codes-list");
+         
+        list.innerHTML = qrCodes.map(q => `
+            <div class="flex items-center justify-between p-4 bg-jaune-creme rounded-lg">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 bg-white rounded-lg flex-center border-2 border-rouge-doux">
+                        <img src="${q.url}" alt="QR Code" class="w-full h-full">
+
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-rouge-brique">${q.menu_id}</h4>
+                        <p class="text-rouge-doux text-sm">${q.scans} scans</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="bg-rouge-doux text-white px-3 py-2 rounded text-sm" onclick="downloadQR('${q.id_qrcode}')">Télécharger</button>
+                    <button class="bg-rose-pale text-rouge-brique px-3 py-2 rounded text-sm" onclick="shareQR('${q.url}')">Partager</button>
+                </div>
+            </div>
+        `).join("");
+        const menuSelect = document.getElementById("qr-menu");
+        const menus = await fetch(frontendUrls + "api/menus", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
+        menuSelect.innerHTML = menus.map(m => `<option value="${m.id_menu}">${m.nom}</option>`).join("");
+    } catch (error) {
+        showMessage("Erreur lors du chargement des QR codes", true);
+    }
+}
+
+document.getElementById("qr-code-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    const data = {
+        menu_id: document.getElementById("qr-menu").value
+    };
+    try {
+        const response = await fetch(frontendUrls + "api/qrcodes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+            body: JSON.stringify(data)
+        });
+        if (response.ok) {
+            showMessage("QR Code généré !");
+            loadQRCodes();
+        } else {
+            showMessage((await response.json()).error, true);
+        }
+    } catch (error) {
+        showMessage("Erreur", true);
+    }
+});
+
+async function downloadQR(id) {
+    const qr = await fetch(frontendUrls + `api/qrcodes/${id}`, { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
+    const a = document.createElement("a");
+    a.href = qr.url;
+    a.download = `qr-${id}.png`;
+    a.click();
+}
+
+async function shareQR(url) {
+    navigator.clipboard.writeText(url);
+    showMessage("URL du QR Code copié !");
+}
+
+// Avis
+async function loadReviews() {
+    try {
+        const reviews = await fetch(frontendUrls + "api/avis", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
+        const list = document.getElementById("reviews-list");
+        list.innerHTML = reviews.map(r => `
+            <div class="bg-white rounded-xl p-6 card-shadow">
+                <div class="flex items-start justify-between mb-3">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-rouge-doux rounded-full flex items-center justify-center text-white font-bold">
+                            ${r.id_personne.toString().charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-rouge-brique">Personne #${r.id_personne}</h4>
+                            <div class="flex text-yellow-400">${"★".repeat(r.note)}${"☆".repeat(5-r.note)}</div>
+                        </div>
+                    </div>
+                    <span class="text-rouge-doux text-sm">${r.date_avis}</span>
+                </div>
+                <p class="text-gray-700">Note : ${r.note}/5</p>
+            </div>
+        `).join("");
+        document.getElementById("avg-rating-stats").textContent = reviews.length ? (reviews.reduce((a, r) => a + r.note, 0) / reviews.length).toFixed(1) : "0";
+        document.getElementById("total-reviews").textContent = reviews.length;
+        document.getElementById("positive-reviews").textContent = reviews.filter(r => r.note >= 4).length;
+        document.getElementById("improve-reviews").textContent = reviews.filter(r => r.note < 4).length;
+    } catch (error) {
+        showMessage("Erreur lors du chargement des avis", true);
+    }
+}
+
+// Stats
+async function loadStats() {
+    try {
+        const items = await fetch(frontendUrls + "api/items", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
+        const popular = items.sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
+        const popularList = document.getElementById("popular-items");
+        popularList.innerHTML = popular.map(item => `
+            <div class="flex justify-between items-center p-3 rounded-lg bg-jaune-creme">
+                <span>${item.nom_plat}</span>
+                <span class="font-bold text-rouge-brique">${item.views || 0} vues</span>
+            </div>
+        `).join("");
+    } catch (error) {
+        showMessage("Erreur lors du chargement des statistiques", true);
+    }
+}
+
+// Initialisation
+makeSortable("item-ingredients");
+makeSortable("menu-items");
+if (token) {
+    showSection("overview");
+} else {
+    window.location.href = frontendUrls + "start/";
+}
+    </script>
+</body>
+</html>

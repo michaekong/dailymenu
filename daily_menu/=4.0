@@ -1,0 +1,10 @@
+Collecting reportlab
+  Downloading reportlab-4.4.1-py3-none-any.whl.metadata (1.8 kB)
+Requirement already satisfied: pillow>=9.0.0 in /home/michael/dailyMenu/env/lib/python3.12/site-packages (from reportlab) (11.2.1)
+Collecting chardet (from reportlab)
+  Using cached chardet-5.2.0-py3-none-any.whl.metadata (3.4 kB)
+Downloading reportlab-4.4.1-py3-none-any.whl (2.0 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 1.1 MB/s eta 0:00:00
+Using cached chardet-5.2.0-py3-none-any.whl (199 kB)
+Installing collected packages: chardet, reportlab
+Successfully installed chardet-5.2.0 reportlab-4.4.1

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentification - Plateforme de Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --rouge-brique: #8B2323;
+            --rouge-doux: #A24E4E;
+            --rose-pale: #E7D3D3;
+            --jaune-creme: #FFF1CF;
+            --bleu-clair: #CCE5FF;
+        }
+        
+        .bg-rouge-brique { background-color: var(--rouge-brique); }
+        .bg-rouge-doux { background-color: var(--rouge-doux); }
+        .bg-rose-pale { background-color: var(--rose-pale); }
+        .bg-jaune-creme { background-color: var(--jaune-creme); }
+        .bg-bleu-clair { background-color: var(--bleu-clair); }
+        
+        .text-rouge-brique { color: var(--rouge-brique); }
+        .text-rouge-doux { color: var(--rouge-doux); }
+        
+        .border-rouge-doux { border-color: var(--rouge-doux); }
+        .border-rouge-brique { border-color: var(--rouge-brique); }
+        
+        .hover-rouge-brique:hover { background-color: var(--rouge-brique); }
+        .hover-rouge-doux:hover { background-color: var(--rouge-doux); }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--jaune-creme) 0%, var(--rose-pale) 50%, var(--bleu-clair) 100%);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 20px 25px -5px rgba(139, 35, 35, 0.1), 0 10px 10px -5px rgba(139, 35, 35, 0.04);
+        }
+        
+        .input-focus:focus {
+            border-color: var(--rouge-doux);
+            box-shadow: 0 0 0 3px rgba(162, 78, 78, 0.1);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--rouge-brique), var(--rouge-doux));
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(139, 35, 35, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: var(--rose-pale);
+            color: var(--rouge-brique);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--rouge-doux);
+            color: white;
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .restaurant-icon {
+            background: linear-gradient(45deg, var(--rouge-brique), var(--rouge-doux));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        } 
+        /* Votre style existant ici... */
+        .map {
+            height: 300px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-width=5px;
+            border-color= #8B2323;
+        }
+  
+    </style>
+</head>
+<body class="gradient-bg font-sans flex items-center justify-center min-h-screen p-4">
+    <div class="container mx-auto max-w-md">
+        <!-- Header avec logo/icône -->
+        <div class="text-center mb-8 animate-fade-in">
+            <div class="text-6xl mb-4 restaurant-icon">🍽️</div>
+            <h1 class="text-3xl font-bold text-rouge-brique mb-2">Plateforme de Menu</h1>
+            <p class="text-rouge-doux">Gestion dynamique pour votre établissement</p>
+        </div>
+
+        <!-- Toggle entre Connexion et Inscription -->
+        <div class="flex bg-white rounded-full p-1 mb-6 card-shadow animate-fade-in">
+            <button id="show-login" class="btn-primary flex-1 px-6 py-3 rounded-full text-white font-semibold transition-all">
+                Connexion
+            </button>
+            <button id="show-register" class="btn-secondary flex-1 px-6 py-3 rounded-full font-semibold transition-all">
+                Inscription
+            </button>
+        </div>
+
+        <!-- Formulaire de Connexion -->
+        <div id="login-form" class="bg-white p-8 rounded-3xl card-shadow animate-fade-in">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-rouge-brique mb-2">Connexion Établissement</h2>
+                <p class="text-rouge-doux text-sm">Accédez à votre tableau de bord</p>
+            </div>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Email Professionnel</label>
+                    <input id="login-email" type="email" 
+                           class="w-full p-4 border-2 border-rose-pale rounded-xl input-focus transition-all bg-jaune-creme focus:bg-white" 
+                           placeholder="votre@email.com" required>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Mot de passe</label>
+                    <input id="login-password" type="password" 
+                           class="w-full p-4 border-2 border-rose-pale rounded-xl input-focus transition-all bg-jaune-creme focus:bg-white" 
+                           placeholder="••••••••" required>
+                </div>
+                <button id="login-btn" class="w-full btn-primary text-white p-4 rounded-xl font-semibold text-lg">
+                    Se connecter
+                </button>
+                <p id="login-error" class="text-rouge-brique text-center font-semibold hidden"></p>
+            </div>
+        </div>
+
+        <!-- Formulaire d'Inscription -->
+        <div id="register-form" class="bg-white p-8 rounded-3xl card-shadow animate-fade-in hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-rouge-brique mb-2">Inscription Établissement</h2>
+                <p class="text-rouge-doux text-sm">Créez votre compte professionnel</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Nom Établissement</label>
+                    <input id="etablissement-nom" type="text" 
+                           class="w-full p-3 border-2 border-rose-pale rounded-xl input-focus transition-all bg-jaune-creme focus:bg-white" 
+                           placeholder="Restaurant Le Gourmet" required>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Email Professionnel</label>
+                    <input id="etablissement-email" type="email" 
+                           class="w-full p-3 border-2 border-rose-pale rounded-xl input-focus transition-all bg-jaune-creme focus:bg-white" 
+                           placeholder="contact@restaurant.com" required>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Mot de passe</label>
+                    <input id="etablissement-password" type="password" 
+                           class="w-full p-3 border-2 border-rose-pale rounded-xl input-focus transition-all bg-jaune-creme focus:bg-white" 
+                           placeholder="••••••••" required>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Numéro de téléphone</label>
+                    <input id="etablissement-numtel" type="text" 
+                           class="w-full p-3 border-2 border-rose-pale rounded-xl input-focus transition-all bg-jaune-creme focus:bg-white" 
+                           placeholder="+237 6XX XXX XXX" required>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Adresse Physique</label>
+                    <input id="etablissement-adresse" type="text" 
+                           class="w-full p-3 border-2 border-rose-pale rounded-xl input-focus transition-all bg-jaune-creme focus:bg-white" 
+                           placeholder="123 Rue de la Paix, Yaoundé" required>
+                </div>
+                 <div>
+                    <label class="block text-rouge-brique font-semibold mb-2">Sélectionnez votre position</label>
+                    <div id="map" class="map"></div>
+               
+                <button id="register-btn" class="w-full btn-primary text-white p-4 rounded-xl font-semibold text-lg mt-6">
+                    S'inscrire
+                </button>
+                <p id="register-error" class="text-rouge-brique text-center font-semibold hidden"></p>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center mt-8 text-rouge-doux text-sm">
+            <p>© 2025 Plateforme de Menu Dynamique</p>
+        </div>
+    </div>
+
+    <script>
+        const frontendUrls = "http://127.0.0.1:8000/";
+//const frontendUrls = "http://127.0.0.1:8000/";
+        let lat ;
+           let  lng;
+        const showLogin = document.getElementById('show-login');
+        const showRegister = document.getElementById('show-register');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+
+        showLogin.addEventListener('click', () => {
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+            showLogin.className = 'btn-primary flex-1 px-6 py-3 rounded-full text-white font-semibold transition-all';
+            showRegister.className = 'btn-secondary flex-1 px-6 py-3 rounded-full font-semibold transition-all';
+            
+            // Animation
+            loginForm.classList.add('animate-fade-in');
+            setTimeout(() => loginForm.classList.remove('animate-fade-in'), 500);
+        });
+
+        showRegister.addEventListener('click', () => {
+            registerForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+            showRegister.className = 'btn-primary flex-1 px-6 py-3 rounded-full text-white font-semibold transition-all';
+            showLogin.className = 'btn-secondary flex-1 px-6 py-3 rounded-full font-semibold transition-all';
+            
+            // Animation
+            registerForm.classList.add('animate-fade-in');
+            setTimeout(() => registerForm.classList.remove('animate-fade-in'), 500);
+        });
+
+        document.getElementById('login-btn').addEventListener('click', async () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const error = document.getElementById('login-error');
+            const btn = document.getElementById('login-btn');
+
+            // Animation du bouton
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => btn.style.transform = 'scale(1)', 150);
+
+            try {
+                const response = await fetch(frontendUrls+'/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+                if (data.error) {
+                    error.textContent = data.error;
+                    error.classList.remove('hidden');
+                } else {
+                    // Note: localStorage removed for Claude.ai compatibility
+                    localStorage.setItem("token", data.token);
+                    alert('Connexion réussie ! Redirection vers le tableau de bord...');
+                   window.location.href = frontendUrls+"dashboard/";
+                }
+            } catch (err) {
+                error.textContent = 'Erreur de connexion au serveur';
+                error.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('register-btn').addEventListener('click', async () => {
+            const error = document.getElementById('register-error');
+            const btn = document.getElementById('register-btn');
+            
+            // Animation du bouton
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => btn.style.transform = 'scale(1)', 150);
+
+            const payload = {
+                nom_etablissement: document.getElementById('etablissement-nom').value,
+                email_pro: document.getElementById('etablissement-email').value,
+                password: document.getElementById('etablissement-password').value,
+                numtel: document.getElementById('etablissement-numtel').value,
+                adresse_physique: document.getElementById('etablissement-adresse').value,
+                latitude: lat,
+                longitude: lng
+            };
+
+            if (isNaN(payload.latitude) || isNaN(payload.longitude)) {
+                error.textContent = 'Latitude et longitude doivent être des nombres valides';
+                error.classList.remove('hidden');
+                return;
+            }
+
+            if (payload.latitude < -90 || payload.latitude > 90 || payload.longitude < -180 || payload.longitude > 180) {
+                error.textContent = 'Latitude doit être entre -90 et 90, longitude entre -180 et 180';
+                error.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const response = await fetch(frontendUrls+'api/etablissement/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (data.error) {
+                    error.textContent = data.error;
+                    error.classList.remove('hidden');
+                } else if (data.warning) {
+                    error.textContent = data.warning;
+                    error.classList.remove('hidden');
+                } else {
+                    alert('Inscription réussie ! Veuillez vérifier votre email pour activer le compte.');
+                    registerForm.classList.add('hidden');
+                    loginForm.classList.remove('hidden');
+                    showLogin.click(); // Basculer vers connexion
+                }
+            } catch (err) {
+                error.textContent = 'Erreur de connexion au serveur';
+                error.classList.remove('hidden');
+            }
+        });
+
+        // Animation au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s ease-in-out';
+                document.body.style.opacity = '1';
+            }, 100);
+        });// Initialiser la carte
+        const map = L.map('map').setView([3.848, 11.502], 13); // Position par défaut
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        let marker;
+
+        // Gérer le clic sur la carte
+        map.on('click', function(e) {
+            lat = e.latlng.lat;
+             lng = e.latlng.lng;
+
+          
+
+            // Ajouter ou mettre à jour le marqueur
+            if (marker) {
+                marker.setLatLng(e.latlng);
+            } else {
+                marker = L.marker(e.latlng).addTo(map);
+            }
+        });
+    </script>
+</body>
+</html>
