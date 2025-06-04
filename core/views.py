@@ -5,7 +5,11 @@ from django.shortcuts import render
 
 
 def first(request):
-    return render(request, 'first.html')
+    
+    status = request.GET.get('status')
+    context = {"status": status}
+    return render(request, "first.html", context)
+    
 def dashboard(request):
     return render(request, 'dashboard.html')
 

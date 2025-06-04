@@ -98,12 +98,30 @@
             border-color: #8B2323;
         }
         
-        /* New spinner styles */
+        /* Full-page spinner styles */
+        .page-spinner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            pointer-events: auto;
+            animation: fadeInSpinner 0.3s ease-in-out;
+        }
+        
+        .page-spinner.active {
+            display: flex;
+        }
+        
         .spinner {
             position: relative;
-            width: 28px;
-            height: 28px;
-            display: none;
+            width: 64px;
+            height: 64px;
         }
         
         .spinner .ring {
@@ -112,7 +130,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border: 3px solid transparent;
+            border: 6px solid transparent;
             border-radius: 50%;
             animation: pulse 1.5s ease-in-out infinite;
         }
@@ -148,12 +166,15 @@
             50% { transform: scale(1.1); }
         }
         
-        .btn-primary.loading .spinner {
-            display: block;
+        @keyframes fadeInSpinner {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
-        .btn-primary.loading .btn-text {
-            display: none;
+        /* Disable page interaction when spinner is active */
+        .loading-inactive {
+            pointer-events: none;
+            opacity: 0.7;
         }
         
         /* Tooltip styles */
@@ -191,28 +212,6 @@
             from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
-        .message {
-  padding: 1em;
-  margin: 1em 0;
-  border-radius: 5px;
-  font-weight: bold;
-}
-
-.message.success {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.message.info {
-  background-color: #cce5ff;
-  color: #004085;
-}
-
-.message.error {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
     </style>
 </head>
 <body class="gradient-bg font-sans flex items-center justify-center min-h-screen p-4">
@@ -223,13 +222,7 @@
             <h1 class="text-3xl font-bold text-rouge-brique mb-2">Plateforme de Menu</h1>
             <p class="text-rouge-doux">Gestion dynamique pour votre établissement</p>
         </div>
-      {% if request.GET.status == "success" %}
-    <div class="message success">✅ Adresse e-mail vérifiée avec succès.</div>
-{% elif request.GET.status == "already_verified" %}
-    <div class="message info">ℹ️ Adresse e-mail déjà vérifiée.</div>
-{% elif request.GET.status == "invalid" %}
-    <div class="message error">❌ Lien de vérification invalide.</div>
-{% endif %}
+
         <!-- Toggle entre Connexion et Inscription -->
         <div class="flex bg-white rounded-full p-1 mb-6 card-shadow animate-fade-in">
             <button id="show-login" class="btn-primary flex-1 px-6 py-3 rounded-full text-white font-semibold transition-all">
@@ -261,11 +254,7 @@
                            placeholder="••••••••" required>
                 </div>
                 <button id="login-btn" class="w-full btn-primary text-white p-4 rounded-xl font-semibold text-lg" aria-busy="false">
-                    <span class="btn-text">Se connecter</span>
-                    <div class="spinner">
-                        <div class="ring ring-outer"></div>
-                        <div class="ring ring-inner"></div>
-                    </div>
+                    Se connecter
                 </button>
                 <p id="login-error" class="text-rouge-brique text-center font-semibold hidden"></p>
             </div>
@@ -314,11 +303,7 @@
                     <div id="map" class="map"></div>
                 </div>
                 <button id="register-btn" class="w-full btn-primary text-white p-4 rounded-xl font-semibold text-lg mt-6" aria-busy="false">
-                    <span class="btn-text">S'inscrire</span>
-                    <div class="spinner">
-                        <div class="ring ring-outer"></div>
-                        <div class="ring ring-inner"></div>
-                    </div>
+                    S'inscrire
                 </button>
                 <p id="register-error" class="text-rouge-brique text-center font-semibold hidden"></p>
             </div>
@@ -329,8 +314,15 @@
             <span class="tooltip-text">Vérifiez votre adresse e-mail pour activer votre compte.</span>
             <span class="tooltip-close" aria-label="Fermer l'info-bulle">×</span>
         </div>
-
-
+        
+        <!-- Full-page spinner -->
+        <div id="page-spinner" class="page-spinner">
+            <div class="spinner">
+                <div class="ring ring-outer"></div>
+                <div class="ring ring-inner"></div>
+            </div>
+        </div>
+        
         <!-- Footer -->
         <div class="text-center mt-8 text-rouge-doux text-sm">
             <p>© 2025 Plateforme de Menu Dynamique</p>
@@ -338,8 +330,8 @@
     </div>
 
     <script>
-         const frontendUrls = "https://dailymenu.onrender.com/";
-        //const frontendUrls = "http://127.0.0.1:8000/";
+      const frontendUrls = "https://dailymenu.onrender.com/";
+          // const frontendUrls = "http://127.0.0.1:8000/";
         let lat;
         let lng;
 
@@ -351,6 +343,7 @@
         const registerBtn = document.getElementById('register-btn');
         const emailTooltip = document.getElementById('email-tooltip');
         const tooltipClose = document.querySelector('.tooltip-close');
+        const pageSpinner = document.getElementById('page-spinner');
 
         // Gestion du toggle entre formulaires
         showLogin.addEventListener('click', () => {
@@ -374,10 +367,9 @@
         // Gestion de la connexion
         loginBtn.addEventListener('click', async () => {
             loginBtn.disabled = true;
-            loginBtn.classList.add('loading');
             loginBtn.setAttribute('aria-busy', 'true');
-            loginBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => loginBtn.style.transform = 'scale(1)', 150);
+            document.body.classList.add('loading-inactive');
+            pageSpinner.classList.add('active');
 
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
@@ -391,8 +383,9 @@
                 });
                 const data = await response.json();
                 loginBtn.disabled = false;
-                loginBtn.classList.remove('loading');
                 loginBtn.setAttribute('aria-busy', 'false');
+                document.body.classList.remove('loading-inactive');
+                pageSpinner.classList.remove('active');
                 if (data.error) {
                     error.textContent = data.error;
                     error.classList.remove('hidden');
@@ -403,8 +396,9 @@
                 }
             } catch (err) {
                 loginBtn.disabled = false;
-                loginBtn.classList.remove('loading');
                 loginBtn.setAttribute('aria-busy', 'false');
+                document.body.classList.remove('loading-inactive');
+                pageSpinner.classList.remove('active');
                 error.textContent = 'Erreur de connexion au serveur';
                 error.classList.remove('hidden');
             }
@@ -413,10 +407,9 @@
         // Gestion de l'inscription
         registerBtn.addEventListener('click', async () => {
             registerBtn.disabled = true;
-            registerBtn.classList.add('loading');
             registerBtn.setAttribute('aria-busy', 'true');
-            registerBtn.style.transform = 'scale(0.95)';
-            setTimeout(() => registerBtn.style.transform = 'scale(1)', 150);
+            document.body.classList.add('loading-inactive');
+            pageSpinner.classList.add('active');
 
             const error = document.getElementById('register-error');
             const payload = {
@@ -433,8 +426,9 @@
                 error.textContent = 'Veuillez sélectionner une position sur la carte';
                 error.classList.remove('hidden');
                 registerBtn.disabled = false;
-                registerBtn.classList.remove('loading');
                 registerBtn.setAttribute('aria-busy', 'false');
+                document.body.classList.remove('loading-inactive');
+                pageSpinner.classList.remove('active');
                 return;
             }
 
@@ -442,8 +436,9 @@
                 error.textContent = 'Latitude doit être entre -90 et 90, longitude entre -180 et 180';
                 error.classList.remove('hidden');
                 registerBtn.disabled = false;
-                registerBtn.classList.remove('loading');
                 registerBtn.setAttribute('aria-busy', 'false');
+                document.body.classList.remove('loading-inactive');
+                pageSpinner.classList.remove('active');
                 return;
             }
 
@@ -455,8 +450,9 @@
                 });
                 const data = await response.json();
                 registerBtn.disabled = false;
-                registerBtn.classList.remove('loading');
                 registerBtn.setAttribute('aria-busy', 'false');
+                document.body.classList.remove('loading-inactive');
+                pageSpinner.classList.remove('active');
                 if (data.error) {
                     error.textContent = data.error;
                     error.classList.remove('hidden');
@@ -472,8 +468,9 @@
                 }
             } catch (err) {
                 registerBtn.disabled = false;
-                registerBtn.classList.remove('loading');
                 registerBtn.setAttribute('aria-busy', 'false');
+                document.body.classList.remove('loading-inactive');
+                pageSpinner.classList.remove('active');
                 error.textContent = 'Erreur de connexion au serveur';
                 error.classList.remove('hidden');
             }
@@ -509,29 +506,6 @@
                 document.body.style.opacity = '1';
             }, 100);
         });
-        // Afficher le message de vérification à partir du paramètre ?status=
-const urlParams = new URLSearchParams(window.location.search);
-const status = urlParams.get('status');
-if (status && emailTooltips) {
-    let message = '';
-    switch (status) {
-        case 'success':
-            message = "✅ Votre adresse email a été vérifiée avec succès. Vous pouvez maintenant vous connecter.";
-            break;
-        case 'already_verified':
-            message = "ℹ️ Votre adresse email est déjà vérifiée. Vous pouvez vous connecter.";
-            break;
-        case 'invalid':
-            message = "❌ Le lien de vérification est invalide ou expiré.";
-            break;
-        default:
-            message = "📬 Vous avez reçu un email de vérification.";
-    }
-    emailTooltips.querySelector('p').textContent = message;
-    emailTooltips.classList.remove('hidden');
-    setTimeout(() => emailTooltips.classList.add('hidden'), 10000);
-}
-
     </script>
 </body>
 </html>

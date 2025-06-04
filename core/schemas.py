@@ -5,9 +5,13 @@ from .models import *
 
 class ErrorResponse(BaseModel):
     error: str
+    class Config:
+       from_attributes = True
 
 class WarningResponse(BaseModel):
     warning: str
+    class Config:
+       from_attributes = True
 
 # Etablissement Schemas
 class EtablissementIn(BaseModel):
@@ -18,6 +22,8 @@ class EtablissementIn(BaseModel):
     latitude: float
     longitude: float
     password: str
+    class Config:
+       from_attributes = True
 
 class EtablissementUpdate(BaseModel):
     nom_etablissement: Optional[str] = Field(None, max_length=50)
@@ -26,6 +32,8 @@ class EtablissementUpdate(BaseModel):
     adresse_physique: Optional[str] = Field(None, max_length=50)
     latitude: Optional[float] = None
     longitude: Optional[float] = None
+    class Config:
+       from_attributes = True
 
 class EtablissementOut(BaseModel):
     id_etablissement: str
@@ -36,25 +44,36 @@ class EtablissementOut(BaseModel):
     latitude: float
     longitude: float
     is_verified: bool
+    class Config:
+       from_attributes = True
 
 class LoginIn(BaseModel):
     email: EmailStr
     password: str
+    class Config:
+       from_attributes = True
 
 class TokenOut(BaseModel):
     token: str
-
+    
+    class Config:
+       from_attributes = True
 # Personne Schemas
 class PersonneIn(BaseModel):
     email: str = Field(..., max_length=50)
     geolocalisation: Optional[str] = Field(None, max_length=255)
     marque_tel: Optional[str] = Field(None, max_length=50)
+    class Config:
+       from_attributes = True
 
 class PersonneOut(BaseModel):
     id_personne: int
     email: str
     geolocalisation: str
     marque_tel: str
+    
+    class Config:
+       from_attributes = True
 
 # Jour Schemas
 class JourIn(BaseModel):

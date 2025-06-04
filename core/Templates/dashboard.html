@@ -34,9 +34,11 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
-        .nav-item:hover {
-            background-color: var(--rose-pale);
-            transform: translateX(5px);
+        @media (hover: hover) {
+            .nav-item:hover {
+                background-color: var(--rose-pale);
+                transform: translateX(5px);
+            }
         }
         .nav-item.active {
             background-color: var(--rouge-doux);
@@ -45,26 +47,34 @@
         .btn-primary {
             background: linear-gradient(45deg, var(--rouge-brique), var(--rouge-doux));
             transition: all 0.3s ease;
+            min-height: 48px; /* Increased touch target */
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(139, 35, 35, 0.3);
+        @media (hover: hover) {
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(139, 35, 35, 0.3);
+            }
         }
         .stat-card {
             background: linear-gradient(135deg, white 0%, var(--jaune-creme) 100%);
             transition: transform 0.3s ease;
+            min-width: 0;
         }
-        .stat-card:hover {
-            transform: translateY(-5px);
+        @media (hover: hover) {
+            .stat-card:hover {
+                transform: translateY(-5px);
+            }
         }
         .menu-item {
             background: white;
             border-left: 4px solid var(--rouge-doux);
             transition: all 0.3s ease;
         }
-        .menu-item:hover {
-            border-left-color: var(--rouge-brique);
-            transform: translateX(5px);
+        @media (hover: hover) {
+            .menu-item:hover {
+                border-left-color: var(--rouge-brique);
+                transform: translateX(5px);
+            }
         }
         .fade-in {
             animation: fadeIn 0.5s ease-in-out;
@@ -81,9 +91,11 @@
             border: 2px dashed var(--rouge-doux);
             transition: all 0.3s ease;
         }
-        .drag-drop-area:hover, .drag-drop-area.dragover {
-            border-color: var(--rouge-brique);
-            background-color: var(--rose-pale);
+        @media (hover: hover) {
+            .drag-drop-area:hover, .drag-drop-area.dragover {
+                border-color: var(--rouge-brique);
+                background-color: var(--rose-pale);
+            }
         }
         .sortable-list {
             min-height: 100px;
@@ -96,13 +108,65 @@
             opacity: 0.7;
             transform: scale(1.02);
         }
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar-hidden {
+            transform: translateX(-100%);
+        }
+        .backdrop {
+            transition: opacity 0.3s ease-in-out;
+        }
+        @media (min-width: 768px) {
+            .sidebar {
+                transform: translateX(0) !important;
+            }
+            .backdrop {
+                display: none !important;
+            }
+        }
+        body {
+            overflow-x: hidden;
+        }
+        /* Responsive form inputs */
+        input, textarea, select {
+            min-height: 48px; /* Touch target */
+        }
+        /* Ensure modals center properly */
+        .modal-content {
+            width: 100%;
+            max-width: 90vw;
+        }
+        @media (min-width: 640px) {
+            .modal-content {
+                max-width: 32rem; /* sm:max-w-lg */
+            }
+        }
+        @media (min-width: 768px) {
+            .modal-content {
+                max-width: 48rem; /* md:max-w-3xl */
+            }
+        }
+        @media (min-width: 1024px) {
+            .modal-content {
+                max-width: 64rem; /* lg:max-w-4xl */
+            }
+        }
+        @media (min-width: 1280px) {
+            .modal-content {
+                max-width: 80rem; /* xl:max-w-5xl */
+            }
+        }
     </style>
 </head>
 <body class="gradient-bg min-h-screen">
+    <!-- Backdrop for mobile sidebar -->
+    <div id="backdrop" class="backdrop hidden fixed inset-0 bg-black bg-opacity-50 z-40" onclick="toggleSidebar()"></div>
+
     <!-- Navigation latérale -->
     <div class="flex">
-        <nav class="w-64 bg-white card-shadow h-screen fixed left-0 top-0 overflow-y-auto">
-            <div class="p-6 border-b border-rose-pale">
+        <nav id="sidebar" class="sidebar w-64 lg:w-72 xl:w-80 bg-white card-shadow h-screen fixed left-0 top-0 overflow-y-auto z-50 md:transform-none sidebar-hidden">
+            <div class="flex justify-between items-center p-6 border-b border-rose-pale">
                 <div class="flex items-center space-x-3">
                     <div class="text-3xl">🍽️</div>
                     <div>
@@ -110,6 +174,7 @@
                         <p class="text-sm text-rouge-doux">Tableau de bord</p>
                     </div>
                 </div>
+                <button id="close-sidebar" class="md:hidden text-rouge-doux text-2xl">×</button>
             </div>
             <div class="p-4">
                 <ul class="space-y-2">
@@ -142,60 +207,69 @@
         </nav>
 
         <!-- Contenu principal -->
-        <main class="ml-64 flex-1 p-6">
+        <main id="main-content" class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto transition-all duration-300">
+            <!-- Hamburger menu for mobile -->
+            <div class="md:hidden mb-4">
+                <button id="open-sidebar" class="btn-primary text-white p-3 rounded-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+
             <!-- Message Alert -->
             <div id="message" class="hidden bg-bleu-clair text-rouge-brique p-4 rounded-lg mb-6 text-center"></div>
 
             <!-- Vue d'ensemble -->
             <div id="overview-section" class="section fade-in">
                 <div class="mb-6">
-                    <h2 class="text-3xl font-bold text-rouge-brique mb-2">Vue d'ensemble</h2>
-                    <p class="text-rouge-doux">Bienvenue sur votre tableau de bord</p>
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique mb-2">Vue d'ensemble</h2>
+                    <p class="text-rouge-doux text-sm sm:text-base lg:text-lg">Bienvenue sur votre tableau de bord</p>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <div class="stat-card p-6 rounded-xl card-shadow">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8">
+                    <div class="stat-card p-4 sm:p-6 lg:p-8 rounded-xl card-shadow">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-rouge-doux text-sm font-medium">Items créés</p>
-                                <p id="items-count" class="text-2xl font-bold text-rouge-brique">0</p>
+                                <p class="text-rouge-doux text-sm sm:text-base lg:text-lg font-medium">Items créés</p>
+                                <p id="items-count" class="text-xl sm:text-2xl lg:text-3xl font-bold text-rouge-brique">0</p>
                             </div>
-                            <div class="text-3xl">🍕</div>
+                            <div class="text-2xl sm:text-3xl lg:text-4xl">🍕</div>
                         </div>
                     </div>
-                    <div class="stat-card p-6 rounded-xl card-shadow">
+                    <div class="stat-card p-4 sm:p-6 lg:p-8 rounded-xl card-shadow">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-rouge-doux text-sm font-medium">Menus actifs</p>
-                                <p id="menus-count" class="text-2xl font-bold text-rouge-brique">0</p>
+                                <p class="text-rouge-doux text-sm sm:text-base lg:text-lg font-medium">Menus actifs</p>
+                                <p id="menus-count" class="text-xl sm:text-2xl lg:text-3xl font-bold text-rouge-brique">0</p>
                             </div>
-                            <div class="text-3xl">📋</div>
+                            <div class="text-2xl sm:text-3xl lg:text-4xl">📋</div>
                         </div>
                     </div>
-                    <div class="stat-card p-6 rounded-xl card-shadow">
+                    <div class="stat-card p-4 sm:p-6 lg:p-8 rounded-xl card-shadow">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-rouge-doux text-sm font-medium">QR scannés</p>
-                                <p id="qr-scans" class="text-2xl font-bold text-rouge-brique">0</p>
+                                <p class="text-rouge-doux text-sm sm:text-base lg:text-lg font-medium">QR scannés</p>
+                                <p id="qr-scans" class="text-xl sm:text-2xl lg:text-3xl font-bold text-rouge-brique">0</p>
                             </div>
-                            <div class="text-3xl">📱</div>
+                            <div class="text-2xl sm:text-3xl lg:text-4xl">📱</div>
                         </div>
                     </div>
-                    <div class="stat-card p-6 rounded-xl card-shadow">
+                    <div class="stat-card p-4 sm:p-6 lg:p-8 rounded-xl card-shadow">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-rouge-doux text-sm font-medium">Note moyenne</p>
-                                <p id="avg-rating" class="text-2xl font-bold text-rouge-brique">0</p>
+                                <p class="text-rouge-doux text-sm sm:text-base lg:text-lg font-medium">Note moyenne</p>
+                                <p id="avg-rating" class="text-xl sm:text-2xl lg:text-3xl font-bold text-rouge-brique">0</p>
                             </div>
-                            <div class="text-3xl">⭐</div>
+                            <div class="text-2xl sm:text-3xl lg:text-4xl">⭐</div>
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl p-6 card-shadow">
-                    <h3 class="text-xl font-bold text-rouge-brique mb-4">Actions rapides</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <button class="btn-primary text-white p-4 rounded-lg font-semibold" onclick="showSection('items')">Créer un nouvel item</button>
-                        <button class="btn-primary text-white p-4 rounded-lg font-semibold" onclick="showSection('menus')">Créer un nouveau menu</button>
-                        <button class="btn-primary text-white p-4 rounded-lg font-semibold" onclick="showSection('qr-codes')">Générer QR Code</button>
+                <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow">
+                    <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-rouge-brique mb-4">Actions rapides</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                        <button class="btn-primary text-white p-3 sm:p-4 lg:p-5 rounded-lg font-semibold text-sm sm:text-base lg:text-lg" onclick="showSection('items')">Créer un nouvel item</button>
+                        <button class="btn-primary text-white p-3 sm:p-4 lg:p-5 rounded-lg font-semibold text-sm sm:text-base lg:text-lg" onclick="showSection('menus')">Créer un nouveau menu</button>
+                        <button class="btn-primary text-white p-3 sm:p-4 lg:p-5 rounded-lg font-semibold text-sm sm:text-base lg:text-lg" onclick="showSection('qr-codes')">Générer QR Code</button>
                     </div>
                 </div>
             </div>
@@ -203,37 +277,37 @@
             <!-- Profil Établissement -->
             <div id="profile-section" class="section hidden fade-in">
                 <div class="mb-6">
-                    <h2 class="text-3xl font-bold text-rouge-brique mb-2">Profil Établissement</h2>
-                    <p class="text-rouge-doux">Gérez les informations de votre établissement</p>
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique mb-2">Profil Établissement</h2>
+                    <p class="text-rouge-doux text-sm sm:text-base lg:text-lg">Gérez les informations de votre établissement</p>
                 </div>
-                <div class="bg-white rounded-xl p-6 card-shadow">
-                    <form id="profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow">
+                    <form id="profile-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-4xl mx-auto">
                         <div>
-                            <label class="block text-rouge-brique font-semibold mb-2">Nom</label>
-                            <input type="text" id="profile-name" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                            <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Nom</label>
+                            <input type="text" id="profile-name" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg">
                         </div>
                         <div>
-                            <label class="block text-rouge-brique font-semibold mb-2">Email</label>
-                            <input type="email" id="profile-email" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                            <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Email</label>
+                            <input type="email" id="profile-email" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg">
                         </div>
                         <div>
-                            <label class="block text-rouge-brique font-semibold mb-2">Téléphone</label>
-                            <input type="tel" id="profile-phone" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                            <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Téléphone</label>
+                            <input type="tel" id="profile-phone" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg">
                         </div>
                         <div>
-                            <label class="block text-rouge-brique font-semibold mb-2">Adresse</label>
-                            <input type="text" id="profile-address" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                            <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Adresse</label>
+                            <input type="text" id="profile-address" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg">
                         </div>
                         <div>
-                            <label class="block text-rouge-brique font-semibold mb-2">Latitude</label>
-                            <input type="number" step="any" id="profile-latitude" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                            <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Latitude</label>
+                            <input type="number" step="any" id="profile-latitude" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg">
                         </div>
                         <div>
-                            <label class="block text-rouge-brique font-semibold mb-2">Longitude</label>
-                            <input type="number" step="any" id="profile-longitude" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                            <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Longitude</label>
+                            <input type="number" step="any" id="profile-longitude" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg">
                         </div>
-                        <div class="md:col-span-2">
-                            <button type="submit" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold">Mettre à jour</button>
+                        <div class="lg:col-span-3">
+                            <button type="submit" class="btn-primary text-white px-4 sm:px-6 lg:px-8 py-3 lg:py-4 rounded-lg font-semibold text-sm sm:text-base lg:text-lg">Mettre à jour</button>
                         </div>
                     </form>
                 </div>
@@ -241,62 +315,62 @@
 
             <!-- Gestion des Items -->
             <div id="items-section" class="section hidden fade-in">
-                <div class="mb-6 flex justify-between items-center">
+                <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 lg:gap-8">
                     <div>
-                        <h2 class="text-3xl font-bold text-rouge-brique mb-2">Gestion des Items</h2>
-                        <p class="text-rouge-doux">Créez et gérez vos plats et boissons</p>
+                        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique mb-2">Gestion des Items</h2>
+                        <p class="text-rouge-doux text-sm sm:text-base lg:text-lg">Créez et gérez vos plats et boissons</p>
                     </div>
-                    <button class="btn-primary text-white px-6 py-3 rounded-lg font-semibold" onclick="openModal('create-item-modal')">+ Nouvel Item</button>
+                    <button class="btn-primary text-white px-4 sm:px-6 lg:px-8 py-3 lg:py-4 rounded-lg font-semibold text-sm sm:text-base lg:text-lg" onclick="openModal('create-item-modal')">+ Nouvel Item</button>
                 </div>
-                <div class="bg-white rounded-xl p-4 card-shadow mb-6">
-                    <div class="flex flex-wrap gap-4 items-center">
-                        <input type="text" id="item-search" placeholder="Rechercher un item..." class="flex-1 p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
-                        <select id="item-category-filter" class="p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow mb-6">
+                    <div class="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-6 lg:gap-8 items-start sm:items-center max-w-4xl mx-auto">
+                        <input type="text" id="item-search" placeholder="Rechercher un item..." class="flex-1 p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme min-w-0 text-sm sm:text-base lg:text-lg">
+                        <select id="item-category-filter" class="p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme w-full sm:w-auto text-sm sm:text-base lg:text-lg">
                             <option value="">Toutes catégories</option>
                         </select>
-                        <select id="item-day-filter" class="p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                        <select id="item-day-filter" class="p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme w-full sm:w-auto text-sm sm:text-base lg:text-lg">
                             <option value="">Tous les jours</option>
                         </select>
                     </div>
                 </div>
-                <div id="items-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                <div id="items-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"></div>
             </div>
 
             <!-- Gestion des Menus -->
             <div id="menus-section" class="section hidden fade-in">
-                <div class="mb-6 flex justify-between items-center">
+                <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 lg:gap-8">
                     <div>
-                        <h2 class="text-3xl font-bold text-rouge-brique mb-2">Gestion des Menus</h2>
-                        <p class="text-rouge-doux">Créez et organisez vos menus</p>
+                        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique mb-2">Gestion des Menus</h2>
+                        <p class="text-rouge-doux text-sm sm:text-base lg:text-lg">Créez et organisez vos menus</p>
                     </div>
-                    <button class="btn-primary text-white px-6 py-3 rounded-lg font-semibold" onclick="openModal('create-menu-modal')">+ Nouveau Menu</button>
+                    <button class="btn-primary text-white px-4 sm:px-6 lg:px-8 py-3 lg:py-4 rounded-lg font-semibold text-sm sm:text-base lg:text-lg" onclick="openModal('create-menu-modal')">+ Nouveau Menu</button>
                 </div>
-                <div id="menus-list" class="grid grid-cols-1 lg:grid-cols-2 gap-6"></div>
+                <div id="menus-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"></div>
             </div>
 
             <!-- QR Codes -->
             <div id="qr-codes-section" class="section hidden fade-in">
                 <div class="mb-6">
-                    <h2 class="text-3xl font-bold text-rouge-brique mb-2">Gestion des QR Codes</h2>
-                    <p class="text-rouge-doux">Générez et gérez vos QR codes pour les menus</p>
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique mb-2">Gestion des QR Codes</h2>
+                    <p class="text-rouge-doux text-sm sm:text-base lg:text-lg">Générez et gérez vos QR codes pour les menus</p>
                 </div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white rounded-xl p-6 card-shadow">
-                        <h3 class="text-xl font-bold text-rouge-brique mb-4">QR Codes Actifs</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                    <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow">
+                        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-rouge-brique mb-4">QR Codes Actifs</h3>
                         <div id="qr-codes-list" class="space-y-4"></div>
                     </div>
-                    <div class="bg-white rounded-xl p-6 card-shadow">
-                        <h3 class="text-xl font-bold text-rouge-brique mb-4">Générer nouveau QR</h3>
-                        <form id="qr-code-form" class="space-y-4">
+                    <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow">
+                        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-rouge-brique mb-4">Générer nouveau QR</h3>
+                        <form id="qr-code-form" class="space-y-4 max-w-md mx-auto">
                             <div>
-                                <label class="block text-rouge-brique font-semibold mb-2">Menu</label>
-                                <select id="qr-menu" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme"></select>
+                                <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Menu</label>
+                                <select id="qr-menu" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg"></select>
                             </div>
                             <div>
-                                <label class="block text-rouge-brique font-semibold mb-2">Nom du QR Code</label>
-                                <input type="text" id="qr-name" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme" placeholder="Ex: Table 5">
+                                <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Nom du QR Code</label>
+                                <input type="text" id="qr-name" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg" placeholder="Ex: Table 5">
                             </div>
-                            <button type="submit" class="w-full btn-primary text-white p-3 rounded-lg font-semibold">Générer</button>
+                            <button type="submit" class="w-full btn-primary text-white p-3 sm:p-4 lg:p-5 rounded-lg font-semibold text-sm sm:text-base lg:text-lg">Générer</button>
                         </form>
                     </div>
                 </div>
@@ -305,148 +379,149 @@
             <!-- Avis Clients -->
             <div id="reviews-section" class="section hidden fade-in">
                 <div class="mb-6">
-                    <h2 class="text-3xl font-bold text-rouge-brique mb-2">Avis Clients</h2>
-                    <p class="text-rouge-doux">Consultez les retours de vos clients</p>
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique mb-2">Avis Clients</h2>
+                    <p class="text-rouge-doux text-sm sm:text-base lg:text-lg">Consultez les retours de vos clients</p>
                 </div>
-                <div class="bg-white rounded-xl p-6 card-shadow mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-center">
+                <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow mb-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 text-center">
                         <div>
-                            <div id="avg-rating-stats" class="text-3xl font-bold text-rouge-brique">0</div>
-                            <div class="text-rouge-doux">Note moyenne</div>
+                            <div id="avg-rating-stats" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique">0</div>
+                            <div class="text-rouge-doux text-sm sm:text-base lg:text-lg">Note moyenne</div>
                         </div>
                         <div>
-                            <div id="total-reviews" class="text-3xl font-bold text-rouge-brique">0</div>
-                            <div class="text-rouge-doux">Total avis</div>
+                            <div id="total-reviews" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique">0</div>
+                            <div class="text-rouge-doux text-sm sm:text-base lg:text-lg">Total avis</div>
                         </div>
                         <div>
-                            <div id="positive-reviews" class="text-3xl font-bold text-rouge-brique">0</div>
-                            <div class="text-rouge-doux">Avis positifs</div>
+                            <div id="positive-reviews" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique">0</div>
+                            <div class="text-rouge-doux text-sm sm:text-base lg:text-lg">Avis positifs</div>
                         </div>
                         <div>
-                            <div id="improve-reviews" class="text-3xl font-bold text-rouge-brique">0</div>
-                            <div class="text-rouge-doux">À améliorer</div>
+                            <div id="improve-reviews" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique">0</div>
+                            <div class="text-rouge-doux text-sm sm:text-base lg:text-lg">À améliorer</div>
                         </div>
                     </div>
                 </div>
-                <div id="reviews-list" class="space-y-4"></div>
+                <div id="reviews-list" class="space-y-4 sm:space-y-6 lg:space-y-8"></div>
             </div>
 
             <!-- Statistiques -->
             <div id="stats-section" class="section hidden fade-in">
                 <div class="mb-6">
-                    <h2 class="text-3xl font-bold text-rouge-brique mb-2">Statistiques</h2>
-                    <p class="text-rouge-doux">Analysez les performances de votre établissement</p>
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique mb-2">Statistiques</h2>
+                    <p class="text-rouge-doux text-sm sm:text-base lg:text-lg">Analysez les performances de votre établissement</p>
                 </div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white rounded-xl p-6 card-shadow">
-                        <h3 class="text-xl font-bold text-rouge-brique mb-4">Scans QR par jour</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                    <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow">
+                        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-rouge-brique mb-4">Scans QR par jour</h3>
                         <div id="qr-scans-chart" class="h-64 bg-jaune-creme rounded-lg flex items-center justify-center">
                             <span class="text-rouge-doux">Graphique à implémenter</span>
                         </div>
                     </div>
-                    <div class="bg-white rounded-xl p-6 card-shadow">
-                        <h3 class="text-xl font-bold text-rouge-brique mb-4">Items les plus consultés</h3>
+                    <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow">
+                        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-rouge-brique mb-4">Items les plus consultés</h3>
                         <div id="popular-items" class="space-y-3"></div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
-<div id="create-item-modal" class="modal hidden fixed inset-0 flex items-center justify-center z-50">
-    <div class="bg-white rounded-xl p-6 w-full max-w-2xl card-shadow max-h-screen overflow-y-auto">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold text-rouge-brique">Créer un Item</h3>
-            <button onclick="closeModal('create-item-modal')" class="text-rouge-doux text-2xl">&times;</button>
-        </div>
-          <form id="create-item-form" class="space-y-4">
+
+    <!-- Modal Création Item -->
+    <div id="create-item-modal" class="modal hidden fixed inset-0 flex items-center justify-center z-50">
+        <div class="modal-content bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow max-h-[95vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-rouge-brique">Créer un Item</h3>
+                <button onclick="closeModal('create-item-modal')" class="text-rouge-doux text-xl sm:text-2xl lg:text-3xl">×</button>
+            </div>
+            <form id="create-item-form" class="space-y-4 sm:space-y-6 lg:space-y-8">
                 <div>
-                    <label class="block text-rouge-brique font-semibold mb-2">Nom</label>
-                    <input type="text" id="item-name" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme" required>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Nom</label>
+                    <input type="text" id="item-name" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg" required>
                 </div>
                 <div>
-                    <label class="block text-rouge-brique font-semibold mb-2">Description</label>
-                    <textarea id="item-description" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme h-24"></textarea>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Description</label>
+                    <textarea id="item-description" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme h-24 sm:h-32 text-sm sm:text-base lg:text-lg"></textarea>
                 </div>
                 <div>
-                    <label class="block text-rouge-brique font-semibold mb-2">Prix (FCFA)</label>
-                    <input type="number" step="0.01" id="item-price" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme" required>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Prix (FCFA)</label>
+                    <input type="number" step="0.01" id="item-price" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg" required>
                 </div>
                 <div>
-                    <label class="block text-rouge-brique font-semibold mb-2">Temps de préparation (min)</label>
-                    <input type="number" id="item-prep-time" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme" required>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Temps de préparation (min)</label>
+                    <input type="number" id="item-prep-time" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg" required>
                 </div>
                 <div>
-                    <label class="block text-rouge-brique font-semibold mb-2">Disponibilité</label>
-                    <select id="item-availability" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme">
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Disponibilité</label>
+                    <select id="item-availability" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg">
                         <option value="true">Oui</option>
                         <option value="false">Non</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-rouge-brique font-semibold mb-2">Catégories</label>
-                    <select id="item-categories" multiple class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme"></select>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Catégories</label>
+                    <select id="item-categories" multiple class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg"></select>
                 </div>
                 <div>
-                    <label class="block text-rouge-brique font-semibold mb-2">Tags</label>
-                    <select id="item-tags" multiple class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme"></select>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Tags</label>
+                    <select id="item-tags" multiple class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg"></select>
                 </div>
                 <div>
-                    <label class="block text-rouge-brique font-semibold mb-2">Jours de disponibilité</label>
-                    <select id="item-days" multiple class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme"></select>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Jours de disponibilité</label>
+                    <select id="item-days" multiple class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg"></select>
                 </div>
                 <div>
-                    <label class="block text-rouge-brique font-semibold mb-2">Ingrédients</label>
-                    <div id="item-ingredients" class="sortable-list bg-rose-pale p-4 rounded-lg"></div>
-                    <select id="ingredient-select" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme mt-2"></select>
-                    <input type="text" id="ingredient-quantity" placeholder="Quantité (ex: 100g)" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme mt-2">
-                    <button type="button" onclick="addIngredient()" class="btn-primary text-white px-4 py-2 rounded-lg mt-2">Ajouter Ingrédient</button>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Ingrédients</label>
+                    <div id="item-ingredients" class="sortable-list bg-rose-pale p-4 sm:p-6 rounded-lg"></div>
+                    <select id="ingredient-select" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme mt-2 text-sm sm:text-base lg:text-lg"></select>
+                    <input type="text" id="ingredient-quantity" placeholder="Quantité (ex: 100g)" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme mt-2 text-sm sm:text-base lg:text-lg">
+                    <button type="button" onclick="addIngredient()" class="btn-primary text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg mt-2 text-sm sm:text-base lg:text-lg">Ajouter Ingrédient</button>
                 </div>
                 <div>
-                    <label class="block text-rouge-brique font-semibold mb-2">Images</label>
-                    <div class="drag-drop-area p-6 rounded-lg text-center" ondragover="event.preventDefault(); this.classList.add('dragover');" ondragleave="this.classList.remove('dragover');" ondrop="handleDrop(event)">
-                        <p>Glissez-déposez vos images ici ou cliquez pour sélectionner</p>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Images</label>
+                    <div class="drag-drop-area p-4 sm:p-6 lg:p-8 rounded-lg text-center" ondragover="event.preventDefault(); this.classList.add('dragover');" ondragleave="this.classList.remove('dragover');" ondrop="handleDrop(event)">
+                        <p class="text-xs sm:text-sm lg:text-base">Glissez-déposez vos images ici ou cliquez pour sélectionner</p>
                         <input type="file" id="item-images" accept="image/*" multiple class="hidden" onchange="handleFileSelect(event)">
-                        <button type="button" onclick="document.getElementById('item-images').click()" class="btn-primary text-white px-4 py-2 rounded-lg mt-2">Choisir</button>
+                        <button type="button" onclick="document.getElementById('item-images').click()" class="btn-primary text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg mt-2 text-sm sm:text-base lg:text-lg">Choisir</button>
                     </div>
-                    <div id="image-preview" class="grid grid-cols-3 gap-2 mt-4"></div>
+                    <div id="image-preview" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 mt-4 max-w-full"></div>
                 </div>
-                <button type="submit" class="w-full btn-primary text-white p-3 rounded-lg font-semibold">Créer</button>
+                <button type="submit" class="w-full btn-primary text-white p-3 sm:p-4 lg:p-5 rounded-lg font-semibold text-sm sm:text-base lg:text-lg">Créer</button>
             </form>
+        </div>
     </div>
-</div>
-   
+
     <!-- Modal Création Menu -->
     <div id="create-menu-modal" class="modal hidden fixed inset-0 flex items-center justify-center z-50">
-        <div class="bg-white rounded-xl p-6 w-full max-w-2xl card-shadow">
+        <div class="modal-content bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow max-h-[95vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold text-rouge-brique">Créer un Menu</h3>
-                <button onclick="closeModal('create-menu-modal')" class="text-rouge-doux text-2xl">&times;</button>
+                <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-rouge-brique">Créer un Menu</h3>
+                <button onclick="closeModal('create-menu-modal')" class="text-rouge-doux text-xl sm:text-2xl lg:text-3xl">×</button>
             </div>
-            <div class="max-h-[80vh] overflow-y-auto pr-3">
-            <form id="create-menu-form" class="space-y-4">
+            <form id="create-menu-form" class="space-y-4 sm:space-y-6 lg:space-y-8">
                 <div>
-                    <label class="block text-rouge-brique font-semibold mb-2">Nom</label>
-                    <input type="text" id="menu-name" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme" required>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Nom</label>
+                    <input type="text" id="menu-name" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg" required>
                 </div>
                 <div>
-                    <label class="block text-rouge-brique font-semibold mb-2">Description</label>
-                    <textarea id="menu-description" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme h-24"></textarea>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Description</label>
+                    <textarea id="menu-description" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme h-24 sm:h-32 text-sm sm:text-base lg:text-lg"></textarea>
                 </div>
                 <div>
-                    <label class="block text-rouge-brique font-semibold mb-2">Items</label>
-                    <div id="menu-items" class="sortable-list bg-rose-pale p-4 rounded-lg"></div>
-                    <select id="item-select" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme mt-2"></select>
-                    <button type="button" onclick="addMenuItem()" class="btn-primary text-white px-4 py-2 rounded-lg mt-2">Ajouter Item</button>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Items</label>
+                    <div id="menu-items" class="sortable-list bg-rose-pale p-4 sm:p-6 rounded-lg max-h-64 overflow-y-auto"></div>
+                    <select id="item-select" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme mt-2 text-sm sm:text-base lg:text-lg"></select>
+                    <button type="button" onclick="addMenuItem()" class="btn-primary text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg mt-2 text-sm sm:text-base lg:text-lg">Ajouter Item</button>
                 </div>
                 <div>
-                    <label class="block text-rouge-brique font-semibold mb-2">Prévisualisation</label>
-                    <div id="menu-preview" class="bg-white p-4 rounded-lg border-2 border-rose-pale"></div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Prévisualisation</label>
+                    <div id="menu-preview" class="bg-white p-4 sm:p-6 rounded-lg border-2 border-rose-pale max-h-64 overflow-y-auto"></div>
                 </div>
-                <button type="submit" class="w-full btn-primary text-white p-3 rounded-lg font-semibold">Créer</button>
+                <button type="submit" class="w-full btn-primary text-white p-3 sm:p-4 lg:p-5 rounded-lg font-semibold text-sm sm:text-base lg:text-lg">Créer</button>
             </form>
         </div>
-        </div>
     </div>
+
 
     <script>
         
@@ -919,20 +994,62 @@ function removeIngredient(id, button) {
     }
 }
 
-// Menus
 async function loadMenus() {
     try {
         const menus = await fetch(frontendUrls + "api/menus", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
         const list = document.getElementById("menus-list");
-        list.innerHTML = menus.map(menu => `
+        list.innerHTML = `
+            <style>
+                .menu-button svg {
+                    display: inline-block;
+                    vertical-align: middle;
+                    width: 18px;
+                    height: 18px;
+                    fill: currentColor;
+                }
+                .menu-button {
+                    padding: 8px;
+                    line-height: 1;
+                    border-radius: 5px;
+                    font-size: 14px;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .menu-button[aria-label="Modifier"] svg {
+                    fill: #FFFFFF;
+                }
+                .menu-button[aria-label="Générer QR"] svg,
+                .menu-button[aria-label="Exporter PDF"] svg,
+                .menu-button[aria-label="Partager"] svg {
+                    fill: #8B2323; /* --rouge-brique */
+                }
+            </style>
+        ` + menus.map(menu => `
             <div class="bg-white rounded-xl p-6 card-shadow">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-rouge-brique">${menu.nom}</h3>
                     <div class="flex space-x-2">
-                        <button class="bg-rouge-doux text-white px-3 py-2 rounded text-sm" onclick="editMenu('${menu.id_menu}')">Modifier</button>
-                        <button class="bg-rose-pale text-rouge-brique px-3 py-2 rounded text-sm" onclick="generateQR('${menu.id_menu}')">Générer QR</button>
-                        <button class="bg-rose-pale text-rouge-brique px-3 py-2 rounded text-sm" onclick="exportPDF('${menu.id_menu}')">Exporter PDF</button>
-                        <button class="bg-rose-pale text-rouge-brique px-3 py-2 rounded text-sm" onclick="shareMenu('${menu.id_menu}')">Partager</button>
+                        <button class="bg-rouge-doux menu-button" aria-label="Modifier" title="Modifier le menu" onclick="editMenu('${menu.id_menu}')">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                            </svg>
+                        </button>
+                        <button class="bg-rose-pale menu-button" aria-label="Générer QR" title="Générer un QR code" onclick="generateQR('${menu.id_menu}')">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 4h6v6H4V4zm8 0h6v6h-6V4zm-8 8h6v6H4v-6zm8 0h6v6h-6v-6zm2-8h2v2h-2V4zm0 4h2v2h-2V8zm-4-4h2v2h-2V4zm0 4h2v2h-2V8zm-4 4h2v2H6v-2zm0 4h2v2H6v-2zm12-4h2v2h-2v-2zm0 4h2v2h-2v-2z"/>
+                            </svg>
+                        </button>
+                        <button class="bg-rose-pale menu-button" aria-label="Exporter PDF" title="Exporter en PDF" onclick="exportPDF('${menu.id_menu}')">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h8v4h4v12zm-6-3h-2v-2h2v2zm0-4h-2v-2h2v2zm-3 4h-2v-2h2v2zm0-4h-2v-2h2v2z"/>
+                            </svg>
+                        </button>
+                        <button class="bg-rose-pale menu-button" aria-label="Partager" title="Partager le menu" onclick="shareMenu('${menu.id_menu}')">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
                 <p class="text-rouge-doux mb-4">${menu.items.length} items • Créé le ${new Date().toLocaleDateString()}</p>
@@ -1145,6 +1262,39 @@ if (token) {
 } else {
     window.location.href = frontendUrls + "start/";
 }
+// Sidebar toggle functionality
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('backdrop');
+        const openSidebarBtn = document.getElementById('open-sidebar');
+        const closeSidebarBtn = document.getElementById('close-sidebar');
+        const mainContent = document.getElementById('main-content');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('sidebar-hidden');
+            backdrop.classList.toggle('hidden');
+            mainContent.classList.toggle('ml-64');
+            mainContent.classList.toggle('lg:ml-72');
+            mainContent.classList.toggle('xl:ml-80');
+        }
+
+        openSidebarBtn?.addEventListener('click', toggleSidebar);
+        closeSidebarBtn?.addEventListener('click', toggleSidebar);
+        backdrop?.addEventListener('click', toggleSidebar);
+
+        // Navigation item click handler
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth < 768) {
+                    toggleSidebar();
+                }
+                if (item.dataset.section) {
+                    showSection(item.dataset.section);
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                }
+            });
+        });
+
     </script>
 </body>
 </html>

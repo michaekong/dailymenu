@@ -51,34 +51,54 @@ def generate_token(id_etablissement):
     }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
 
-# Etablissement Endpoints
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+
 @api.post("/etablissement/register", response={201: EtablissementOut, 400: ErrorResponse})
 def register(request, data: EtablissementIn):
     if Etablissement.objects.filter(email_pro=data.email_pro).exists():
         return 400, {"error": "Email already exists"}
+
     etablissement = Etablissement(**data.dict(exclude={'password'}))
     etablissement.set_password(data.password)
     etablissement.save()
-    send_mail(
-        'Verify your email',
-        f'Click to verify: {settings.FRONTEND_URL}api/etablissement/verify/{etablissement.verification_token}',
-        settings.DEFAULT_FROM_EMAIL,
-        [etablissement.email_pro],
-        fail_silently=False,
+
+    # Construction de l’URL de vérification
+    verification_url = f"{settings.FRONTEND_URL}api/etablissement/verify/{etablissement.verification_token}"
+
+    # Render du template HTML
+    html_content = render_to_string("verify_email_url.html", {
+        "nom": etablissement.nom_etablissement,
+        "verification_url": verification_url,
+    })
+
+    # Création de l’email avec version texte + HTML
+    email = EmailMultiAlternatives(
+        subject='Vérifiez votre adresse email',
+        body=f"Veuillez vérifier votre adresse en cliquant ici : {verification_url}",  # version texte
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=[etablissement.email_pro],
     )
+    email.attach_alternative(html_content, "text/html")
+    email.send(fail_silently=False)
+
     return 201, etablissement
 
-@api.get("/etablissement/verify/{token}", response={200: WarningResponse, 400: ErrorResponse})
+
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+@api.get("/etablissement/verify/{token}")
 def verify_email(request, token: str):
     try:
         etablissement = Etablissement.objects.get(verification_token=token)
         if etablissement.is_verified:
-            return {"warning": "Email already verified"}
+            return HttpResponseRedirect(f"{reverse('first')}?status=already_verified")
         etablissement.is_verified = True
         etablissement.save()
-        return {"warning": "Email verified successfully"}
+        return HttpResponseRedirect(f"{reverse('first')}?status=success")
     except Etablissement.DoesNotExist:
-        return 400, {"error": "Invalid verification token"}
+        return HttpResponseRedirect(f"{reverse('first')}?status=invalid")
 
 @api.post("/login", response={200: TokenOut, 401: ErrorResponse})
 def login(request, data: LoginIn):
