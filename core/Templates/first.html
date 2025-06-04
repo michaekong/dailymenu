@@ -47,11 +47,20 @@
         .btn-primary {
             background: linear-gradient(45deg, var(--rouge-brique), var(--rouge-doux));
             transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(139, 35, 35, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
         
         .btn-secondary {
@@ -79,16 +88,109 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-        } 
-        /* Votre style existant ici... */
+        }
+        
         .map {
             height: 300px;
             border-radius: 8px;
             margin-bottom: 20px;
-            border-width=5px;
-            border-color= #8B2323;
+            border-width: 5px;
+            border-color: #8B2323;
         }
-  
+        
+        /* New spinner styles */
+        .spinner {
+            position: relative;
+            width: 28px;
+            height: 28px;
+            display: none;
+        }
+        
+        .spinner .ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 3px solid transparent;
+            border-radius: 50%;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        .spinner .ring-outer {
+            border-top-color: var(--rouge-brique);
+            border-bottom-color: var(--rouge-doux);
+            animation: spinOuter 1.2s linear infinite;
+        }
+        
+        .spinner .ring-inner {
+            border-top-color: var(--rouge-doux);
+            border-bottom-color: var(--rouge-brique);
+            width: 70%;
+            height: 70%;
+            top: 15%;
+            left: 15%;
+            animation: spinInner 1.2s linear infinite reverse;
+        }
+        
+        @keyframes spinOuter {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes spinInner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .btn-primary.loading .spinner {
+            display: block;
+        }
+        
+        .btn-primary.loading .btn-text {
+            display: none;
+        }
+        
+        /* Tooltip styles */
+        .tooltip {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            border: 2px solid var(--rouge-doux);
+            border-radius: 8px;
+            padding: 12px 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-width: 90%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: tooltipFadeIn 0.3s ease-in-out;
+        }
+        
+        .tooltip-text {
+            color: var(--rouge-brique);
+            font-weight: 500;
+        }
+        
+        .tooltip-close {
+            cursor: pointer;
+            color: var(--rouge-doux);
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        @keyframes tooltipFadeIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
     </style>
 </head>
 <body class="gradient-bg font-sans flex items-center justify-center min-h-screen p-4">
@@ -130,8 +232,12 @@
                            class="w-full p-4 border-2 border-rose-pale rounded-xl input-focus transition-all bg-jaune-creme focus:bg-white" 
                            placeholder="••••••••" required>
                 </div>
-                <button id="login-btn" class="w-full btn-primary text-white p-4 rounded-xl font-semibold text-lg">
-                    Se connecter
+                <button id="login-btn" class="w-full btn-primary text-white p-4 rounded-xl font-semibold text-lg" aria-busy="false">
+                    <span class="btn-text">Se connecter</span>
+                    <div class="spinner">
+                        <div class="ring ring-outer"></div>
+                        <div class="ring ring-inner"></div>
+                    </div>
                 </button>
                 <p id="login-error" class="text-rouge-brique text-center font-semibold hidden"></p>
             </div>
@@ -175,15 +281,25 @@
                            class="w-full p-3 border-2 border-rose-pale rounded-xl input-focus transition-all bg-jaune-creme focus:bg-white" 
                            placeholder="123 Rue de la Paix, Yaoundé" required>
                 </div>
-                 <div>
+                <div>
                     <label class="block text-rouge-brique font-semibold mb-2">Sélectionnez votre position</label>
                     <div id="map" class="map"></div>
-               
-                <button id="register-btn" class="w-full btn-primary text-white p-4 rounded-xl font-semibold text-lg mt-6">
-                    S'inscrire
+                </div>
+                <button id="register-btn" class="w-full btn-primary text-white p-4 rounded-xl font-semibold text-lg mt-6" aria-busy="false">
+                    <span class="btn-text">S'inscrire</span>
+                    <div class="spinner">
+                        <div class="ring ring-outer"></div>
+                        <div class="ring ring-inner"></div>
+                    </div>
                 </button>
                 <p id="register-error" class="text-rouge-brique text-center font-semibold hidden"></p>
             </div>
+        </div>
+        
+        <!-- Info-bulle -->
+        <div id="email-tooltip" class="tooltip hidden">
+            <span class="tooltip-text">Vérifiez votre adresse e-mail pour activer votre compte.</span>
+            <span class="tooltip-close" aria-label="Fermer l'info-bulle">×</span>
         </div>
         
         <!-- Footer -->
@@ -194,21 +310,25 @@
 
     <script>
         const frontendUrls = "https://dailymenu.onrender.com/";
-//const frontendUrls = "http://127.0.0.1:8000/";
-        let lat ;
-           let  lng;
+        // const frontendUrls = "http://127.0.0.1:8000/";
+        let lat;
+        let lng;
+
         const showLogin = document.getElementById('show-login');
         const showRegister = document.getElementById('show-register');
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const emailTooltip = document.getElementById('email-tooltip');
+        const tooltipClose = document.querySelector('.tooltip-close');
 
+        // Gestion du toggle entre formulaires
         showLogin.addEventListener('click', () => {
             loginForm.classList.remove('hidden');
             registerForm.classList.add('hidden');
             showLogin.className = 'btn-primary flex-1 px-6 py-3 rounded-full text-white font-semibold transition-all';
             showRegister.className = 'btn-secondary flex-1 px-6 py-3 rounded-full font-semibold transition-all';
-            
-            // Animation
             loginForm.classList.add('animate-fade-in');
             setTimeout(() => loginForm.classList.remove('animate-fade-in'), 500);
         });
@@ -218,52 +338,58 @@
             loginForm.classList.add('hidden');
             showRegister.className = 'btn-primary flex-1 px-6 py-3 rounded-full text-white font-semibold transition-all';
             showLogin.className = 'btn-secondary flex-1 px-6 py-3 rounded-full font-semibold transition-all';
-            
-            // Animation
             registerForm.classList.add('animate-fade-in');
             setTimeout(() => registerForm.classList.remove('animate-fade-in'), 500);
         });
 
-        document.getElementById('login-btn').addEventListener('click', async () => {
+        // Gestion de la connexion
+        loginBtn.addEventListener('click', async () => {
+            loginBtn.disabled = true;
+            loginBtn.classList.add('loading');
+            loginBtn.setAttribute('aria-busy', 'true');
+            loginBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => loginBtn.style.transform = 'scale(1)', 150);
+
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             const error = document.getElementById('login-error');
-            const btn = document.getElementById('login-btn');
-
-            // Animation du bouton
-            btn.style.transform = 'scale(0.95)';
-            setTimeout(() => btn.style.transform = 'scale(1)', 150);
 
             try {
-                const response = await fetch(frontendUrls+'/api/login', {
+                const response = await fetch(frontendUrls + '/api/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
                 const data = await response.json();
+                loginBtn.disabled = false;
+                loginBtn.classList.remove('loading');
+                loginBtn.setAttribute('aria-busy', 'false');
                 if (data.error) {
                     error.textContent = data.error;
                     error.classList.remove('hidden');
                 } else {
-                    // Note: localStorage removed for Claude.ai compatibility
                     localStorage.setItem("token", data.token);
                     alert('Connexion réussie ! Redirection vers le tableau de bord...');
-                   window.location.href = frontendUrls+"dashboard/";
+                    window.location.href = frontendUrls + "dashboard/";
                 }
             } catch (err) {
+                loginBtn.disabled = false;
+                loginBtn.classList.remove('loading');
+                loginBtn.setAttribute('aria-busy', 'false');
                 error.textContent = 'Erreur de connexion au serveur';
                 error.classList.remove('hidden');
             }
         });
 
-        document.getElementById('register-btn').addEventListener('click', async () => {
-            const error = document.getElementById('register-error');
-            const btn = document.getElementById('register-btn');
-            
-            // Animation du bouton
-            btn.style.transform = 'scale(0.95)';
-            setTimeout(() => btn.style.transform = 'scale(1)', 150);
+        // Gestion de l'inscription
+        registerBtn.addEventListener('click', async () => {
+            registerBtn.disabled = true;
+            registerBtn.classList.add('loading');
+            registerBtn.setAttribute('aria-busy', 'true');
+            registerBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => registerBtn.style.transform = 'scale(1)', 150);
 
+            const error = document.getElementById('register-error');
             const payload = {
                 nom_etablissement: document.getElementById('etablissement-nom').value,
                 email_pro: document.getElementById('etablissement-email').value,
@@ -275,24 +401,33 @@
             };
 
             if (isNaN(payload.latitude) || isNaN(payload.longitude)) {
-                error.textContent = 'Latitude et longitude doivent être des nombres valides';
+                error.textContent = 'Veuillez sélectionner une position sur la carte';
                 error.classList.remove('hidden');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
                 return;
             }
 
             if (payload.latitude < -90 || payload.latitude > 90 || payload.longitude < -180 || payload.longitude > 180) {
                 error.textContent = 'Latitude doit être entre -90 et 90, longitude entre -180 et 180';
                 error.classList.remove('hidden');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
                 return;
             }
 
             try {
-                const response = await fetch(frontendUrls+'api/etablissement/register', {
+                const response = await fetch(frontendUrls + 'api/etablissement/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
                 const data = await response.json();
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
                 if (data.error) {
                     error.textContent = data.error;
                     error.classList.remove('hidden');
@@ -300,14 +435,40 @@
                     error.textContent = data.warning;
                     error.classList.remove('hidden');
                 } else {
-                    alert('Inscription réussie ! Veuillez vérifier votre email pour activer le compte.');
                     registerForm.classList.add('hidden');
                     loginForm.classList.remove('hidden');
-                    showLogin.click(); // Basculer vers connexion
+                    showLogin.click();
+                    emailTooltip.classList.remove('hidden');
+                    setTimeout(() => emailTooltip.classList.add('hidden'), 10000);
                 }
             } catch (err) {
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
                 error.textContent = 'Erreur de connexion au serveur';
                 error.classList.remove('hidden');
+            }
+        });
+
+        // Fermer l'info-bulle
+        tooltipClose.addEventListener('click', () => {
+            emailTooltip.classList.add('hidden');
+        });
+
+        // Initialiser la carte
+        const map = L.map('map').setView([3.848, 11.502], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+
+        let marker;
+        map.on('click', function(e) {
+            lat = e.latlng.lat;
+            lng = e.latlng.lng;
+            if (marker) {
+                marker.setLatLng(e.latlng);
+            } else {
+                marker = L.marker(e.latlng).addTo(map);
             }
         });
 
@@ -318,28 +479,6 @@
                 document.body.style.transition = 'opacity 0.5s ease-in-out';
                 document.body.style.opacity = '1';
             }, 100);
-        });// Initialiser la carte
-        const map = L.map('map').setView([3.848, 11.502], 13); // Position par défaut
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-        }).addTo(map);
-
-        let marker;
-
-        // Gérer le clic sur la carte
-        map.on('click', function(e) {
-            lat = e.latlng.lat;
-             lng = e.latlng.lng;
-
-          
-
-            // Ajouter ou mettre à jour le marqueur
-            if (marker) {
-                marker.setLatLng(e.latlng);
-            } else {
-                marker = L.marker(e.latlng).addTo(map);
-            }
         });
     </script>
 </body>

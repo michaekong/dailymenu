@@ -7,7 +7,7 @@ from typing import List, Optional
 from decimal import Decimal
 from django.conf import settings
 
-print(settings.DEBUG)  # Par exemple
+
 
 from ninja.files import UploadedFile
 from ninja.security import HttpBearer
@@ -368,7 +368,7 @@ def serialize_item(item: Item) -> ItemOut:
 
 @api.get("/items", response=List[ItemOut], auth=AuthBearer())
 def list_items(request):
-    items = Item.objects.all().prefetch_related("categories", "tags", "ingredients", "jours_disponibilite", "images")
+    items = Item.objects.all().filter(etablissement=request.auth).prefetch_related("categories", "tags", "ingredients", "jours_disponibilite", "images")
     return [serialize_item(item) for item in items]
 
 @api.delete("/items/{item_id}", response={204: None, 404: ErrorResponse}, auth=AuthBearer())
