@@ -25,6 +25,7 @@ urlpatterns = [
     path('api/', api.urls),
     path('', first, name='first'),
     path('dashboard/', dashboard, name='dashboard'),
+     path("menus/<uuid:menu_id>/", share_menu_view, name="share-menu"),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + \
     static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

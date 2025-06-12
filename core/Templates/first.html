@@ -98,7 +98,7 @@
             border-color: #8B2323;
         }
         
-        /* New spinner styles */
+        /* Spinner styles */
         .spinner {
             position: relative;
             width: 28px;
@@ -191,28 +191,53 @@
             from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
+        
+        /* Messages et erreurs */
         .message {
-  padding: 1em;
-  margin: 1em 0;
-  border-radius: 5px;
-  font-weight: bold;
-}
-
-.message.success {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.message.info {
-  background-color: #cce5ff;
-  color: #004085;
-}
-
-.message.error {
-  background-color: #f8d7da;
-  color: #721c24;
-}
-
+            padding: 1em;
+            margin: 1em 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .message.info {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Styles pour les erreurs */
+        .error-message {
+            background-color: var(--rose-pale);
+            border: 2px solid var(--rouge-doux);
+            color: var(--rouge-brique);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        .invalid-input {
+            border-color: var(--rouge-brique);
+            animation: shake 0.3s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
     </style>
 </head>
 <body class="gradient-bg font-sans flex items-center justify-center min-h-screen p-4">
@@ -223,13 +248,10 @@
             <h1 class="text-3xl font-bold text-rouge-brique mb-2">Plateforme de Menu</h1>
             <p class="text-rouge-doux">Gestion dynamique pour votre établissement</p>
         </div>
-      {% if request.GET.status == "success" %}
-    <div class="message success">✅ Adresse e-mail vérifiée avec succès.</div>
-{% elif request.GET.status == "already_verified" %}
-    <div class="message info">ℹ️ Adresse e-mail déjà vérifiée.</div>
-{% elif request.GET.status == "invalid" %}
-    <div class="message error">❌ Lien de vérification invalide.</div>
-{% endif %}
+
+        <!-- Messages de vérification -->
+        <div id="status-messages" class="hidden"></div>
+
         <!-- Toggle entre Connexion et Inscription -->
         <div class="flex bg-white rounded-full p-1 mb-6 card-shadow animate-fade-in">
             <button id="show-login" class="btn-primary flex-1 px-6 py-3 rounded-full text-white font-semibold transition-all">
@@ -267,7 +289,7 @@
                         <div class="ring ring-inner"></div>
                     </div>
                 </button>
-                <p id="login-error" class="text-rouge-brique text-center font-semibold hidden"></p>
+                <p id="login-error" class="error-message hidden"></p>
             </div>
         </div>
 
@@ -320,7 +342,7 @@
                         <div class="ring ring-inner"></div>
                     </div>
                 </button>
-                <p id="register-error" class="text-rouge-brique text-center font-semibold hidden"></p>
+                <p id="register-error" class="error-message hidden"></p>
             </div>
         </div>
         
@@ -330,7 +352,6 @@
             <span class="tooltip-close" aria-label="Fermer l'info-bulle">×</span>
         </div>
 
-
         <!-- Footer -->
         <div class="text-center mt-8 text-rouge-doux text-sm">
             <p>© 2025 Plateforme de Menu Dynamique</p>
@@ -338,8 +359,8 @@
     </div>
 
     <script>
-         const frontendUrls = "https://dailymenu.onrender.com/";
-        //const frontendUrls = "http://127.0.0.1:8000/";
+        // const frontendUrls = "https://dailymenu.onrender.com/";
+        const frontendUrls = "http://127.0.0.1:8000/";
         let lat;
         let lng;
 
@@ -351,6 +372,24 @@
         const registerBtn = document.getElementById('register-btn');
         const emailTooltip = document.getElementById('email-tooltip');
         const tooltipClose = document.querySelector('.tooltip-close');
+
+        // Fonctions de validation
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function validatePhone(phone) {
+            const phoneRegex = /^\+237\s?6[0-9]{2}\s?[0-9]{3}\s?[0-9]{3}$/;
+            return phoneRegex.test(phone);
+        }
+
+        function showError(elementId, message) {
+            const error = document.getElementById(elementId);
+            error.textContent = message;
+            error.classList.remove('hidden');
+            setTimeout(() => error.classList.add('hidden'), 5000);
+        }
 
         // Gestion du toggle entre formulaires
         showLogin.addEventListener('click', () => {
@@ -372,19 +411,58 @@
         });
 
         // Gestion de la connexion
-        loginBtn.addEventListener('click', async () => {
+        loginBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
             loginBtn.disabled = true;
             loginBtn.classList.add('loading');
             loginBtn.setAttribute('aria-busy', 'true');
             loginBtn.style.transform = 'scale(0.95)';
             setTimeout(() => loginBtn.style.transform = 'scale(1)', 150);
 
-            const email = document.getElementById('login-email').value;
+            const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
-            const error = document.getElementById('login-error');
+            const emailInput = document.getElementById('login-email');
+            const passwordInput = document.getElementById('login-password');
+
+            // Validation
+            if (!email) {
+                showError('login-error', 'L\'email est requis.');
+                emailInput.classList.add('invalid-input');
+                loginBtn.disabled = false;
+                loginBtn.classList.remove('loading');
+                loginBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+            if (!validateEmail(email)) {
+                showError('login-error', 'Veuillez entrer un email valide.');
+                emailInput.classList.add('invalid-input');
+                loginBtn.disabled = false;
+                loginBtn.classList.remove('loading');
+                loginBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+            if (!password) {
+                showError('login-error', 'Le mot de passe est requis.');
+                passwordInput.classList.add('invalid-input');
+                loginBtn.disabled = false;
+                loginBtn.classList.remove('loading');
+                loginBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+            if (password.length < 8) {
+                showError('login-error', 'Le mot de passe doit contenir au moins 8 caractères.');
+                passwordInput.classList.add('invalid-input');
+                loginBtn.disabled = false;
+                loginBtn.classList.remove('loading');
+                loginBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+
+            emailInput.classList.remove('invalid-input');
+            passwordInput.classList.remove('invalid-input');
 
             try {
-                const response = await fetch(frontendUrls + '/api/login', {
+                const response = await fetch(`${frontendUrls}api/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
@@ -394,61 +472,154 @@
                 loginBtn.classList.remove('loading');
                 loginBtn.setAttribute('aria-busy', 'false');
                 if (data.error) {
-                    error.textContent = data.error;
-                    error.classList.remove('hidden');
+                    showError('login-error', data.error);
                 } else {
                     localStorage.setItem("token", data.token);
-                    alert('Connexion réussie ! Redirection vers le tableau de bord...');
-                    window.location.href = frontendUrls + "dashboard/";
+                    window.location.href = `${frontendUrls}dashboard/`;
                 }
             } catch (err) {
                 loginBtn.disabled = false;
                 loginBtn.classList.remove('loading');
                 loginBtn.setAttribute('aria-busy', 'false');
-                error.textContent = 'Erreur de connexion au serveur';
-                error.classList.remove('hidden');
+                showError('login-error', 'Erreur de connexion au serveur.');
             }
         });
 
         // Gestion de l'inscription
-        registerBtn.addEventListener('click', async () => {
+        registerBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
             registerBtn.disabled = true;
             registerBtn.classList.add('loading');
             registerBtn.setAttribute('aria-busy', 'true');
             registerBtn.style.transform = 'scale(0.95)';
             setTimeout(() => registerBtn.style.transform = 'scale(1)', 150);
 
-            const error = document.getElementById('register-error');
+            const nom = document.getElementById('etablissement-nom').value.trim();
+            const email = document.getElementById('etablissement-email').value.trim();
+            const password = document.getElementById('etablissement-password').value;
+            const numtel = document.getElementById('etablissement-numtel').value.trim();
+            const adresse = document.getElementById('etablissement-adresse').value.trim();
+            const nomInput = document.getElementById('etablissement-nom');
+            const emailInput = document.getElementById('etablissement-email');
+            const passwordInput = document.getElementById('etablissement-password');
+            const numtelInput = document.getElementById('etablissement-numtel');
+            const adresseInput = document.getElementById('etablissement-adresse');
+
+            // Validation
+            if (!nom) {
+                showError('register-error', 'Le nom de l\'établissement est requis.');
+                nomInput.classList.add('invalid-input');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+            if (nom.length < 2) {
+                showError('register-error', 'Le nom de l\'établissement doit contenir au moins 2 caractères.');
+                nomInput.classList.add('invalid-input');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+            if (!email) {
+                showError('register-error', 'L\'email est requis.');
+                emailInput.classList.add('invalid-input');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+            if (!validateEmail(email)) {
+                showError('register-error', 'Veuillez entrer un email valide.');
+                emailInput.classList.add('invalid-input');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+            if (!password) {
+                showError('register-error', 'Le mot de passe est requis.');
+                passwordInput.classList.add('invalid-input');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+            if (password.length < 8) {
+                showError('register-error', 'Le mot de passe doit contenir au moins 8 caractères.');
+                passwordInput.classList.add('invalid-input');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+            if (!numtel) {
+                showError('register-error', 'Le numéro de téléphone est requis.');
+                numtelInput.classList.add('invalid-input');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+            if (!validatePhone(numtel)) {
+                showError('register-error', 'Veuillez entrer un numéro de téléphone valide (ex. +237 6XX XXX XXX).');
+                numtelInput.classList.add('invalid-input');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+            if (!adresse) {
+                showError('register-error', 'L\'adresse est requise.');
+                adresseInput.classList.add('invalid-input');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+            if (adresse.length < 5) {
+                showError('register-error', 'L\'adresse doit contenir au moins 5 caractères.');
+                adresseInput.classList.add('invalid-input');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+            if (isNaN(lat) || isNaN(lng)) {
+                showError('register-error', 'Veuillez sélectionner une position sur la carte.');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+            if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                showError('register-error', 'Latitude doit être entre -90 et 90, longitude entre -180 et 180.');
+                registerBtn.disabled = false;
+                registerBtn.classList.remove('loading');
+                registerBtn.setAttribute('aria-busy', 'false');
+                return;
+            }
+
+            // Réinitialiser les styles des champs
+            nomInput.classList.remove('invalid-input');
+            emailInput.classList.remove('invalid-input');
+            passwordInput.classList.remove('invalid-input');
+            numtelInput.classList.remove('invalid-input');
+            adresseInput.classList.remove('invalid-input');
+
             const payload = {
-                nom_etablissement: document.getElementById('etablissement-nom').value,
-                email_pro: document.getElementById('etablissement-email').value,
-                password: document.getElementById('etablissement-password').value,
-                numtel: document.getElementById('etablissement-numtel').value,
-                adresse_physique: document.getElementById('etablissement-adresse').value,
+                nom_etablissement: nom,
+                email_pro: email,
+                password,
+                numtel,
+                adresse_physique: adresse,
                 latitude: lat,
                 longitude: lng
             };
 
-            if (isNaN(payload.latitude) || isNaN(payload.longitude)) {
-                error.textContent = 'Veuillez sélectionner une position sur la carte';
-                error.classList.remove('hidden');
-                registerBtn.disabled = false;
-                registerBtn.classList.remove('loading');
-                registerBtn.setAttribute('aria-busy', 'false');
-                return;
-            }
-
-            if (payload.latitude < -90 || payload.latitude > 90 || payload.longitude < -180 || payload.longitude > 180) {
-                error.textContent = 'Latitude doit être entre -90 et 90, longitude entre -180 et 180';
-                error.classList.remove('hidden');
-                registerBtn.disabled = false;
-                registerBtn.classList.remove('loading');
-                registerBtn.setAttribute('aria-busy', 'false');
-                return;
-            }
-
             try {
-                const response = await fetch(frontendUrls + 'api/etablissement/register', {
+                const response = await fetch(`${frontendUrls}api/etablissement/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -458,11 +629,9 @@
                 registerBtn.classList.remove('loading');
                 registerBtn.setAttribute('aria-busy', 'false');
                 if (data.error) {
-                    error.textContent = data.error;
-                    error.classList.remove('hidden');
+                    showError('register-error', data.error);
                 } else if (data.warning) {
-                    error.textContent = data.warning;
-                    error.classList.remove('hidden');
+                    showError('register-error', data.warning);
                 } else {
                     registerForm.classList.add('hidden');
                     loginForm.classList.remove('hidden');
@@ -474,8 +643,7 @@
                 registerBtn.disabled = false;
                 registerBtn.classList.remove('loading');
                 registerBtn.setAttribute('aria-busy', 'false');
-                error.textContent = 'Erreur de connexion au serveur';
-                error.classList.remove('hidden');
+                showError('register-error', 'Erreur de connexion au serveur.');
             }
         });
 
@@ -508,30 +676,36 @@
                 document.body.style.transition = 'opacity 0.5s ease-in-out';
                 document.body.style.opacity = '1';
             }, 100);
-        });
-        // Afficher le message de vérification à partir du paramètre ?status=
-const urlParams = new URLSearchParams(window.location.search);
-const status = urlParams.get('status');
-if (status && emailTooltips) {
-    let message = '';
-    switch (status) {
-        case 'success':
-            message = "✅ Votre adresse email a été vérifiée avec succès. Vous pouvez maintenant vous connecter.";
-            break;
-        case 'already_verified':
-            message = "ℹ️ Votre adresse email est déjà vérifiée. Vous pouvez vous connecter.";
-            break;
-        case 'invalid':
-            message = "❌ Le lien de vérification est invalide ou expiré.";
-            break;
-        default:
-            message = "📬 Vous avez reçu un email de vérification.";
-    }
-    emailTooltips.querySelector('p').textContent = message;
-    emailTooltips.classList.remove('hidden');
-    setTimeout(() => emailTooltips.classList.add('hidden'), 10000);
-}
 
+            // Afficher le message de vérification à partir du paramètre ?status=
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+            if (status) {
+                const statusMessages = document.getElementById('status-messages');
+                let message = '';
+                let messageClass = '';
+                switch (status) {
+                    case 'success':
+                        message = "✅ Votre adresse email a été vérifiée avec succès. Vous pouvez maintenant vous connecter.";
+                        messageClass = 'message success';
+                        break;
+                    case 'already_verified':
+                        message = "ℹ️ Votre adresse email est déjà vérifiée. Vous pouvez vous connecter.";
+                        messageClass = 'message info';
+                        break;
+                    case 'invalid':
+                        message = "❌ Le lien de vérification est invalide ou expiré.";
+                        messageClass = 'message error';
+                        break;
+                    default:
+                        message = "📬 Vous avez reçu un email de vérification.";
+                        messageClass = 'message info';
+                }
+                statusMessages.innerHTML = `<div class="${messageClass}">${message}</div>`;
+                statusMessages.classList.remove('hidden');
+                setTimeout(() => statusMessages.classList.add('hidden'), 10000);
+            }
+        });
     </script>
 </body>
 </html>

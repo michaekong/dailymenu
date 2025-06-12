@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu - dailyMenu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --rouge-brique: #8B2323;
+            --rouge-doux: #A24E4E;
+            --rose-pale: #E7D3D3;
+            --jaune-creme: #FFF1CF;
+            --bleu-clair: #CCE5FF;
+            --gris-fonce: #4B5563;
+            --vert-succes: #D1FAE5;
+        }
+        .bg-rouge-brique { background-color: var(--rouge-brique); }
+        .bg-rouge-doux { background-color: var(--rouge-doux); }
+        .bg-rose-pale { background-color: var(--rose-pale); }
+        .bg-jaune-creme { background-color: var(--jaune-creme); }
+        .bg-bleu-clair { background-color: var(--bleu-clair); }
+        .bg-vert-succes { background-color: var(--vert-succes); }
+        .text-rouge-brique { color: var(--rouge-brique); }
+        .text-rouge-doux { color: var(--rouge-doux); }
+        .border-rouge-doux { border-color: var(--rouge-doux); }
+        .hover-rouge-brique:hover { background-color: var(--rouge-brique); }
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--jaune-creme) 0%, var(--rose-pale) 50%, var(--bleu-clair) 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 8px 20px rgba(139, 35, 35, 0.1);
+        }
+        .menu-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .menu-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(139, 35, 35, 0.15);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal {
+            backdrop-filter: blur(10px);
+            background-color: rgba(139, 35, 35, 0.2);
+        }
+        .star-rating .star {
+            cursor: pointer;
+            color: #d1d5db;
+            transition: color 0.2s;
+        }
+        .star-rating .star.selected {
+            color: #f59e0b;
+        }
+        .zoom-image {
+            max-height: 85vh;
+            max-width: 95vw;
+            object-fit: contain;
+        }
+        .spinner {
+            border: 4px solid var(--rose-pale);
+            border-top: 4px solid var(--rouge-brique);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .fab {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 50;
+        }
+        .error-message {
+            background-color: var(--rose-pale);
+            border: 2px solid var(--rouge-doux);
+            color: var(--rouge-brique);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .success-message {
+            background-color: var(--vert-succes);
+            color: var(--gris-fonce);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            margin-bottom: 16px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .invalid-input {
+            border-color: var(--rouge-brique);
+            animation: shake 0.3s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen flex flex-col">
+    <!-- En-tête -->
+    <header class="bg-rouge-brique text-white p-4 sticky top-0 z-20 shadow-lg">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl">🍽️</span>
+                <h1 class="text-xl font-bold">dailyMenu</h1>
+            </div>
+        </div>
+    </header>
+
+    <!-- Bouton flottant pour filtres -->
+    <button id="toggle-filters" class="fab bg-rouge-doux text-white p-4 rounded-full shadow-lg hover:bg-rouge-brique transition-transform transform hover:scale-105" aria-label="Ouvrir les filtres">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1m-4 8H4m8 8H4"></path>
+        </svg>
+    </button>
+
+    <!-- Filtres -->
+    <div id="filters" class="hidden bg-white p-6 shadow-lg max-w-7xl mx-auto mt-4 rounded-xl card-shadow">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div>
+                <label for="search-input" class="block text-rouge-brique font-semibold mb-2 text-sm">Recherche</label>
+                <input type="text" id="search-input" placeholder="Rechercher un plat..." class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm focus:ring-2 focus:ring-rouge-doux">
+            </div>
+            <div>
+                <label for="category-filter" class="block text-rouge-brique font-semibold mb-2 text-sm">Catégorie</label>
+                <select id="category-filter" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm focus:ring-2 focus:ring-rouge-doux">
+                    <option value="">Toutes</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-rouge-brique font-semibold mb-2 text-sm">Allergènes à exclure</label>
+                <div id="allergen-filter" class="space-y-2 max-h-32 overflow-y-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <main class="flex-1 p-4 sm:p-6 max-w-7xl mx-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl sm:text-3xl font-bold text-rouge-brique">Menu</h2>
+            <div id="loading" class="hidden spinner"></div>
+        </div>
+        <div id="menu-items" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </main>
+
+    <!-- Section Avis -->
+    <section class="bg-white p-6 max-w-7xl mx-auto mb-6 rounded-xl card-shadow">
+        <h3 class="text-xl sm:text-2xl font-bold text-rouge-brique mb-4">Donner un avis</h3>
+        <div id="review-message" class="hidden"></div>
+        <form id="review-form" class="space-y-6">
+            <div class="star-rating flex justify-center space-x-3" role="radiogroup" aria-label="Notez l'établissement">
+                <span class="star text-3xl" data-value="1" role="radio" aria-checked="false">★</span>
+                <span class="star text-3xl" data-value="2" role="radio" aria-checked="false">★</span>
+                <span class="star text-3xl" data-value="3" role="radio" aria-checked="false">★</span>
+                <span class="star text-3xl" data-value="4" role="radio" aria-checked="false">★</span>
+                <span class="star text-3xl" data-value="5" role="radio" aria-checked="false">★</span>
+            </div>
+            <input type="hidden" id="rating" name="rating" value="0">
+            <div>
+                <label for="comment" class="block text-rouge-brique font-semibold mb-2 text-sm">Commentaire (optionnel)</label>
+                <textarea id="comment" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme h-28 text-sm focus:ring-2 focus:ring-rouge-doux" placeholder="Partagez votre expérience..." maxlength="500"></textarea>
+            </div>
+            <button type="submit" class="w-full bg-rouge-brique text-white p-3 rounded-lg font-semibold hover:bg-rouge-doux transition-transform transform hover:scale-105" aria-label="Soumettre l'avis">Soumettre</button>
+        </form>
+        <h3 class="text-xl sm:text-2xl font-bold text-rouge-brique mt-8 mb-4">Historique de vos avis</h3>
+        <div id="review-history" class="space-y-4"></div>
+    </section>
+
+    <!-- Modal Zoom Image -->
+    <div id="image-zoom-modal" class="modal hidden fixed inset-0 flex items-center justify-center z-50">
+        <div class="relative bg-white rounded-xl p-4">
+            <button id="close-zoom" class="absolute top-2 right-2 text-rouge-doux text-2xl hover:text-rouge-brique" aria-label="Fermer le zoom">×</button>
+            <img id="zoom-image" class="zoom-image" src="" alt="Image agrandie">
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000/api'; // À remplacer par l'URL de votre API
+        const menuId = window.location.pathname.split('/').pop(); // Extrait menu_id de l'URL
+
+        // Afficher le spinner de chargement
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('hidden', !show);
+        }
+
+        // Afficher un message (erreur ou succès)
+        function showMessage(text, type = 'error') {
+            const message = document.getElementById('review-message');
+            message.textContent = text;
+            message.classList.remove('hidden', 'error-message', 'success-message');
+            message.classList.add(type === 'success' ? 'success-message' : 'error-message');
+            setTimeout(() => message.classList.add('hidden'), 5000);
+        }
+
+        // Valider le commentaire
+        function validateComment(comment) {
+            if (comment.length > 500) {
+                return { valid: false, error: 'Le commentaire ne doit pas dépasser 500 caractères.' };
+            }
+            const forbiddenWords = ['insulte', 'grossier', 'offensant'];
+            if (forbiddenWords.some(word => comment.toLowerCase().includes(word))) {
+                return { valid: false, error: 'Le commentaire contient des mots inappropriés.' };
+            }
+            return { valid: true };
+        }
+
+        // Récupérer les catégories
+        async function fetchCategories() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/categories`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (!response.ok) throw new Error('Erreur lors du chargement des catégories');
+                const categories = await response.json();
+                const select = document.getElementById('category-filter');
+                categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.id_category;
+                    option.textContent = cat.name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                showMessage('Impossible de charger les catégories.', 'error');
+                console.error(error);
+            }
+        }
+
+        // Récupérer les allergènes
+        async function fetchAllergens() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/allergenes`);
+                if (!response.ok) throw new Error('Erreur lors du chargement des allergènes');
+                const allergens = await response.json();
+                const container = document.getElementById('allergen-filter');
+                allergens.forEach(allergen => {
+                    const label = document.createElement('label');
+                    label.className = 'flex items-center';
+                    label.innerHTML = `
+                        <input type="checkbox" value="${allergen.id_allergene}" class="allergen-filter mr-2 h-4 w-4 text-rouge-doux focus:ring-rouge-doux border-rose-pale">
+                        ${allergen.nom_allergene}
+                    `;
+                    container.appendChild(label);
+                });
+            } catch (error) {
+                showMessage('Impossible de charger les allergènes.', 'error');
+                console.error(error);
+            }
+        }
+
+        // Récupérer et afficher les items du menu
+        async function fetchMenuItems() {
+            showLoading(true);
+            try {
+                const response = await fetch(`${API_BASE_URL}/menus/${menuId}`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Menu introuvable');
+                }
+                const menu = await response.json();
+                renderMenuItems(menu.items);
+            } catch (error) {
+                showMessage(`Erreur lors du chargement du menu : ${error.message}`, 'error');
+                console.error(error);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Afficher les items du menu
+        function renderMenuItems(items) {
+            const menuItems = document.getElementById('menu-items');
+            menuItems.innerHTML = '';
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'menu-item bg-white p-4 rounded-xl card-shadow fade-in';
+                div.dataset.categoryId = item.categories.map(c => c.id_category).join(',');
+                div.innerHTML = `
+                    <img src="${item.images[0]?.url_image || 'https://via.placeholder.com/300x200'}" alt="${item.nom_plat}" class="w-full h-48 object-cover rounded-lg mb-3 cursor-pointer lazy" loading="lazy" onclick="openImageZoom('${item.images[0]?.url_image || ''}')">
+                    <h3 class="text-lg font-bold text-rouge-brique">${item.nom_plat}</h3>
+                    <p class="text-rouge-doux text-sm line-clamp-2">${item.description || 'Aucune description'}</p>
+                    <p class="text-rouge-brique font-semibold mt-2">${item.price} FCFA</p>
+                    <p class="text-rouge-doux text-xs mt-1">Allergènes: ${item.ingredients.flatMap(i => i.allergenes || []).map(a => a.nom_allergene).join(', ') || 'Aucun'}</p>
+                `;
+                menuItems.appendChild(div);
+            });
+        }
+
+        // Filtrer les items
+        function filterMenu() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            const allergens = Array.from(document.querySelectorAll('.allergen-filter:checked')).map(el => el.value);
+
+            fetchMenuItems().then(() => {
+                let items = Array.from(document.querySelectorAll('.menu-item'));
+                items.forEach(item => {
+                    const name = item.querySelector('h3').textContent.toLowerCase();
+                    const description = item.querySelector('p').textContent.toLowerCase();
+                    const categoryIds = item.dataset.categoryId.split(',');
+                    const allergenText = item.querySelector('p:last-child').textContent.toLowerCase();
+
+                    const matchesSearch = search ? (name.includes(search) || description.includes(search)) : true;
+                    const matchesCategory = category ? categoryIds.includes(category) : true;
+                    const matchesAllergens = allergens.length === 0 || !allergens.some(id => allergenText.includes(id));
+
+                    item.classList.toggle('hidden', !(matchesSearch && matchesCategory && matchesAllergens));
+                });
+            });
+        }
+
+        // Gestion des filtres
+        document.getElementById('search-input').addEventListener('input', filterMenu);
+        document.getElementById('category-filter').addEventListener('change', filterMenu);
+        document.getElementById('allergen-filter').addEventListener('change', filterMenu);
+        document.getElementById('toggle-filters').addEventListener('click', () => {
+            const filters = document.getElementById('filters');
+            filters.classList.toggle('hidden');
+            filters.classList.toggle('fade-in');
+        });
+
+        // Zoom image
+        function openImageZoom(src) {
+            if (!src) return;
+            const modal = document.getElementById('image-zoom-modal');
+            const img = document.getElementById('zoom-image');
+            img.src = src;
+            modal.classList.remove('hidden');
+            modal.classList.add('fade-in');
+        }
+
+        document.getElementById('close-zoom').addEventListener('click', () => {
+            const modal = document.getElementById('image-zoom-modal');
+            modal.classList.add('hidden');
+        });
+
+        // Gestion des avis
+        const reviewForm = document.getElementById('review-form');
+        const ratingStars = document.querySelectorAll('.star');
+        const ratingInput = document.getElementById('rating');
+        const commentInput = document.getElementById('comment');
+
+        // Sélection des étoiles
+        ratingStars.forEach(star => {
+            star.addEventListener('click', () => {
+                const value = star.getAttribute('data-value');
+                ratingInput.value = value;
+                ratingStars.forEach(s => {
+                    s.classList.toggle('selected', s.getAttribute('data-value') <= value);
+                    s.setAttribute('aria-checked', s.getAttribute('data-value') <= value);
+                });
+                ratingInput.classList.remove('invalid-input');
+            });
+        });
+
+        // Soumission d'un avis
+        reviewForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const rating = parseInt(ratingInput.value);
+            const comment = commentInput.value.trim();
+            const personneId = localStorage.getItem('personne_id') || 1; // Simulé, à gérer via authentification
+
+            // Validation des champs
+            if (!rating) {
+                showMessage('Veuillez sélectionner une note.', 'error');
+                ratingInput.classList.add('invalid-input');
+                return;
+            }
+
+            if (comment) {
+                const commentValidation = validateComment(comment);
+                if (!commentValidation.valid) {
+                    showMessage(commentValidation.error, 'error');
+                    commentInput.classList.add('invalid-input');
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/avis`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({
+                        id_personne: personneId,
+                        note: rating,
+                        commentaire: comment || null
+                    })
+                });
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Erreur lors de la soumission de l’avis');
+                }
+                showMessage('Avis soumis avec succès !', 'success');
+                reviewForm.reset();
+                ratingStars.forEach(s => {
+                    s.classList.remove('selected');
+                    s.setAttribute('aria-checked', 'false');
+                });
+                ratingInput.value = 0;
+                commentInput.classList.remove('invalid-input');
+                fetchReviewHistory();
+            } catch (error) {
+                showMessage(`Erreur : ${error.message}`, 'error');
+                console.error(error);
+            }
+        });
+
+        // Récupérer et afficher l'historique des avis
+        async function fetchReviewHistory() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/avis`, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (!response.ok) throw new Error('Erreur lors du chargement des avis');
+                const reviews = await response.json();
+                const reviewHistory = document.getElementById('review-history');
+                reviewHistory.innerHTML = '';
+                reviews.forEach((review, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'bg-jaune-creme p-4 rounded-lg card-shadow';
+                    div.innerHTML = `
+                        <p class="text-rouge-brique font-semibold">Note: ${'★'.repeat(review.note)}</p>
+                        <p class="text-rouge-doux text-sm">${review.commentaire || 'Aucun commentaire'}</p>
+                        <p class="text-rouge-doux text-xs">Date: ${new Date(review.date_avis).toLocaleDateString()}</p>
+                        <button class="text-rouge-brique text-sm underline hover:text-rouge-doux" onclick="reportReview(${index})" aria-label="Signaler cet avis">Signaler</button>
+                    `;
+                    reviewHistory.appendChild(div);
+                });
+            } catch (error) {
+                showMessage('Impossible de charger l’historique des avis.', 'error');
+                console.error(error);
+            }
+        }
+
+        // Signaler un avis (modération manuelle simulée)
+        window.reportReview = async function(index) {
+            showMessage('Avis signalé pour modération.', 'success');
+            // En production, envoyer une requête à l'API pour signaler l'avis
+            fetchReviewHistory();
+        };
+
+        // Initialisation
+        fetchCategories();
+        fetchAllergens();
+        fetchMenuItems();
+        fetchReviewHistory();
+
+        // Service Worker intégré
+        const serviceWorkerCode = `
+            const CACHE_NAME = 'menu-cache-v2';
+            const urlsToCache = [
+                '/menus/',
+                'https://cdn.tailwindcss.com',
+                '/static/images/placeholder.jpg'
+            ];
+
+            self.addEventListener('install', event => {
+                event.waitUntil(
+                    caches.open(CACHE_NAME).then(cache => {
+                        return cache.addAll(urlsToCache);
+                    })
+                );
+            });
+
+            self.addEventListener('fetch', event => {
+                event.respondWith(
+                    caches.match(event.request).then(response => {
+                        return response || fetch(event.request).then(fetchResponse => {
+                            if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
+                                return fetchResponse;
+                            }
+                            const responseToCache = fetchResponse.clone();
+                            caches.open(CACHE_NAME).then(cache => {
+                                cache.put(event.request, responseToCache);
+                            });
+                            return fetchResponse;
+                        });
+                    })
+                );
+            });
+
+            self.addEventListener('activate', event => {
+                const cacheWhitelist = [CACHE_NAME];
+                event.waitUntil(
+                    caches.keys().then(cacheNames => {
+                        return Promise.all(
+                            cacheNames.map(cacheName => {
+                                if (!cacheWhitelist.includes(cacheName)) {
+                                    return caches.delete(cacheName);
+                                }
+                            })
+                        );
+                    })
+                );
+            });
+        `;
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register(new URL('data:application/javascript,' + encodeURIComponent(serviceWorkerCode), document.baseURI))
+                .then(() => console.log('Service Worker registered'))
+                .catch(err => console.error('Service Worker registration failed:', err));
+        }
+    </script>
+</body>
+</html>

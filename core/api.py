@@ -108,6 +108,7 @@ def login(request, data: LoginIn):
             return 401, {"error": "Email not verified"}
         if etablissement.check_password(data.password):
             token = generate_token(etablissement.id_etablissement)
+         
             return {"token": token}
         return 401, {"error": "Invalid credentials"}
     except Etablissement.DoesNotExist:
@@ -194,6 +195,20 @@ def list_categories(request):
             parent_id=c.parent_id
         )
         for c in Category.objects.filter(etablissement=request.auth)
+    ]
+@api.get("/categories_client/", response=List[CategoryOut])
+def list_categories_client(request,menu_id:str):
+    print(menu_id)
+    menu=Menu.objects.get(id_menu=menu_id)
+    print(menu)
+    return [
+        CategoryOut(
+            id_category=c.id_category,
+            name=c.name,
+            parent_id=c.parent_id
+        )
+        
+        for c in Category.objects.filter(etablissement=menu.etablissement)
     ]
 
 # Tag Endpoints
@@ -438,6 +453,22 @@ def list_menus(request):
         )
         for m in menus
     ]
+@api.get("/menus/{menu_id}", response=MenuOut)
+def get_menu_by_id(request, menu_id: str):
+    menu=Menu.objects.get(id_menu=menu_id)
+    try:
+        menu = Menu.objects.select_related().prefetch_related(
+            'items__categories',
+            'items__tags',
+            'items__ingredients',
+            'items__jours_disponibilite',
+            'items__images'
+        ).get(id_menu=menu_id, etablissement=menu.etablissement)
+    except Menu.DoesNotExist:
+        return  {"error": "Menu not found"}, 404
+
+    return menu
+   
 @api.get("/menus/{menu_id}/export-pdf", auth=AuthBearer())
 def export_menu_pdf(request, menu_id: str):
     try:
@@ -464,6 +495,7 @@ def create_qrcode(request, data: QRCodeIn):
 
         # Génère l'URL cible pour le menu
         target_url = f"{settings.FRONTEND_URL}menus/{data.menu_id}"
+        print(target_url)
 
         # Génère le QR code
         qr = qrcode.QRCode(version=1, box_size=10, border=5)

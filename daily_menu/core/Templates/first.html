@@ -391,7 +391,7 @@
                     error.classList.remove('hidden');
                 } else {
                     localStorage.setItem("token", data.token);
-                    alert('Connexion réussie ! Redirection vers le tableau de bord...');
+                  
                     window.location.href = frontendUrls + "dashboard/";
                 }
             } catch (err) {
