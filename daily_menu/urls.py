@@ -16,13 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from core.api import api
+from core.api import api,public_api
 from core.views import *
 from django.conf import settings
 from django.conf.urls.static import static
+
+api.add_router("/public", public_api)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', api.urls),
+
     path('', first, name='first'),
     path('dashboard/', dashboard, name='dashboard'),
      path("menus/<uuid:menu_id>/", share_menu_view, name="share-menu"),

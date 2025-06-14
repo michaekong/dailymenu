@@ -185,7 +185,14 @@ def create_category(request, data: CategoryIn):
         name=category.name,
         parent_id=category.parent_id
     )
-
+@api.delete("/categories/{category_id}", response={204: None, 404: ErrorResponse}, auth=AuthBearer())
+def delete_category(request, category_id: str):
+    try:
+        category = Category.objects.get(id_category=category_id, etablissement=request.auth)
+        category.delete()
+        return 204, None
+    except Category.DoesNotExist:
+        return 404, {"detail": "Catégorie introuvable"}
 @api.get("/categories", response=List[CategoryOut], auth=AuthBearer())
 def list_categories(request):
     return [
@@ -217,6 +224,15 @@ def create_tag(request, data: TagIn):
     tag = Tag.objects.create(etablissement=request.auth, **data.dict())
     return 201, TagOut(id_tag=tag.id_tag, name=tag.name)
 
+@api.delete("/tags/{tag_id}", response={204: None, 404: ErrorResponse}, auth=AuthBearer())
+def delete_tag(request, tag_id: str):
+    try:
+        tag = Tag.objects.get(id_tag=tag_id, etablissement=request.auth)
+        tag.delete()
+        return 204, None
+    except Tag.DoesNotExist:
+        return 404, {"detail": "Tag introuvable"}
+
 @api.get("/tags", response=List[TagOut], auth=AuthBearer())
 def list_tags(request):
     return [
@@ -232,6 +248,14 @@ def create_ingredient(request, data: IngredientIn):
         description=ingredient.description or "",
         categorie=ingredient.categorie
     )
+@api.delete("/ingredients/{ingredient_id}", response={204: None, 404: ErrorResponse}, auth=AuthBearer())
+def delete_ingredient(request, ingredient_id: int):
+    try:
+        ingredient = Ingredient.objects.get(id_ingredient=ingredient_id, etablissement=request.auth)
+        ingredient.delete()
+        return 204, None
+    except Ingredient.DoesNotExist:
+        return 404, {"detail": "Ingrédient introuvable ou accès non autorisé"}
 
 @api.get("/ingredients", response=List[IngredientOut])
 def list_ingredients(request):
@@ -610,3 +634,40 @@ def test_email(request):
         return {"warning": "Test email sent successfully"}
     except Exception as e:
         return 500, {"error": f"Failed to send email: {str(e)}"}
+public_api = Router()
+
+# 📂 Catégories publiques
+@public_api.get("/public/categories/{etablissement_id}", response=List[CategoryOut])
+def public_list_categories(request, etablissement_id: str):
+    return [
+        CategoryOut(
+            id_category=c.id_category,
+            name=c.name,
+            parent_id=c.parent_id
+        )
+        for c in Category.objects.filter(etablissement_id=etablissement_id)
+    ]
+
+# 🏷️ Tags publics
+@public_api.get("/public/tags/{etablissement_id}", response=List[TagOut])
+def public_list_tags(request, etablissement_id: str):
+    return [
+        TagOut(
+            id_tag=t.id_tag,
+            name=t.name
+        )
+        for t in Tag.objects.filter(etablissement_id=etablissement_id)
+    ]
+
+# 🥕 Ingrédients publics
+@public_api.get("/public/ingredients/{etablissement_id}", response=List[IngredientOut])
+def public_list_ingredients(request, etablissement_id: str):
+    return [
+        IngredientOut(
+            id_ingredient=i.id_ingredient,
+            nom_ingredient=i.nom_ingredient,
+            description=i.description or "",
+            categorie=i.categorie
+        )
+        for i in Ingredient.objects.filter(etablissement_id=etablissement_id)
+    ]
