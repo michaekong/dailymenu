@@ -606,15 +606,9 @@ keyframes logoFadeIn {
     to { opacity: 1; transform: scale(1); }
 }
 
-.section-divider {
-    height: 2px;
-    background: linear-gradient(to right, transparent, var(--rouge-doux), transparent);
-    margin: clamp(1rem, 2vw, 1.5rem) 0;
-} 
 .sidebar {
     width: 100%;
-    max-width: 16rem;
-    background: linear-gradient(to bottom, var(--glass-bg), rgba(162, 78, 78, 0.1));
+    background:  #E7D3D3;
     backdrop-filter: blur(12px);
     transition: transform 0.3s ease-in-out;
     box-shadow: var(--glow-shadow);
@@ -644,13 +638,103 @@ keyframes logoFadeIn {
     pointer-events: auto;
 }
 
-@media (min-width: 640px) { 
-    .sidebar { max-width: 18rem; } 
+.sidebar {
+    width: 100%;
+    background:  #E7D3D3;
+    backdrop-filter: blur(12px);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: var(--glow-shadow);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    z-index: 30;
+}
+
+.sidebar-hidden {
+    transform: translateX(-100%);
+}
+
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 20;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.backdrop.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.sidebar-header {
+    position: sticky;
+    top: 0;
+    background:  #E7D3D3;
+    backdrop-filter:  #E7D3D3;
+    z-index: 31;
+    padding: clamp(0.75rem, 2vw, 1rem);
+}
+
+.sidebar-content {
+    padding: clamp(0.75rem, 2vw, 1rem);
+}
+
+.nav-list {
+    overflow-y: auto;
+    max-height: calc(100vh - 240px);
+    scrollbar-width: thin;
+    scrollbar-color: var(--rouge-doux) var(--rose-pale);
+}
+
+.nav-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.nav-list::-webkit-scrollbar-track {
+    background: var(--rose-pale);
+}
+
+.nav-list::-webkit-scrollbar-thumb {
+    background: var(--rouge-doux);
+    border-radius: 3px;
+}
+
+.search-container {
+    margin-bottom: 1rem;
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo-svg {
+    width: 5rem;
+    height: 5rem;
+    max-width: 120px;
+    transition: transform 0.3s ease;
+}
+
+@media (min-width: 640px) {
+    .sidebar {
+        max-width: 20rem;
+    }
+    .logo-svg {
+        width: 6rem;
+        height: 6rem;
+        max-width: 150px;
+    }
 }
 
 @media (min-width: 768px) {
     .sidebar {
         transform: translateX(0);
+        max-width: 22rem;
     }
     .sidebar-hidden {
         transform: translateX(-100%);
@@ -659,100 +743,108 @@ keyframes logoFadeIn {
         display: none;
     }
     #main-content {
-        margin-left: 18rem;
+        margin-left: 22rem;
+    }
+    .logo-svg {
+        width: 8rem;
+        height: 8rem;
+        max-width: 200px;
     }
 }
 
-@media (min-width: 1024px) { 
-    .sidebar { max-width: 20rem; }
-    #main-content { margin-left: 20rem; } 
+@media (min-width: 1024px) {
+    .sidebar {
+        max-width: 24rem;
+    }
+    #main-content {
+        margin-left: 24rem;
+    }
 }
 </style>
 
 </head>
 <body class="font-sans">
-    <!-- Sidebar -->
-    <nav id="sidebar" class="sidebar fixed top-0 left-0 h-full bg-glass shadow-lg z-30 sidebar-hidden md:sidebar">
+<nav id="sidebar" class="sidebar fixed top-0 left-0 h-full bg-glass shadow-lg z-30 sidebar-hidden">
+    <div class="sidebar-header p-4 border-b border-rouge-doux flex justify-between items-center">
         <div class="logo-container">
-       <svg class="logo-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
-  <!-- Assiette -->
-  <circle cx="150" cy="120" r="90" fill="var(--jaune-creme)" stroke="var(--rouge-brique)" stroke-width="5"/>
-
-  <!-- Couteau -->
-  <rect x="235" y="70" width="8" height="100" rx="4" fill="var(--rouge-brique)" />
-  <path d="M243 70 Q255 120 243 170" fill="var(--rouge-brique)" />
-
-  <!-- Fourchette -->
-  <rect x="57" y="70" width="8" height="100" rx="4" fill="var(--rouge-brique)" />
-  <g stroke="var(--rouge-brique)" stroke-width="2">
-    <line x1="57" y1="75" x2="50" y2="90"/>
-    <line x1="60" y1="75" x2="53" y2="90"/>
-    <line x1="63" y1="75" x2="56" y2="90"/>
-  </g>
-
-  <!-- Cadran de l'horloge (petit cercle) -->
-  <circle cx="150" cy="120" r="35" fill="white" stroke="var(--rouge-brique)" stroke-width="3"/>
-
-  <!-- Index horaires -->
-  <g stroke="var(--rouge-brique)" stroke-width="2">
-    <line x1="150" y1="85" x2="150" y2="90"/>
-    <line x1="150" y1="150" x2="150" y2="155"/>
-    <line x1="115" y1="120" x2="120" y2="120"/>
-    <line x1="180" y1="120" x2="185" y2="120"/>
-  </g>
-
-  <!-- Aiguilles de l'horloge -->
-  <line x1="150" y1="120" x2="150" y2="95" stroke="var(--rouge-brique)" stroke-width="3" stroke-linecap="round"/>
-  <line x1="150" y1="120" x2="170" y2="120" stroke="var(--rouge-brique)" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="150" cy="120" r="3" fill="var(--rouge-brique)" />
-
-  <!-- Texte -->
-  <text x="150" y="250" text-anchor="middle" font-size="24" font-family="Manrope, sans-serif" fill="var(--rouge-brique)">Daily Menu</text>
-</svg>
-
-
+            <svg class="logo-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="150" cy="120" r="90" fill="var(--jaune-creme)" stroke="var(--rouge-brique)" stroke-width="5"/>
+                <rect x="235" y="70" width="8" height="100" rx="4" fill="var(--rouge-brique)" />
+                <path d="M243 70 Q255 120 243 170" fill="var(--rouge-brique)" />
+                <rect x="57" y="70" width="8" height="100" rx="4" fill="var(--rouge-brique)" />
+                <g stroke="var(--rouge-brique)" stroke-width="2">
+                    <line x1="57" y1="75" x2="50" y2="90"/>
+                    <line x1="60" y1="75" x2="53" y2="90"/>
+                    <line x1="63" y1="75" x2="56" y2="90"/>
+                </g>
+                <circle cx="150" cy="120" r="35" fill="white" stroke="var(--rouge-brique)" stroke-width="3"/>
+                <g stroke="var(--rouge-brique)" stroke-width="2">
+                    <line x1="150" y1="85" x2="150" y2="90"/>
+                    <line x1="150" y1="150" x2="150" y2="155"/>
+                    <line x1="115" y1="120" x2="120" y2="120"/>
+                    <line x1="180" y1="120" x2="185" y2="120"/>
+                </g>
+                <line x1="150" y1="120" x2="150" y2="95" stroke="var(--rouge-brique)" stroke-width="3" stroke-linecap="round"/>
+                <line x1="150" y1="120" x2="170" y2="120" stroke="var(--rouge-brique)" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="150" cy="120" r="3" fill="var(--rouge-brique)" />
+                <text x="150" y="250" text-anchor="middle" font-size="24" font-family="Manrope, sans-serif" fill="var(--rouge-brique)">Daily Menu</text>
+            </svg>
         </div>
-        <div class="p-4 border-b border-rouge-doux">
-            <h1 class="text-2xl font-bold text-rouge-brique">Tableau de Bord</h1>
-        </div>
-        <button id="close-sidebar" class="md:hidden p-4 text-rouge-brique focus:outline-none">
-            <i data-feather="x" class="icon-svg"></i>
+        <button id="close-sidebar" class="md:hidden text-rouge-brique focus:outline-none">
+            <i data-feather="x" class="icon-svg w-6 h-6"></i>
         </button>
-        <ul class="space-y-2 p-4">
-            <li class="nav-item flex items-center space-x-2 p-3 rounded-lg cursor-pointer" data-section="overview">
-                <i data-feather="grid" class="icon-svg text-rouge-doux"></i>
-                <span>Vue d'ensemble</span>
-            </li>
-            <li class="nav-item flex items-center space-x-2 p-3 rounded-lg cursor-pointer" data-section="profile">
-                <i data-feather="user" class="icon-svg text-rouge-doux"></i>
-                <span>Profil</span>
-            </li>
-            <li class="nav-item flex items-center space-x-2 p-3 rounded-lg cursor-pointer" data-section="items">
-                <i data-feather="package" class="icon-svg text-rouge-doux"></i>
-                <span>Gestion des Items</span>
-            </li>
-            <li class="nav-item flex items-center space-x-2 p-3 rounded-lg cursor-pointer" data-section="menus">
-                <i data-feather="menu" class="icon-svg text-rouge-doux"></i>
-                <span>Gestion des Menus</span>
-            </li>
-            <li class="nav-item flex items-center space-x-2 p-3 rounded-lg cursor-pointer" data-section="qr-codes">
-                <i data-feather="qr-code" class="icon-svg text-rouge-doux"></i>
-                <span>QR Codes</span>
-            </li>
-            <li class="nav-item flex items-center space-x-2 p-3 rounded-lg cursor-pointer" data-section="reviews">
-                <i data-feather="star" class="icon-svg text-rouge-doux"></i>
-                <span>Avis</span>
-            </li>
-            <li class="nav-item flex items-center space-x-2 p-3 rounded-lg cursor-pointer" data-section="stats">
-                <i data-feather="bar-chart-2" class="icon-svg text-rouge-doux"></i>
-                <span>Statistiques</span>
-            </li>
-            <li class="nav-item flex items-center space-x-2 p-3 rounded-lg cursor-pointer" onclick="logout()">
-                <i data-feather="log-out" class="icon-svg text-rouge-doux"></i>
-                <span>Déconnexion</span>
-            </li>
-        </ul>
-    </nav>
+    </div>
+    <div class="sidebar-content p-4">
+        <h1 class="text-xl sm:text-2xl font-bold text-rouge-brique mb-4">Tableau de Bord</h1>
+        <div class="search-container mb-4">
+            <input type="text" id="nav-search" placeholder="Filtrer les éléments..." class="w-full p-2 rounded-lg bg-rose-pale text-rouge-brique placeholder-rouge-doux focus:outline-none focus:ring-2 focus:ring-rouge-doux">
+        </div>
+        <div class="nav-list overflow-y-auto max-h-[calc(100vh-240px)]">
+            <ul id="nav-items" class="space-y-2">
+                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="overview">
+                    <i data-feather="grid" class="icon-svg text-rouge-doux w-5 h-5"></i>
+                    <span class="text-rouge-brique font-medium text-base">Vue d'ensemble</span>
+                </li>
+                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="profile">
+                    <i data-feather="user" class="icon-svg text-rouge-doux w-5 h-5"></i>
+                    <span class="text-rouge-brique font-medium text-base">Profil</span>
+                </li>
+                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="items">
+                    <i data-feather="package" class="icon-svg text-rouge-doux w-5 h-5"></i>
+                    <span class="text-rouge-brique font-medium text-base">Gestion des Items</span>
+                </li>
+                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="menus">
+                    <i data-feather="menu" class="icon-svg text-rouge-doux w-5 h-5"></i>
+                    <span class="text-rouge-brique font-medium text-base">Gestion des Menus</span>
+                </li>
+                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="qr-codes">
+                    <i data-feather="qr-code" class="icon-svg text-rouge-doux w-5 h-5"></i>
+                    <span class="text-rouge-brique font-medium text-base">QR Codes</span>
+                </li>
+                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="reviews">
+                    <i data-feather="star" class="icon-svg text-rouge-doux w-5 h-5"></i>
+                    <span class="text-rouge-brique font-medium text-base">Avis</span>
+                </li>
+                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="stats">
+                    <i data-feather="bar-chart-2" class="icon-svg text-rouge-doux w-5 h-5"></i>
+                    <span class="text-rouge-brique font-medium text-base">Statistiques</span>
+                </li>
+                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" onclick="logout()">
+                    <i data-feather="log-out" class="icon-svg text-rouge-doux w-5 h-5"></i>
+                    <span class="text-rouge-brique font-medium text-base">Déconnexion</span>
+                </li>
+                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="settings">
+                    <i data-feather="settings" class="icon-svg text-rouge-doux w-5 h-5"></i>
+                    <span class="text-rouge-brique font-medium text-base">Paramètres</span>
+                </li>
+                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="help">
+                    <i data-feather="help-circle" class="icon-svg text-rouge-doux w-5 h-5"></i>
+                    <span class="text-rouge-brique font-medium text-base">Aide</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
     <!-- Backdrop -->
     <div id="backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
@@ -1878,7 +1970,6 @@ if (token) {
 } else {
     window.location.href = frontendUrls + "start/";
 }
-// Sidebar toggle functionality
 const sidebar = document.getElementById('sidebar');
 const backdrop = document.getElementById('backdrop');
 const openSidebarBtn = document.getElementById('open-sidebar');
@@ -1894,7 +1985,6 @@ openSidebarBtn?.addEventListener('click', toggleSidebar);
 closeSidebarBtn?.addEventListener('click', toggleSidebar);
 backdrop?.addEventListener('click', toggleSidebar);
 
-// Navigation item click handler
 document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', () => {
         if (window.innerWidth < 768) {
@@ -1907,6 +1997,23 @@ document.querySelectorAll('.nav-item').forEach(item => {
         }
     });
 });
+
+// Ajoutez ici le code de sidebar.js
+document.getElementById('nav-search')?.addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const navItems = document.querySelectorAll('#nav-items .nav-item');
+    navItems.forEach(item => {
+        const text = item.querySelector('span').textContent.toLowerCase();
+        item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+    });
+});
     </script>
 </body>
+<footer id="page-footer" class="bg-rouge-brique text-jaune-creme py-4 text-center">
+    <p class="text-sm">© 2025 Daily Menu. Tous droits réservés.</p>
+    <p class="text-sm mt-1">
+        <a href="/contact" class="hover:text-rose-pale transition-colors">Contact</a> | 
+        <a href="/terms" class="hover:text-rose-pale transition-colors">Conditions d'utilisation</a>
+    </p>
+</footer>
 </html>
