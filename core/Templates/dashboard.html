@@ -1535,7 +1535,13 @@ body.modal-open {
         let selectedImages = [];
         let selectedIngredients = [];
         let selectedMenuItems = [];
-
+ loadOverview(); 
+                loadProfile(); 
+        loadItems(); 
+        loadMenus(); 
+                    loadQRCodes(); 
+                loadReviews(); 
+        loadStats(); 
 
         // Horloge en direct
         function updateClock() {
