@@ -1159,7 +1159,7 @@ async function loadQRCodes() {
                 </div>
                 <div class="flex space-x-2">
                     <button class="bg-rouge-doux text-white px-3 py-2 rounded text-sm" onclick="downloadQR('${q.id_qrcode}')">Télécharger</button>
-                    <button class="bg-rose-pale text-rouge-brique px-3 py-2 rounded text-sm" onclick="shareQR('${q.url}')">Partager</button>
+                    <button class="bg-rose-pale text-rouge-brique px-3 py-2 rounded text-sm" onclick="shareQR(frontendUrls+'${q.url}')">Partager</button>
                 </div>
             </div>
         `).join("");
