@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'ninja.compatibility.files.fix_request_files_middleware',
 ]
 
 ROOT_URLCONF = 'daily_menu.urls'
@@ -105,8 +106,8 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-#FRONTEND_URL="https://dailymenu.onrender.com/"
-FRONTEND_URL="http://127.0.0.1:8000/"
+FRONTEND_URL="https://dailymenu.onrender.com/"
+#FRONTEND_URL="http://127.0.0.1:8000/"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

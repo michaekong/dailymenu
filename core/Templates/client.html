@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DailyMenu - Tableau de Bord Administration</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght%40700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Menu Restaurant - Interface Client</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <style>
-        :root {
+   
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&display=swap');
+
+:root {
     /* Couleurs de base - ajustées */
     --rouge-brique: #8B2323;   /* Rouge principal profond */
     --rouge-doux: #A24E4E;     /* Rouge plus clair pour les accents */
@@ -33,16 +36,12 @@
     --glass-border: 1px solid rgba(255, 255, 255, 0.1);
 
     /* Font sizes */
-    --font-xl: 3.2rem;
+    --font-xl: 3.2rem; /* Légèrement plus grand pour les titres */
     --font-lg: 2.4rem;
-    --font-md: 1.8rem; /* Ajusté pour les titres de sections */
-    --font-sm: 1.4rem; /* Ajusté pour les sous-titres/cards */
-    --font-xs: 1.4rem; /* Texte général */
-    --font-xxs: 1.1rem; /* Petit texte */
-
-    /* Dashboard Specific */
-    --sidebar-width: 280px; /* Largeur de la sidebar */
-    --header-height: 80px; /* Hauteur de l'en-tête principal */
+    --font-md: 1.6rem;
+    --font-sm: 1.2rem;
+    --font-xs: 1rem;
+    --font-xxs: 0.85rem;
 }
 
 /* --- Généralités & Base --- */
@@ -57,344 +56,338 @@ html {
 }
 
 body {
-    font-family: 'Montserrat', sans-serif;
-    background: var(--background-light);
-    color: var(--text-dark);
-    line-height: 1.6;
-    display: flex;
+    font-family: 'Montserrat', sans-serif; /* Nouvelle police pour le corps de texte */
+    background: linear-gradient(135deg, var(--rose-pale), var(--background-light));
     min-height: 100vh;
+    color: var(--text-dark);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
     overflow-x: hidden;
 }
 
-/* Empêche le scroll du body quand une modale est ouverte */
-body.modal-open {
-    overflow: hidden;
-}
-
-/* --- Layout Principal du Dashboard --- */
-.dashboard-wrapper {
+/* --- Layout Principal --- */
+.main-wrapper {
     display: flex;
     width: 100%;
+    max-width: 1400px;
     min-height: 100vh;
     background: var(--background-light);
+    box-shadow: 0 0 30px var(--shadow-dark);
+    overflow: hidden;
 }
 
 /* --- Barre Latérale (Sidebar) --- */
 .sidebar {
-    width: var(--sidebar-width);
+    width: 300px;
     background: var(--sidebar-background);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
     color: var(--text-light);
-    padding: 20px;
+    padding: 30px 20px;
     display: flex;
     flex-direction: column;
-    position: fixed;
+    gap: 25px;
+    border-right: var(--glass-border);
+    position: sticky;
     top: 0;
-    left: 0;
-    height: 100%;
-    box-shadow: 5px 0 15px var(--shadow-dark);
-    transition: transform 0.3s ease-in-out;
-    z-index: 1000;
+    height: 100vh;
     overflow-y: auto;
+    flex-shrink: 0;
 }
 
-.sidebar-hidden {
-    transform: translateX(-100%);
-}
-
-.sidebar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 30px;
-}
-
-.sidebar-header .logo-title {
-    font-family: 'Playfair Display', serif;
-    font-size: var(--font-md);
+.sidebar .header .logo-title {
+    font-family: 'Playfair Display', serif; /* Nouvelle police pour les titres principaux */
+    font-size: var(--font-lg);
+    margin-bottom: 5px;
     color: var(--jaune-creme);
     text-shadow: 1px 1px 3px var(--text-dark);
     font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.sidebar-header .logo-title .fas {
-    color: var(--rouge-vif);
 }
 
-.close-sidebar-btn {
-    display: none;
-    background: none;
-    border: none;
-    color: var(--rose-pale);
+.sidebar .header p {
+    font-size: var(--font-xxs); /* Taille légèrement réduite */
+    opacity: 0.8;
+}
+
+.etablissement-info-card,
+.qr-section {
+    background: var(--glass-effect-dark);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
+    border: var(--glass-border);
+}
+
+.etablissement-info-card h3,
+.qr-section h3 {
     font-size: var(--font-sm);
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-.close-sidebar-btn:hover {
-    color: var(--rouge-vif);
-}
-
-.sidebar-nav ul {
-    list-style: none;
-}
-.sidebar-nav li {
-    margin-bottom: 10px;
-}
-.sidebar-nav .nav-item {
+    margin-bottom: 15px;
+    color: var(--rose-pale);
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 12px 15px;
+    font-weight: 600; /* Plus de poids */
+}
+.etablissement-info-card h3 .fas,
+.qr-section h3 .fas {
+    margin-right: 10px;
+    color: var(--rouge-vif); /* Icônes en rouge vif */
+}
+
+.etablissement-info-card p {
+    font-size: 0.9rem; /* Légèrement plus grand */
+    line-height: 1.6;
+    color: rgba(231, 211, 211, 0.85);
+    margin-bottom: 8px;
+}
+.etablissement-info-card p .fas {
+    margin-right: 8px;
+    color: var(--rouge-doux);
+}
+
+.qr-code {
+    width: 150px;
+    height: 150px;
+    background: var(--jaune-creme);
     border-radius: 8px;
-    color: var(--text-light);
-    text-decoration: none;
-    font-size: var(--font-xs);
-    font-weight: 600;
-    transition: background 0.3s ease, color 0.3s ease, transform 0.2s ease;
-}
-.sidebar-nav .nav-item .fas {
-    font-size: 1.2rem;
-    color: var(--rose-pale);
-    transition: color 0.3s ease;
-}
-
-.sidebar-nav .nav-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    transform: translateX(5px);
-}
-.sidebar-nav .nav-item:hover .fas {
-    color: var(--jaune-creme);
-}
-
-.sidebar-nav .nav-item.active {
-    background: var(--rouge-brique);
-    color: white;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-.sidebar-nav .nav-item.active .fas {
-    color: var(--jaune-creme);
-}
-
-
-/* --- Main Content Area --- */
-.main-content {
-    flex-grow: 1;
-    margin-left: var(--sidebar-width);
-    background: var(--background-light);
-    min-height: 100vh;
-    transition: margin-left 0.3s ease-in-out;
-    position: relative;
-}
-
-.open-sidebar-btn {
-    display: none;
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: var(--rouge-brique);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 1.5rem;
+    margin: 15px auto 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 5px 15px var(--shadow-medium);
-    cursor: pointer;
-    z-index: 999;
-    transition: transform 0.2s ease;
+    font-size: 3rem;
+    color: var(--rouge-brique);
+    box-shadow: 0 5px 15px var(--shadow-dark);
+    overflow: hidden;
 }
-.open-sidebar-btn:hover {
-    transform: scale(1.05);
+.qr-code img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
-.main-header {
-    background: var(--card-background);
-    padding: 20px 30px;
+/* --- Zone de Contenu Principal (Main Content) --- */
+.content-area {
+    flex-grow: 1;
+    background: var(--background-light);
+    position: relative;
+    z-index: 1;
+    padding-bottom: 50px;
+}
+
+/* --- Top Banner (Inspiré Nando's) --- */
+.top-banner {
+    background: linear-gradient(135deg, var(--rouge-brique) 0%, var(--rouge-doux) 100%);
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+    box-shadow: 0 5px 20px var(--shadow-dark);
+    margin-bottom: 30px;
+}
+.top-banner .vcenter {
+    max-width: 800px;
+    margin: 0 auto;
+}
+.top-banner h1 {
+    font-family: 'Playfair Display', serif; /* Police principale de titre */
+    font-size: var(--font-xl);
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    line-height: 1.1; /* Améliore la densité du titre */
+}
+.top-banner p {
+    font-size: var(--font-sm);
+    line-height: 1.6;
+    opacity: 0.9;
+    margin-bottom: 20px;
+}
+.top-banner .cta-button {
+    display: inline-block;
+    background: var(--jaune-creme);
+    color: var(--rouge-brique);
+    padding: 12px 25px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: var(--font-xs);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px var(--shadow-medium);
+}
+.top-banner .cta-button:hover {
+    background: #FFECB3;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px var(--shadow-dark);
+}
+.top-banner .cta-button .fas {
+    margin-left: 8px;
+    font-size: 0.9em;
+}
+
+/* --- Sub-Navigation des Catégories (Inspirée Nando's subNav) --- */
+.nav-container {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--background-light);
+    border-bottom: 1px solid var(--border-color);
+    padding: 15px 20px;
+    box-shadow: 0 2px 8px var(--shadow-light);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 2px 10px var(--shadow-light);
-    position: sticky;
-    top: 0;
-    z-index: 500;
-}
-.main-header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: var(--font-md);
-    color: var(--rouge-brique);
-    font-weight: 700;
-}
-.header-actions {
-    display: flex;
-    gap: 15px;
 }
 
-/* Boutons globaux */
-.btn {
+.sub-nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    white-space: nowrap;
+    padding-bottom: 10px;
+    flex-grow: 1;
+    margin-right: 15px;
+}
+.sub-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.sub-nav .nav-items {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-btn {
+    flex-shrink: 0;
     padding: 10px 20px;
+    border: 1px solid var(--rouge-doux);
     border-radius: 25px;
-    font-size: var(--font-xxs);
+    background: transparent;
+    color: var(--rouge-brique);
+    font-size: var(--font-xxs); /* Taille de police légèrement plus petite pour les filtres */
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 3px 8px var(--shadow-light);
+    text-transform: uppercase;
 }
-.btn-primary {
+
+.filter-btn:hover {
+    background: rgba(162, 78, 78, 0.1);
+    border-color: var(--rouge-brique);
+    color: var(--rouge-brique);
+    transform: translateY(-2px); /* Léger survol */
+}
+
+/* Filtre de catégorie actif (un seul) */
+.filter-btn[data-filter-type="category"].active {
     background: var(--rouge-brique);
     color: white;
-    border: 1px solid var(--rouge-brique);
-}
-.btn-primary:hover {
-    background: var(--rouge-doux);
-    border-color: var(--rouge-doux);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px var(--shadow-medium);
+    border-color: var(--rouge-brique);
+    box-shadow: 0 3px 10px var(--shadow-medium);
 }
 
-.btn-secondary {
-    background: var(--jaune-creme);
-    color: var(--rouge-brique);
-    border: 1px solid var(--jaune-creme);
-}
-.btn-secondary:hover {
-    background: var(--jaune-moutarde);
-    border-color: var(--jaune-moutarde);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px var(--shadow-medium);
-}
-
-.btn-tertiary {
-    background: var(--rose-pale);
-    color: var(--rouge-brique);
-    border: 1px solid var(--rose-pale);
-}
-.btn-tertiary:hover {
-    background: #E0C0C0;
-    border-color: #E0C0C0;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px var(--shadow-medium);
-}
-
-.btn-danger {
-    background: var(--rouge-vif);
+/* Filtre allergène actif (peut être multiple) */
+.filter-btn[data-filter-type="allergene"].active {
+    background: var(--rouge-vif); /* Rouge plus vif pour les allergènes actifs */
     color: white;
-    border: 1px solid var(--rouge-vif);
-}
-.btn-danger:hover {
-    background: #C62828;
-    border-color: #C62828;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px var(--shadow-medium);
+    border-color: var(--rouge-vif);
+    box-shadow: 0 3px 10px var(--shadow-medium);
 }
 
-.btn-icon {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-}
-.btn-icon .fas {
-    margin: 0;
-}
 
-/* --- Toast Messages (Nouveaux messages info-bulles) --- */
-#toast-container {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 3000; /* Au-dessus de tout */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    pointer-events: none; /* Permet de cliquer à travers pour le contenu derrière */
-}
-
-.toast-message {
-    pointer-events: auto; /* Réactive les événements de souris pour le toast lui-même */
-    padding: 15px 25px;
-    margin-bottom: 10px;
-    border-radius: 10px;
-    font-weight: 600;
+.filter-toggle {
+    display: none;
     text-align: center;
-    box-shadow: 0 5px 15px var(--shadow-medium);
-    opacity: 0;
-    animation: fadeInOut 5s forwards; /* Animation combinée */
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    min-width: 250px;
-    max-width: 90%;
-    justify-content: center;
+}
+.mobile-filter-toggle-btn {
+    background: var(--rouge-doux);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: var(--font-xs);
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 3px 10px var(--shadow-light);
+}
+.mobile-filter-toggle-btn .fas {
+    margin-right: 8px;
+}
+.mobile-filter-toggle-btn:hover {
+    background: var(--rouge-brique);
+    transform: translateY(-2px);
+}
+.mobile-filter-toggle-btn.active {
+    background: var(--rouge-brique);
+    box-shadow: 0 3px 10px var(--shadow-medium);
 }
 
-@keyframes fadeInOut {
-    0% { opacity: 0; transform: translateY(-20px); }
-    10% { opacity: 1; transform: translateY(0); }
-    90% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0; transform: translateY(-20px); }
+
+/* --- Barre de recherche --- */
+.search-container {
+    padding: 20px 30px;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
 }
 
-.toast-message span {
-    flex-grow: 1;
+.search-bar {
+    width: 100%;
+    padding: 12px 45px 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 25px;
+    background: var(--card-background);
+    font-size: var(--font-xs);
+    color: var(--text-dark);
+    box-shadow: 0 2px 8px var(--shadow-light);
+    transition: all 0.3s ease;
 }
 
-.toast-success {
-    background: #e6ffe6;
-    color: #388e3c;
-    border: 1px solid #a5d6a7;
-}
-.toast-error {
-    background: #ffe6e6;
-    color: #d32f2f;
-    border: 1px solid #ef9a9a;
+.search-bar::placeholder {
+    color: rgba(44, 26, 26, 0.6);
 }
 
-.close-toast-btn {
+.search-bar:focus {
+    outline: none;
+    border-color: var(--rouge-doux);
+    box-shadow: 0 0 15px rgba(162, 78, 78, 0.4);
+}
+
+.clear-search-btn {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
     background: none;
     border: none;
-    font-size: 1.2rem;
+    color: var(--text-dark);
+    font-size: 1.1rem;
     cursor: pointer;
-    color: inherit; /* Hérite la couleur du texte parent */
-    opacity: 0.7;
+    opacity: 0.6;
     transition: opacity 0.2s ease;
 }
-.close-toast-btn:hover {
+
+.clear-search-btn:hover {
     opacity: 1;
 }
 
-
-/* --- Section Content --- */
-.section {
+/* --- Conteneur des Sections de Menu --- */
+#menuSectionsContainer {
     padding: 30px;
-    transition: opacity 0.3s ease;
 }
-.section h2 {
-    font-family: 'Playfair Display', serif;
+
+/* --- Sections de Menu (inspirées Nando's) --- */
+.menu-section {
+    margin-bottom: 50px; /* Plus d'espace entre les sections */
+}
+
+.menu-section h2 {
+    font-family: 'Playfair Display', serif; /* Police de titre pour les sections */
     font-size: var(--font-lg);
     color: var(--rouge-brique);
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     text-align: center;
     position: relative;
     padding-bottom: 10px;
+    font-weight: 700;
 }
-.section h2::after {
+.menu-section h2::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -405,642 +398,394 @@ body.modal-open {
     background: var(--rouge-doux);
     border-radius: 2px;
 }
-
-/* Filters */
-.filters-and-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-bottom: 30px;
-    padding: 15px 20px;
-    background: var(--card-background);
-    border-radius: 12px;
-    box-shadow: 0 2px 10px var(--shadow-light);
-    border: 1px solid var(--border-color);
-    align-items: center;
-}
-.filter-group {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.filter-group label {
-    font-size: var(--font-xs);
-    color: var(--rouge-brique);
-    font-weight: 600;
-}
-.filter-select {
-    padding: 8px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background: var(--background-light);
-    font-size: var(--font-xxs);
-    color: var(--text-dark);
-    cursor: pointer;
-}
-.filter-select:focus {
-    outline: none;
-    border-color: var(--rouge-doux);
-    box-shadow: 0 0 0 3px rgba(162, 78, 78, 0.2);
+.menu-section h2 em {
+    font-style: normal;
+    background: linear-gradient(45deg, var(--rouge-doux), var(--rouge-brique));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 
-/* --- Cards (Info, Item, Menu, QR) --- */
-.info-card,
-.dashboard-card,
-.menu-item-card,
-.menu-card,
-.qr-code-card,
-.review-card,
-.stat-item-card,
-.form-card {
-    background: var(--card-background);
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 5px 20px var(--shadow-light);
-    border: 1px solid var(--border-color);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.info-card:hover,
-.menu-item-card:hover,
-.menu-card:hover,
-.qr-code-card:hover,
-.review-card:hover,
-.stat-item-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px var(--shadow-medium);
-}
-
-
-/* Grid containers for sections */
-.grid-container,
-.grid-container-items,
-.grid-container-menus,
-.grid-container-qr,
-.grid-container-reviews,
-.grid-container-stats {
+/* --- Grille des plats (dans chaque section) --- */
+.menu-grid {
     display: grid;
-    gap: 30px;
-    margin-top: 20px;
-}
-
-.grid-container {
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-.grid-container-items, .grid-container-menus, .grid-container-reviews {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-}
-.grid-container-qr {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-}
-.grid-container-stats {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px; /* Plus d'espace entre les cartes */
 }
 
-
-/* Info Cards (Overview, Reviews Stats) */
-.info-card h3 {
-    font-size: var(--font-xs);
-    color: var(--rouge-doux);
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 600;
-}
-.info-card .count {
-    font-family: 'Playfair Display', serif;
-    font-size: var(--font-lg);
-    color: var(--rouge-brique);
-    font-weight: 700;
-    text-align: center;
-    margin-top: 15px;
-}
-.info-card.positive {
-    background: #e6ffe6;
-    border-color: #a5d6a7;
-}
-.info-card.negative {
-    background: #ffe6e6;
-    border-color: #ef9a9a;
-}
-
-
-/* Item Cards */
-.menu-item-card {
+.dish-card {
+    background: var(--card-background);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 5px 20px var(--shadow-light);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    position: relative;
 }
-.item-image-container {
+
+.dish-card:hover {
+    transform: translateY(-8px); /* Animation plus prononcée */
+    box-shadow: 0 15px 35px var(--shadow-medium); /* Ombre plus large */
+}
+
+.dish-card.unavailable-item {
+    opacity: 0.6;
+    pointer-events: none;
+    filter: grayscale(80%);
+}
+.dish-card.unavailable-item .dish-price::before {
+    content: 'INDISPONIBLE - ';
+    font-size: 0.8em;
+    color: var(--rouge-brique);
+    font-weight: normal;
+}
+
+
+/* --- Flags (New, Popular, etc.) - Stylisation Ruban --- */
+.dish-card .flag {
+    position: absolute;
+    top: 15px;
+    left: -5px; /* Décalé pour l'effet ruban */
+    padding: 6px 15px 6px 20px; /* Plus de padding pour l'effet */
+    font-size: 0.7rem; /* Taille plus petite */
+    font-weight: 700; /* Plus de poids */
+    text-transform: uppercase;
+    z-index: 10;
+    box-shadow: 2px 2px 8px rgba(0,0,0,0.25);
+    transform: rotate(-3deg); /* Légère rotation */
+    transform-origin: top left;
+    clip-path: polygon(0 0, 100% 0, 95% 50%, 100% 100%, 0 100%, 5% 50%); /* Forme de ruban */
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    transition: transform 0.2s ease;
+}
+.dish-card:hover .flag {
+    transform: rotate(-3deg) scale(1.05); /* Léger zoom au survol de la carte */
+}
+
+.dish-card .flag.new {
+    background: #4CAF50; /* Vert pour 'New' */
+    color: white;
+}
+.dish-card .flag.featured {
+    background: var(--jaune-moutarde); /* Jaune moutarde pour 'POPULAIRE' */
+    color: var(--rouge-brique); /* Texte foncé sur jaune */
+}
+
+.dish-diet-icons {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    display: flex;
+    gap: 8px;
+}
+.dish-diet-icons .diet-icon {
+    font-size: 0.8rem; /* Taille plus petite */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-style: normal;
+    text-transform: uppercase;
+    font-weight: 600;
+    background: rgba(0,0,0,0.5);
+    transition: transform 0.2s ease;
+}
+.dish-diet-icons .diet-icon:hover {
+    transform: translateY(-3px); /* Léger survol sur l'icône */
+}
+.dish-diet-icons .diet-icon.vegetarian {
+    background: var(--rouge-doux);
+}
+.dish-diet-icons .diet-icon.vegan {
+    background: #6D983F;
+}
+.dish-diet-icons .diet-icon.gluten-free {
+    background: #64B5F6;
+}
+
+
+.dish-image {
     width: 100%;
     height: 180px;
-    background: var(--jaune-creme);
-    border-radius: 10px;
+    border-radius: 8px;
     margin-bottom: 15px;
-    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    font-size: 3rem;
+    color: var(--rouge-brique);
+    background: var(--jaune-creme);
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1); /* Ombre interne sur l'image */
 }
-.item-image {
+.dish-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
     transition: transform 0.3s ease;
 }
-.item-image-container:hover .item-image {
-    transform: scale(1.05);
+.dish-image:hover img {
+    transform: scale(1.08); /* Zoom plus prononcé */
 }
-.placeholder-icon {
-    font-size: 4rem;
-    color: var(--rouge-doux);
-}
-.item-title {
-    font-family: 'Playfair Display', serif;
-    font-size: var(--font-sm);
+
+.dish-title {
+    font-family: 'Playfair Display', serif; /* Police de titre pour les plats */
+    font-size: var(--font-md);
+    font-weight: 700;
     color: var(--rouge-brique);
     margin-bottom: 8px;
+    line-height: 1.2;
 }
-.item-description {
-    font-size: var(--font-xxs);
+
+.dish-nutritional {
+    font-size: var(--font-xxs); /* Plus petite et discrète */
     color: var(--text-dark);
-    opacity: 0.8;
-    margin-bottom: 15px;
+    opacity: 0.7;
+    margin-bottom: 10px;
+}
+
+.dish-description {
+    font-size: var(--font-xxs); /* Taille de texte pour la description */
+    color: var(--text-dark);
+    line-height: 1.5;
+    margin-bottom: 12px;
     flex-grow: 1;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.item-details {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+
+.dish-info {
     border-top: 1px dashed var(--border-color);
+    padding-top: 12px;
+    margin-top: 8px;
+    font-size: var(--font-xxs); /* Taille de texte pour les infos */
+    color: var(--text-dark);
+}
+.dish-info div {
+    margin-bottom: 5px;
+}
+.dish-info strong {
+    color: var(--rouge-doux);
+}
+.dish-info .fas {
+    margin-right: 5px;
+    color: var(--rouge-vif); /* Icônes en rouge vif */
+}
+
+.dish-price {
+    font-size: var(--font-sm);
+    font-weight: 700;
+    color: var(--rouge-brique);
+    margin-top: 15px;
+    text-align: right;
+}
+.dish-price .fas {
+    margin-right: 5px;
+    color: var(--jaune-creme);
+}
+
+
+/* --- Système d'avis --- */
+.rating-section {
+    border-top: 1px solid var(--border-color);
     padding-top: 15px;
-    margin-top: 10px;
+    margin-top: 15px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.05);
 }
-.item-price {
-    font-size: var(--font-xs);
-    font-weight: 700;
-    color: var(--rouge-brique);
-}
-.item-prep-time {
-    font-size: var(--font-xxs);
-    color: var(--rouge-doux);
-}
-.item-prep-time .fas {
-    margin-right: 5px;
-    color: var(--rouge-vif);
-}
-.item-days-availability, .menu-days-availability {
-    font-size: var(--font-xxs);
-    color: var(--rouge-doux);
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    width: 100%;
-    text-align: left;
-    padding-bottom: 10px;
-    border-bottom: 1px dashed var(--border-color);
-}
-.item-days-availability .fas, .menu-days-availability .fas {
-    color: var(--rouge-vif);
-}
-.item-actions {
-    margin-top: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-}
-
-
-/* Menu Cards */
-.menu-card {
-    display: flex;
-    flex-direction: column;
-}
-.menu-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 15px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 15px;
-}
-.menu-title {
-    font-family: 'Playfair Display', serif;
-    font-size: var(--font-sm);
-    color: var(--rouge-brique);
-    font-weight: 700;
-    flex-grow: 1;
-}
-.menu-actions-group {
-    display: flex;
-    gap: 8px;
-    flex-shrink: 0;
-}
-.menu-description {
+.rating-section h4 {
     font-size: var(--font-xxs);
     color: var(--text-dark);
     margin-bottom: 10px;
-    opacity: 0.8;
 }
-.menu-meta {
-    font-size: var(--font-xxs);
-    color: var(--rouge-doux);
-    margin-bottom: 20px;
-    border-bottom: 1px dashed var(--border-color);
-    padding-bottom: 15px;
-}
-.menu-items-list h4 {
-    font-size: var(--font-xs);
-    color: var(--rouge-brique);
+
+.stars {
+    display: flex;
+    gap: 3px;
     margin-bottom: 10px;
-    font-weight: 600;
-}
-.menu-item-entry {
-    display: flex;
-    justify-content: space-between;
-    font-size: var(--font-xxs);
-    padding: 5px 0;
-    border-bottom: 1px dotted rgba(0,0,0,0.1);
-}
-.menu-item-entry:last-child {
-    border-bottom: none;
-}
-.no-items-message, .no-data-message {
-    font-style: italic;
-    color: var(--rouge-doux);
-    font-size: var(--font-xs);
-    text-align: center;
-    padding: 20px;
-    background: var(--jaune-creme);
-    border-radius: 8px;
-    margin-top: 20px;
 }
 
-/* QR Code Cards */
-.qr-code-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
+.star {
+    color: #FFD700; /* Or */
+    font-size: 1.5rem; /* Taille légèrement plus grande */
+    cursor: pointer;
+    transition: transform 0.2s ease, text-shadow 0.2s ease, color 0.2s ease;
 }
-.qr-code-img-container {
-    width: 150px;
-    height: 150px;
-    background: white;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 10px var(--shadow-light);
-    border: 1px solid var(--border-color);
+.star:hover {
+    transform: scale(1.2); /* Zoom plus prononcé au survol */
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); /* Ombre lumineuse */
+    color: #FFEA00; /* Légèrement plus clair au survol */
 }
-.qr-code-image {
+.star i {
+    pointer-events: none; /* Permet au clic d'être sur le span .star */
+}
+
+.comment-box {
     width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-.qr-code-details {
-    margin-bottom: 15px;
-}
-.qr-code-title {
-    font-size: var(--font-sm);
-    color: var(--rouge-brique);
-    font-weight: 700;
-    margin-bottom: 5px;
-}
-.qr-code-scans {
-    font-size: var(--font-xxs);
-    color: var(--rouge-doux);
-}
-.qr-code-scans .fas {
-    margin-right: 5px;
-    color: var(--rouge-vif);
-}
-.qr-code-link {
-    font-size: var(--font-xxs);
-    margin-top: 5px;
-}
-.qr-code-link a {
-    color: var(--rouge-doux);
-    text-decoration: underline;
-}
-.qr-code-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-}
-
-
-/* Review Cards */
-.review-card {
-    display: flex;
-    flex-direction: column;
-}
-.review-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-    border-bottom: 1px dashed var(--border-color);
-    padding-bottom: 15px;
-}
-.reviewer-avatar {
-    width: 45px;
-    height: 45px;
-    background: var(--rouge-doux);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: 700;
-    font-size: var(--font-xs);
-    flex-shrink: 0;
-}
-.reviewer-info {
-    flex-grow: 1;
-}
-.reviewer-id {
-    font-size: var(--font-xs);
-    color: var(--rouge-brique);
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-.review-stars {
-    color: #FFD700;
-    font-size: 1.1rem;
-    letter-spacing: 2px;
-}
-.review-date {
-    font-size: var(--font-xxs);
-    color: var(--rouge-doux);
-    flex-shrink: 0;
-}
-.review-comment {
-    font-size: var(--font-xxs);
-    color: var(--text-dark);
-    margin-bottom: 15px;
-}
-.review-rating-text {
-    font-size: var(--font-xxs);
-    color: var(--text-dark);
-}
-.review-rating-text strong {
-    color: var(--rouge-brique);
-}
-
-/* Stat Item Card */
-.stat-item-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--jaune-creme);
-    padding: 15px 20px;
-    border-radius: 8px;
-    font-size: var(--font-xs);
-    font-weight: 600;
-    color: var(--text-dark);
-    box-shadow: 0 2px 8px var(--shadow-light);
-}
-.stat-item-card .stat-value {
-    font-weight: 700;
-    color: var(--rouge-brique);
-}
-.list-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-
-/* --- Form Elements --- */
-.form-card {
-    padding: 30px;
-    margin-bottom: 30px;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-.form-group label {
-    display: block;
-    font-size: var(--font-xxs);
-    color: var(--rouge-brique);
-    font-weight: 600;
-    margin-bottom: 8px;
-}
-.form-group input[type="text"],
-.form-group input[type="email"],
-.form-group input[type="tel"],
-.form-group input[type="number"],
-.form-group textarea,
-.form-group select {
-    width: 100%;
-    padding: 12px 15px;
+    padding: 8px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     background: var(--background-light);
-    font-size: var(--font-xs);
     color: var(--text-dark);
-    transition: all 0.2s ease;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-}
-.form-group textarea {
+    font-size: var(--font-xxs);
     resize: vertical;
-    min-height: 80px;
+    min-height: 50px;
+    margin-bottom: 10px;
+    transition: border-color 0.2s ease;
 }
-.form-group select[multiple] {
-    min-height: 100px;
-    padding: 10px;
-}
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
+.comment-box:focus {
     outline: none;
     border-color: var(--rouge-doux);
-    box-shadow: 0 0 0 3px rgba(162, 78, 78, 0.2);
-    background: white;
+}
+.comment-box::placeholder {
+    color: rgba(44, 26, 26, 0.5);
 }
 
-.grid-2-cols {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+.submit-comment {
+    padding: 10px 18px;
+    border-radius: 20px;
+    background: var(--rouge-brique);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: var(--font-xxs);
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 10px var(--shadow-medium);
 }
 
-.flex-group {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
+.submit-comment:hover {
+    background: var(--rouge-doux);
+    transform: translateY(-2px);
 }
-.flex-group select {
-    flex-grow: 1;
-    min-width: 150px;
-}
-.flex-group input[type="text"] {
-    flex-grow: 1;
-    min-width: 100px;
+.submit-comment:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
 }
 
 
-/* Drag & Drop Zone */
-.drop-zone {
-    border: 2px dashed var(--rouge-doux);
-    border-radius: 10px;
-    padding: 30px;
+/* --- Chargement & Hors-ligne --- */
+.loading {
     text-align: center;
-    color: var(--rouge-brique);
-    font-size: var(--font-xs);
-    cursor: pointer;
-    transition: background 0.3s ease, border-color 0.3s ease;
-    margin-bottom: 20px;
+    padding: 50px;
+    color: var(--text-dark);
+    font-size: var(--font-sm);
 }
-.drop-zone:hover,
-.drop-zone.dragover {
-    background: rgba(162, 78, 78, 0.05);
-    border-color: var(--rouge-brique);
-}
-.drop-zone input[type="file"] {
-    display: none;
-}
-
-.image-preview-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 10px;
-    margin-top: 15px;
-}
-.uploaded-image-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 2px 8px var(--shadow-light);
-}
-.uploaded-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.remove-image-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: rgba(255, 255, 255, 0.7);
-    border: none;
+.spinner {
+    width: 45px;
+    height: 45px;
+    border: 5px solid rgba(139, 35, 35, 0.2);
+    border-top: 5px solid var(--rouge-brique);
     border-radius: 50%;
-    width: 25px;
-    height: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: var(--rouge-vif);
-    font-size: 1.2rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    transition: background 0.2s, transform 0.2s;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
 }
-.remove-image-btn:hover {
-    background: white;
-    transform: scale(1.1);
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-
-.sortable-list {
-    min-height: 50px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 10px;
-    background: var(--background-light);
-    margin-top: 15px;
-}
-.sortable-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--jaune-creme);
-    padding: 10px 15px;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    cursor: grab;
-    font-size: var(--font-xxs);
-    color: var(--text-dark);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-}
-.sortable-item:last-child {
-    margin-bottom: 0;
-}
-.sortable-item:hover {
-    background: #FFEFBB;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-.sortable-item.dragging {
-    opacity: 0.5;
-    transform: scale(1.02);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-}
-.remove-btn {
-    background: none;
-    border: none;
-    color: var(--rouge-vif);
-    font-size: 1rem;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-}
-.remove-btn:hover {
-    transform: scale(1.2);
-}
-
-.menu-preview-list {
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 15px;
-    margin-top: 20px;
-    background: var(--background-light);
-}
-.preview-item {
-    padding: 8px 0;
-    border-bottom: 1px dotted rgba(0,0,0,0.1);
-    font-size: var(--font-xxs);
-    color: var(--text-dark);
+.offline-indicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--rouge-brique);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: var(--font-xs);
+    z-index: 1000;
     display: flex;
     align-items: center;
     gap: 8px;
+    box-shadow: 0 5px 15px var(--shadow-dark);
 }
-.preview-item:last-child {
-    border-bottom: none;
+.offline-indicator .fas {
+    font-size: 1.1rem;
 }
-.preview-item .fas {
+
+.no-results-message {
+    text-align: center;
+    padding: 50px;
+    font-size: var(--font-sm);
     color: var(--rouge-doux);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
-.menu-preview-list h4 {
-    font-size: var(--font-xs);
+.no-results-message .fas {
+    font-size: 3rem;
     color: var(--rouge-brique);
-    margin-bottom: 10px;
-    font-weight: 600;
 }
 
 
-/* Modals */
-.modal {
+/* --- Utilitaires --- */
+.hidden {
+    display: none !important;
+}
+
+/* --- Modal de Zoom d'Image --- */
+.image-zoom-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.image-zoom-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+.modal-image {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 15px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Animation plus "rebondissante" */
+}
+.image-zoom-modal.active .modal-image {
+    transform: scale(1);
+}
+.close-modal-btn {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    color: white;
+    font-size: 40px;
+    cursor: pointer;
+    z-index: 2001;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+.close-modal-btn:hover {
+    transform: rotate(90deg);
+    color: var(--rouge-vif);
+}
+
+/* --- Nouvelle modale de détails du plat --- */
+.dish-detail-modal {
     position: fixed;
     top: 0;
     left: 0;
@@ -1050,22 +795,20 @@ body.modal-open {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2000;
+    z-index: 1500;
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
-.modal.hidden {
-    display: none;
-}
-.modal:not(.hidden) { /* Quand la modale est active */
+.dish-detail-modal.active {
     opacity: 1;
     visibility: visible;
 }
-.modal-content {
+
+.dish-detail-modal .modal-content {
     background: var(--card-background);
     border-radius: 15px;
-    max-width: 600px;
+    max-width: 750px; /* Légèrement plus large */
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
@@ -1073,19 +816,13 @@ body.modal-open {
     padding: 30px;
     box-shadow: 0 10px 40px var(--shadow-dark);
     transform: translateY(20px);
-    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Animation "rebondissante" */
 }
-.modal:not(.hidden) .modal-content {
+.dish-detail-modal.active .modal-content {
     transform: translateY(0);
 }
-.modal-content h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: var(--font-md);
-    color: var(--rouge-brique);
-    margin-bottom: 25px;
-    text-align: center;
-}
-.close-modal-btn {
+
+.dish-detail-modal .close-detail-modal-btn {
     position: absolute;
     top: 15px;
     right: 20px;
@@ -1094,1574 +831,1147 @@ body.modal-open {
     cursor: pointer;
     transition: color 0.2s ease, transform 0.2s ease;
 }
-.close-modal-btn:hover {
-    color: var(--rouge-vif);
+.dish-detail-modal .close-detail-modal-btn:hover {
+    color: var(--rouge-brique);
     transform: rotate(90deg);
 }
-.form-modal .btn-primary {
+
+.detail-header {
+    text-align: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
+}
+.detail-header img {
     width: 100%;
-    margin-top: 25px;
-    justify-content: center;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px var(--shadow-light);
+}
+.detail-header h2 {
+    font-family: 'Playfair Display', serif; /* Police de titre */
+    font-size: var(--font-lg); /* Plus grand */
+    color: var(--rouge-brique);
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+.detail-header p {
+    font-size: var(--font-xs);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+.detail-header .detail-price {
+    font-size: var(--font-md);
+    font-weight: bold;
+    color: var(--rouge-brique);
+    margin-top: 15px;
+}
+.detail-header .detail-dish-nutritional {
+    font-size: var(--font-xxs); /* Taille discrète */
+    color: var(--text-dark);
+    opacity: 0.7;
+    margin-bottom: 5px;
 }
 
+.detail-body {
+    padding: 0 10px;
+}
+.detail-body p {
+    margin-bottom: 15px;
+    font-size: var(--font-xs);
+    line-height: 1.6;
+    color: var(--text-dark);
+}
+
+.detail-info-section, .detail-allergens-section {
+    background: var(--background-light);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+}
+.detail-info-section h3, .detail-allergens-section h3 {
+    font-size: var(--font-sm);
+    color: var(--rouge-doux);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600; /* Plus de poids */
+}
+.detail-info-section p {
+    font-size: var(--font-xxs); /* Taille de texte pour les infos */
+    margin-bottom: 8px;
+    color: var(--text-dark);
+}
+
+.detail-allergens-section ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.detail-allergens-section li {
+    background: var(--jaune-creme);
+    color: var(--rouge-brique);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.detail-allergens-section li .fas {
+    font-size: 0.9em;
+    color: var(--rouge-vif); /* Icônes en rouge vif */
+}
+
+.detail-rating {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    border-top: none;
+    margin-top: 0;
+}
+.detail-rating h4 {
+    margin-top: 20px;
+    text-align: left;
+    font-size: var(--font-sm);
+}
+
+/* --- Animations de fond (particules) --- */
+.particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--rouge-doux);
+    border-radius: 50%;
+    opacity: 0.5;
+    box-shadow: 0 0 12px var(--rouge-doux);
+    pointer-events: none;
+    z-index: 0;
+}
+/* Les animations de float seront appliquées par JS */
 
 /* --- Responsive Design --- */
-@media (max-width: 768px) {
-    .sidebar {
-        width: 250px;
-        transform: translateX(-100%);
-    }
-    .sidebar:not(.sidebar-hidden) {
-        transform: translateX(0);
-    }
-
-    .main-content {
-        margin-left: 0;
-        padding-top: 70px;
-    }
-
-    .open-sidebar-btn {
-        display: flex;
-    }
-    .close-sidebar-btn {
-        display: block;
-    }
-
-    .main-header {
-        padding: 15px 20px;
+@media (max-width: 992px) {
+    .main-wrapper {
         flex-direction: column;
-        align-items: flex-start;
-        position: fixed;
+        max-width: 100%;
+        box-shadow: none;
+    }
+    .sidebar {
         width: 100%;
+        position: relative;
+        height: auto;
+        border-right: none;
+        border-bottom: var(--glass-border);
+        padding: 20px;
+    }
+    .sidebar .header {
+        text-align: center;
+    }
+    .sidebar .header .logo-title {
+        font-size: var(--font-lg);
+    }
+    .etablissement-info-card,
+    .qr-section {
+        margin-bottom: 20px;
+    }
+    .etablissement-info-card h3,
+    .qr-section h3 {
+        justify-content: center;
+    }
+    .etablissement-info-card p {
+        text-align: center;
+    }
+
+    .content-area {
+        padding: 0;
+    }
+
+    .top-banner {
+        padding: 40px 20px;
+        margin-bottom: 20px;
+    }
+    .top-banner h1 {
+        font-size: var(--font-md);
+    }
+    .top-banner p {
+        font-size: var(--font-xxs);
+    }
+
+    .nav-container {
+        padding: 15px 10px;
+        position: sticky;
         top: 0;
-        left: 0;
-    }
-    .main-header h1 {
-        font-size: var(--font-sm);
-        margin-bottom: 10px;
-    }
-    .header-actions {
-        width: 100%;
-        justify-content: space-around;
-        gap: 10px;
-    }
-    .btn {
-        flex-grow: 1;
+        z-index: 100;
+        display: flex;
+        flex-wrap: wrap;
         justify-content: center;
     }
 
-    .section {
+    .sub-nav {
+        order: 2;
+        flex-basis: 100%;
+        margin-top: 15px;
+        transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        padding-bottom: 0;
+    }
+    .sub-nav.expanded {
+        max-height: 300px;
+        opacity: 1;
+        padding-bottom: 10px;
+    }
+    .sub-nav .nav-items {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .filter-btn {
+        padding: 8px 15px;
+        font-size: 0.8rem;
+    }
+    .filter-toggle {
+        display: block;
+        order: 1;
+        flex-grow: 1;
+        text-align: center;
+    }
+    .mobile-filter-toggle-btn {
+        margin-right: 0;
+    }
+
+
+    .search-container {
+        padding: 15px 20px;
+        position: static;
+    }
+    .clear-search-btn {
+        right: 30px;
+    }
+
+    #menuSectionsContainer {
         padding: 20px;
     }
-    .section h2 {
-        font-size: var(--font-sm);
-        margin-bottom: 20px;
+    .menu-section h2 {
+        font-size: var(--font-md);
     }
-
-    .grid-container,
-    .grid-container-items,
-    .grid-container-menus,
-    .grid-container-qr,
-    .grid-container-reviews,
-    .grid-container-stats {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .form-group.grid-2-cols {
+    .menu-grid {
         grid-template-columns: 1fr;
     }
-
-    .flex-group {
-        flex-direction: column;
-        align-items: stretch;
+    .dish-title {
+        font-size: 1.25rem;
     }
-    .flex-group select,
-    .flex-group input[type="text"],
-    .flex-group button {
-        width: 100%;
-        flex-shrink: 0;
+    .dish-price {
+        font-size: 1.1rem;
     }
-    .flex-group button {
-        margin-top: 10px;
-    }
-
-    .modal-content {
-        width: 95%;
-        padding: 20px;
-    }
-    .modal-content h2 {
-        font-size: var(--font-sm);
-        margin-bottom: 20px;
+    .offline-indicator {
+        font-size: 0.8rem;
+        padding: 8px 15px;
+        top: 15px;
+        right: 15px;
     }
     .close-modal-btn {
+        font-size: 30px;
+        top: 15px;
+        right: 15px;
+    }
+
+    /* Modale de détails sur mobile */
+    .dish-detail-modal .modal-content {
+        width: 95%;
+        padding: 20px;
+        border-radius: 10px;
+    }
+    .dish-detail-modal .close-detail-modal-btn {
         font-size: 25px;
         top: 10px;
         right: 15px;
     }
-
-    .backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 900;
+    .detail-header img {
+        max-height: 200px;
+    }
+    .detail-header h2 {
+        font-size: var(--font-md);
+    }
+    .detail-header p {
+        font-size: var(--font-xs);
+    }
+    .detail-info-section, .detail-allergens-section {
+        padding: 15px;
+    }
+    .detail-info-section h3, .detail-allergens-section h3 {
+        font-size: var(--font-xs);
+        margin-bottom: 10px;
+    }
+    .detail-allergens-section li {
+        font-size: 0.75rem;
+        padding: 5px 10px;
     }
 }
-
-/* Version mobile de la sidebar ouverte pour le backdrop et le main content */
-@media (max-width: 768px) {
-    .sidebar:not(.sidebar-hidden) + .backdrop {
-        display: block;
-    }
-}
-    </style>
+</style>
 </head>
+
 <body>
-
-    <div id="backdrop" class="backdrop hidden"></div>
-
-    <aside id="sidebar" class="sidebar sidebar-hidden">
-        <div class="sidebar-header">
-            <h2 class="logo-title"><i class="fas fa-utensils"></i> DailyMenu Admin</h2>
-            <div id="live-clock" class="live-clock"></div>
-            <button id="close-sidebar" class="close-sidebar-btn"><i class="fas fa-times"></i></button>
-        </div>
-        <nav class="sidebar-nav">
-            <ul>
-                <li><a href="#overview" class="nav-item active" data-section="overview"><i class="fas fa-tachometer-alt"></i> Aperçu</a></li>
-                <li><a href="#profile" class="nav-item" data-section="profile"><i class="fas fa-user-cog"></i> Mon Profil</a></li>
-                <li><a href="#items" class="nav-item" data-section="items"><i class="fas fa-burger"></i> Plats</a></li>
-                <li><a href="#menus" class="nav-item" data-section="menus"><i class="fas fa-book-open"></i> Menus</a></li>
-                <li><a href="#qr-codes" class="nav-item" data-section="qr-codes"><i class="fas fa-qrcode"></i> QR Codes</a></li>
-                <li><a href="#reviews" class="nav-item" data-section="reviews"><i class="fas fa-star-half-alt"></i> Avis</a></li>
-                <li><a href="#stats" class="nav-item" data-section="stats"><i class="fas fa-chart-line"></i> Statistiques</a></li>
-                <li><a href="#" class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
-            </ul>
-        </nav>
-    </aside>
-
-    <div id="main-content" class="main-content">
-        <button id="open-sidebar" class="open-sidebar-btn"><i class="fas fa-bars"></i></button>
-
-        <header class="main-header">
-            <h1 id="current-section-title">Aperçu du Tableau de Bord</h1>
-            <div class="header-actions">
-                <button class="btn btn-primary hidden" id="add-item-btn" onclick="openModal('create-item-modal')"><i class="fas fa-plus-circle"></i> Ajouter Plat</button>
-                <button class="btn btn-primary hidden" id="add-menu-btn" onclick="openModal('create-menu-modal')"><i class="fas fa-plus-circle"></i> Créer Menu</button>
-                <button class="btn btn-primary hidden" id="generate-qr-main-btn" onclick="openModal('generate-qr-modal')"><i class="fas fa-qrcode"></i> Générer QR</button>
-            </div>
-        </header>
-
-        <div id="toast-container"></div>
-
-        <section id="overview-section" class="section">
-            <h2>Aperçu</h2>
-            <div class="grid-container">
-                <div class="info-card">
-                    <h3><i class="fas fa-burger"></i> Plats</h3>
-                    <p id="items-count" class="count">0</p>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-book-open"></i> Menus</h3>
-                    <p id="menus-count" class="count">0</p>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-qrcode"></i> Scans QR</h3>
-                    <p id="qr-scans" class="count">0</p>
-                </div>
-                <div class="info-card">
-                    <h3><i class="fas fa-star"></i> Note Moyenne</h3>
-                    <p id="avg-rating" class="count">0.0</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="profile-section" class="section hidden">
-            <h2>Mon Profil</h2>
-            <form id="profile-form" class="form-card">
-                <div class="form-group">
-                    <label for="profile-name">Nom de l'établissement</label>
-                    <input type="text" id="profile-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="profile-email">Email professionnel</label>
-                    <input type="email" id="profile-email" required>
-                </div>
-                <div class="form-group">
-                    <label for="profile-phone">Numéro de téléphone</label>
-                    <input type="tel" id="profile-phone">
-                </div>
-                <div class="form-group">
-                    <label for="profile-address">Adresse physique</label>
-                    <input type="text" id="profile-address">
-                </div>
-                <div class="form-group grid-2-cols">
-                    <div>
-                        <label for="profile-latitude">Latitude</label>
-                        <input type="number" step="any" id="profile-latitude">
-                    </div>
-                    <div>
-                        <label for="profile-longitude">Longitude</label>
-                        <input type="number" step="any" id="profile-longitude">
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Enregistrer les modifications</button>
-            </form>
-        </section>
-
-        <section id="items-section" class="section hidden">
-            <h2>Gestion des Plats</h2>
-            <div class="filters-and-actions">
-                <div class="filter-group">
-                    <label for="item-category-filter">Catégorie:</label>
-                    <select id="item-category-filter" class="filter-select"></select>
-                </div>
-                <div class="filter-group">
-                    <label for="item-day-filter-items">Jour:</label>
-                    <select id="item-day-filter-items" class="filter-select"></select>
-                </div>
-            </div>
-            <div id="items-list" class="grid-container-items">
-                </div>
-        </section>
-
-        <section id="menus-section" class="section hidden">
-            <h2>Gestion des Menus</h2>
-            <div class="filters-and-actions">
-                <div class="filter-group">
-                    <label for="menu-day-filter">Jour:</label>
-                    <select id="menu-day-filter" class="filter-select"></select>
-                </div>
-            </div>
-            <div id="menus-list" class="grid-container-menus">
-                </div>
-        </section>
-
-        <section id="qr-codes-section" class="section hidden">
-            <h2>Mes QR Codes</h2>
-            <div class="qr-form-section form-card">
-                <h3>Générer un nouveau QR Code</h3>
-                <form id="qr-code-form">
-                    <div class="form-group">
-                        <label for="qr-menu-select">Sélectionner un Menu:</label>
-                        <select id="qr-menu-select" required></select>
-                    </div>
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-qrcode"></i> Générer QR Code</button>
-                </form>
-            </div>
-            <h3>QR Codes existants</h3>
-            <div id="qr-codes-list" class="grid-container-qr">
-                </div>
-        </section>
-
-        <section id="reviews-section" class="section hidden">
-            <h2>Avis Clients</h2>
-            <div class="grid-container-stats">
-                <div class="info-card">
-                    <h3>Total Avis</h3>
-                    <p id="total-reviews" class="count">0</p>
-                </div>
-                <div class="info-card">
-                    <h3>Note Moyenne Globale</h3>
-                    <p id="avg-rating-stats" class="count">0.0</p>
-                </div>
-                <div class="info-card positive">
-                    <h3>Avis Positifs (≥4★)</h3>
-                    <p id="positive-reviews" class="count">0</p>
-                </div>
-                <div class="info-card negative">
-                    <h3>Avis à Améliorer (<4★)</h3>
-                    <p id="improve-reviews" class="count">0</p>
-                </div>
-            </div>
-            <h3>Détails des Avis</h3>
-            <div id="reviews-list" class="grid-container-reviews">
-                </div>
-        </section>
-
-        <section id="stats-section" class="section hidden">
-            <h2>Statistiques</h2>
-            <h3>Plats les plus consultés</h3>
-            <div id="popular-items" class="list-container">
-                </div>
-        </section>
+    <div class="offline-indicator hidden" id="offlineIndicator">
+        <i class="fas fa-wifi-slash"></i> Mode hors-ligne activé
     </div>
 
-    <div id="create-item-modal" class="modal hidden">
+    <div class="main-wrapper">
+        <aside class="sidebar">
+            <header class="header">
+                <h1 class="logo-title" id="menuTitle">Menu du Restaurant</h1>
+                <p id="menuDescription">Découvrez nos délices culinaires</p>
+            </header>
+
+            <section class="etablissement-info-card" id="etablissementInfo">
+                <h3><i class="fas fa-building"></i> Infos Établissement</h3>
+                </section>
+
+            <section class="qr-section">
+                <h3><i class="fas fa-qrcode"></i> QR Code Menu</h3>
+                <div class="qr-code" id="qrCodeContainer">
+                    <span><i class="fas fa-qrcode"></i></span>
+                </div>
+            </section>
+        </aside>
+
+        <main class="content-area">
+            <div class="top-banner" data-ga-dmt="header_bm">
+                <div class="vcenter">
+                    <h1 id="bannerTitle">Notre Menu</h1>
+                    <p id="bannerDescription">Craving PERi-PERi? You’ve come to the right place!</p>
+                    <p class="cta-container">
+                        <a class="cta-button" <i class="fas fa-chevron-down"></i> Voir le menu</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="nav-container">
+                <nav class="sub-nav" id="subNavCategories">
+                    <div class="inner">
+                        <div class="nav-items" id="filtersContainer">
+                            <button class="filter-btn active" data-filter="all" data-filter-type="category">Tous les plats</button>
+                            </div>
+                    </div>
+                </nav>
+                <div class="filter-toggle">
+                    <button class="mobile-filter-toggle-btn" id="mobileFilterToggleButton"><i class="fas fa-sliders-h"></i> Filtres</button>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <input type="text" class="search-bar" placeholder="Rechercher un plat, ingrédient..." id="searchInput">
+                <button class="clear-search-btn hidden" id="clearSearchBtn"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                Chargement du menu...
+            </div>
+
+            <div id="menuSectionsContainer">
+                </div>
+
+            <p class="no-results-message hidden" id="noResultsMessage">
+                <i class="fas fa-search-minus"></i> Aucun plat trouvé correspondant à votre recherche et vos filtres.
+            </p>
+
+        </main>
+    </div>
+
+    <div class="image-zoom-modal" id="imageZoomModal">
+        <span class="close-modal-btn"><i class="fas fa-times-circle"></i></span>
+        <img class="modal-image" id="modalImage" src="" alt="Image agrandie">
+    </div>
+
+    <div class="dish-detail-modal hidden" id="dishDetailModal">
         <div class="modal-content">
-            <span class="close-modal-btn" onclick="closeModal('create-item-modal')"><i class="fas fa-times-circle"></i></span>
-            <h2>Ajouter un Nouveau Plat</h2>
-            <form id="create-item-form" class="form-modal">
-                <div class="form-group">
-                    <label for="item-name">Nom du plat</label>
-                    <input type="text" id="item-name" required>
+            <span class="close-detail-modal-btn"><i class="fas fa-times-circle"></i></span>
+            <div class="detail-header">
+                <img id="detailDishImage" src="" alt="Image du plat">
+                <h2 id="detailDishTitle"></h2>
+                <p id="detailDishNutritional"></p>
+                <p class="detail-price" id="detailDishPrice"></p>
+            </div>
+            <div class="detail-body">
+                <p id="detailDishDescription"></p>
+                <div class="detail-info-section">
+                    <h3><i class="fas fa-info-circle"></i> Informations Complémentaires</h3>
+                    <p id="detailDishPrepTime"></p>
+                    <p id="detailDishAvailability"></p>
+                    <p id="detailDishTags"></p>
                 </div>
-                <div class="form-group">
-                    <label for="item-description">Description</label>
-                    <textarea id="item-description"></textarea>
+                <div class="detail-allergens-section">
+                    <h3><i class="fas fa-allergies"></i> Allergènes Potentiels</h3>
+                    <ul id="detailDishAllergensList">
+                        </ul>
                 </div>
-                <div class="form-group">
-                    <label for="item-price">Prix (FCFA)</label>
-                    <input type="number" id="item-price" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="item-prep-time">Temps de préparation (min)</label>
-                    <input type="number" id="item-prep-time" required>
-                </div>
-                <div class="form-group">
-                    <label for="item-availability">Disponible</label>
-                    <select id="item-availability">
-                        <option value="true">Oui</option>
-                        <option value="false">Non</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="item-categories">Catégories</label>
-                    <select id="item-categories" multiple required></select>
-                </div>
-                <div class="form-group">
-                    <label for="item-tags">Tags</label>
-                    <select id="item-tags" multiple></select>
-                </div>
-                <div class="form-group">
-                    <label for="item-days">Jours de disponibilité</label>
-                    <select id="item-days" multiple></select>
-                </div>
-
-                <h3>Ingrédients</h3>
-                <div class="flex-group">
-                    <select id="ingredient-select"></select>
-                    <input type="text" id="ingredient-quantity" placeholder="Quantité (ex: 200g, 2 unités)">
-                    <button type="button" class="btn btn-secondary" onclick="addItemIngredient()">Ajouter Ingrédient</button>
-                </div>
-                <div id="item-ingredients" class="sortable-list" ondragover="event.preventDefault();" ondrop="handleDrop(event);">
+                <div class="rating-section detail-rating">
+                    <h4>Votre avis:</h4>
+                    <div class="stars" data-item-id="">
+                        <span class="star" data-value="1"><i class="far fa-star"></i></span>
+                        <span class="star" data-value="2"><i class="far fa-star"></i></span>
+                        <span class="star" data-value="3"><i class="far fa-star"></i></span>
+                        <span class="star" data-value="4"><i class="far fa-star"></i></span>
+                        <span class="star" data-value="5"><i class="far fa-star"></i></span>
                     </div>
-
-                <h3>Images</h3>
-                <div class="drop-zone" ondragover="event.preventDefault(); this.classList.add('dragover');" ondragleave="this.classList.remove('dragover');" onclick="document.getElementById('image-upload-input').click();">
-                    Glissez & déposez des images ici ou cliquez pour sélectionner
-                    <input type="file" id="image-upload-input" multiple accept="image/*" onchange="handleFileSelect(event)" style="display: none;">
+                    <textarea class="comment-box" placeholder="Laissez un commentaire..."></textarea>
+                    <button class="submit-comment"><i class="fas fa-paper-plane"></i> Soumettre l'avis</button>
                 </div>
-                <div id="image-preview" class="image-preview-grid">
-                    </div>
-
-                <button type="submit" class="btn btn-primary mt-4"><i class="fas fa-plus-circle"></i> Créer Plat</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="create-menu-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-modal-btn" onclick="closeModal('create-menu-modal')"><i class="fas fa-times-circle"></i></span>
-            <h2>Créer un Nouveau Menu</h2>
-            <form id="create-menu-form" class="form-modal">
-                <div class="form-group">
-                    <label for="menu-name">Nom du menu</label>
-                    <input type="text" id="menu-name" required>
-                </div>
-                <div class="form-group">
-                    <label for="menu-description">Description du menu</label>
-                    <textarea id="menu-description"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="menu-days">Jours de disponibilité</label>
-                    <select id="menu-days" multiple required></select>
-                </div>
-
-                <h3>Plats du menu</h3>
-                <div class="flex-group">
-                    <select id="item-select"></select>
-                    <button type="button" class="btn btn-secondary" onclick="addMenuItem()">Ajouter Plat</button>
-                </div>
-                <div id="menu-items" class="sortable-list" ondragover="event.preventDefault();" ondrop="handleDrop(event);">
-                    </div>
-                <div id="menu-preview" class="menu-preview-list">
-                    <h4>Aperçu de l'ordre du menu:</h4>
-                    </div>
-
-                <button type="submit" class="btn btn-primary mt-4"><i class="fas fa-plus-circle"></i> Créer Menu</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="generate-qr-modal" class="modal hidden">
-        <div class="modal-content">
-            <span class="close-modal-btn" onclick="closeModal('generate-qr-modal')"><i class="fas fa-times-circle"></i></span>
-            <h2>Générer un QR Code</h2>
-            <form id="generate-qr-modal-form" class="form-modal">
-                <div class="form-group">
-                    <label for="modal-qr-menu">Sélectionner un Menu:</label>
-                    <select id="modal-qr-menu" required></select>
-                </div>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-qrcode"></i> Générer</button>
-            </form>
+            </div>
         </div>
     </div>
 
 
-    <script>
-        const frontendUrls = "http://127.0.0.1:8000/"; // Assurez-vous que cette URL est correcte
-        let token = localStorage.getItem("token");
-        let allItems = []; // Stocker tous les items pour les filtres
-        let allMenus = []; // Stocker tous les menus pour les filtres
-        let allCategories = []; // Stocker toutes les catégories
-        let allTags = []; // Stocker tous les tags
-        let allDays = []; // Stocker tous les jours
-        let selectedImages = [];
-        let selectedIngredients = [];
-        let selectedMenuItems = [];
+    <script >(function() {
+    // --- Configuration API ---
+    const API_BASE_URL = 'http://127.0.0.1:8000'; // Votre URL de base
+    // const API_BASE_URL = "https://dailymenu.onrender.com"; // Si déployé
+
+    // Extrait menu_id depuis l'URL (amélioré pour être plus robuste)
+    const getMenuIdFromUrl = () => {
+        const path = window.location.pathname;
+        const match = path.match(/\/menus\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
+        return match ? match[1] : 'eb95505e-6bc2-439f-be3c-1d8e7f7df721'; // Valeur par défaut
+    };
+    const MENU_ID = getMenuIdFromUrl();
+
+    // --- Variables Globales (pour le cache et les données) ---
+    let menuData = null;
+    let allItems = [];
+    let categories = [];
+    let allergenes = [];
+    let activeAllergeneFilters = new Set(); // Pour le filtrage multiple des allergènes
+    let activeCategoryFilter = 'all'; // Pour le filtre de catégorie (un seul à la fois)
 
 
-        // Horloge en direct
-        function updateClock() {
-            const now = new Date();
-            const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            const timeString = now.toLocaleTimeString('fr-FR', options);
-            document.getElementById('live-clock').textContent = timeString;
+    // --- Références DOM Caching ---
+    const loadingElement = document.getElementById('loading');
+    const menuSectionsContainer = document.getElementById('menuSectionsContainer');
+    const offlineIndicator = document.getElementById('offlineIndicator');
+    const menuTitleElement = document.getElementById('menuTitle');
+    const menuDescriptionElement = document.getElementById('menuDescription');
+    const etablissementInfoElement = document.getElementById('etablissementInfo');
+    const qrCodeContainer = document.getElementById('qrCodeContainer');
+    const filtersContainer = document.getElementById('filtersContainer');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const noResultsMessage = document.getElementById('noResultsMessage');
+
+    // Nouveaux éléments pour la bannière et la sous-navigation
+    const bannerTitleElement = document.getElementById('bannerTitle');
+    const bannerDescriptionElement = document.getElementById('bannerDescription');
+    const subNavCategories = document.getElementById('subNavCategories');
+    const mobileFilterToggleButton = document.getElementById('mobileFilterToggleButton');
+
+    // Modale de zoom d'image
+    const imageZoomModal = document.getElementById('imageZoomModal');
+    const modalImage = document.getElementById('modalImage');
+    const closeModalBtn = imageZoomModal.querySelector('.close-modal-btn');
+
+    // Nouvelle modale de détails du plat
+    const dishDetailModal = document.getElementById('dishDetailModal');
+    const closeDetailModalBtn = dishDetailModal.querySelector('.close-detail-modal-btn');
+    const detailDishImage = document.getElementById('detailDishImage');
+    const detailDishTitle = document.getElementById('detailDishTitle');
+    const detailDishNutritional = document.getElementById('detailDishNutritional');
+    const detailDishPrice = document.getElementById('detailDishPrice');
+    const detailDishDescription = document.getElementById('detailDishDescription');
+    const detailDishPrepTime = document.getElementById('detailDishPrepTime');
+    const detailDishAvailability = document.getElementById('detailDishAvailability');
+    const detailDishTags = document.getElementById('detailDishTags');
+    const detailDishAllergensList = document.getElementById('detailDishAllergensList');
+    const detailRatingSection = dishDetailModal.querySelector('.detail-rating');
+
+
+    // --- Fonctions Utilitaires ---
+
+    // Fonction pour retenter la requête API avec un délai croissant
+    async function fetchWithRetry(url, retries = 3, delay = 1000) {
+        for (let attempt = 1; attempt <= retries; attempt++) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error(`Menu non trouvé (404) pour l'ID: ${MENU_ID}`);
+                    }
+                    throw new Error(`Erreur HTTP: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.warn(`Tentative ${attempt}/${retries} échouée pour ${url}: ${error.message}`);
+                if (attempt === retries) throw error;
+                await new Promise(resolve => setTimeout(resolve, delay * attempt));
+            }
+        }
+    }
+
+    // Affiche/Masque un élément avec une classe 'hidden'
+    const toggleVisibility = (element, show) => {
+        if (element) {
+            element.classList.toggle('hidden', !show);
+        }
+    };
+
+    // --- Chargement des Données du Menu ---
+    async function loadMenuData() {
+        toggleVisibility(loadingElement, true);
+        toggleVisibility(menuSectionsContainer, false);
+        toggleVisibility(noResultsMessage, false);
+        toggleVisibility(offlineIndicator, false);
+
+        try {
+            const data = await fetchWithRetry(`${API_BASE_URL}/api/public/menu/${MENU_ID}`);
+            menuData = data.menu || {};
+            allItems = data.menu.items || [];
+            categories = data.categories || [];
+            allergenes = data.allergenes || [];
+            const etablissement = data.etablissement || {};
+            const qrcodeUrl = data.qrcode;
+
+            // Stocker dans localStorage pour le mode hors-ligne
+            localStorage.setItem('menuCache', JSON.stringify(data));
+
+            // Mise à jour de l'interface
+            updateMenuHeader(menuData);
+            updateEtablissementInfo(etablissement);
+            updateQRCode(qrcodeUrl);
+            updateBanner(menuData);
+            generateFilterButtons(); // Renommé pour plus de clarté
+            displayMenuSections();
+
+            toggleVisibility(loadingElement, false);
+            toggleVisibility(menuSectionsContainer, true);
+
+        } catch (error) {
+            console.error('Erreur lors du chargement du menu:', error);
+            const cachedData = localStorage.getItem('menuCache');
+            if (cachedData) {
+                const data = JSON.parse(cachedData);
+                menuData = data.menu || {};
+                allItems = data.menu.items || [];
+                categories = data.categories || [];
+                allergenes = data.allergenes || [];
+                const etablissement = data.etablissement || {};
+                const qrcodeUrl = data.qrcode;
+
+                updateMenuHeader(menuData);
+                updateEtablissementInfo(etablissement);
+                updateQRCode(qrcodeUrl);
+                updateBanner(menuData);
+                generateFilterButtons();
+                displayMenuSections();
+
+                toggleVisibility(loadingElement, false);
+                toggleVisibility(menuSectionsContainer, true);
+                toggleVisibility(offlineIndicator, true);
+            } else {
+                loadingElement.innerHTML = `
+                    <div style="color: var(--rouge-brique); text-align: center;">
+                        <p><i class="fas fa-exclamation-triangle"></i> Une erreur est survenue lors du chargement du menu.</p>
+                        <p><small>Vérifiez votre connexion ou l'ID du menu et réessayez plus tard.</small></p>
+                        <p><small>Détail de l'erreur: ${error.message}</small></p>
+                    </div>
+                `;
+                toggleVisibility(loadingElement, true);
+            }
+        }
+    }
+
+    // --- Mise à jour de l'interface utilisateur ---
+
+    function updateMenuHeader(data) {
+        menuTitleElement.textContent = `${data.nom || 'Menu du Restaurant'}`;
+        menuDescriptionElement.textContent = data.description || 'Votre expérience culinaire';
+    }
+
+    function updateBanner(data) {
+        bannerTitleElement.textContent = data.nom || 'Notre Menu';
+        bannerDescriptionElement.textContent = data.description || 'Découvrez nos saveurs uniques !';
+    }
+
+    function updateEtablissementInfo(etablissement) {
+        if (!etablissementInfoElement) return;
+
+        const nom = etablissement.nom_etablissement || 'Nom non disponible';
+        const adresse = etablissement.adresse_physique || 'Adresse non disponible';
+        const telephone = etablissement.numtel || 'Numéro non disponible';
+        const email = etablissement.email_pro || 'Email non disponible';
+
+        etablissementInfoElement.innerHTML = `
+            <h3><i class="fas fa-building"></i> Infos Établissement</h3>
+            <p><i class="fas fa-store"></i> <strong>Nom:</strong> ${nom}</p>
+            <p><i class="fas fa-map-marker-alt"></i> <strong>Adresse:</strong> ${adresse}</p>
+            <p><i class="fas fa-phone"></i> <strong>Tel:</strong> ${telephone}</p>
+            <p><i class="fas fa-envelope"></i> <strong>Email:</strong> ${email}</p>
+        `;
+    }
+
+    function updateQRCode(qrcodeUrl) {
+        if (qrcodeUrl) {
+            qrCodeContainer.innerHTML = `<img src="${qrcodeUrl}" alt="QR Code du menu">`;
+        } else {
+            qrCodeContainer.innerHTML = '<span><i class="fas fa-qrcode"></i> Pas de QR code</span>';
+        }
+    }
+
+    function generateFilterButtons() {
+        filtersContainer.innerHTML = ''; // Nettoyer tous les filtres
+
+        // Bouton "Tous les plats"
+        const allButton = document.createElement('button');
+        allButton.className = `filter-btn ${activeCategoryFilter === 'all' ? 'active' : ''}`;
+        allButton.dataset.filter = 'all';
+        allButton.dataset.filterType = 'category';
+        allButton.textContent = 'Tous les plats';
+        filtersContainer.appendChild(allButton);
+
+        // Boutons de catégorie
+        const sortedCategories = [...categories].sort((a, b) => a.name.localeCompare(b.name));
+        sortedCategories.forEach(category => {
+            const button = document.createElement('button');
+            button.className = `filter-btn ${activeCategoryFilter === category.name.toLowerCase() ? 'active' : ''}`;
+            button.dataset.filter = category.name.toLowerCase();
+            button.dataset.filterType = 'category';
+            button.textContent = category.name.charAt(0).toUpperCase() + category.name.slice(1);
+            filtersContainer.appendChild(button);
+        });
+
+        // Boutons allergènes
+        const sortedAllergenes = [...allergenes].sort((a, b) => a.nom_allergene.localeCompare(b.nom_allergene));
+        sortedAllergenes.forEach(allergene => {
+            const button = document.createElement('button');
+            const allergeneKey = `allergene-${allergene.nom_allergene.toLowerCase()}`;
+            button.className = `filter-btn ${activeAllergeneFilters.has(allergeneKey) ? 'active' : ''}`;
+            button.dataset.filter = allergeneKey;
+            button.dataset.filterType = 'allergene';
+            button.textContent = `Sans ${allergene.nom_allergene}`;
+            filtersContainer.appendChild(button);
+        });
+
+        attachFilterEvents();
+    }
+
+    function displayMenuSections() {
+        menuSectionsContainer.innerHTML = '';
+        toggleVisibility(noResultsMessage, false);
+
+        const itemsByCategory = {};
+        allItems.forEach(item => {
+            const categoryNames = item.categories.length > 0 ? item.categories.map(cat => cat.name) : ['Autres'];
+            categoryNames.forEach(catName => {
+                if (!itemsByCategory[catName]) {
+                    itemsByCategory[catName] = [];
+                }
+                itemsByCategory[catName].push(item);
+            });
+        });
+
+        const orderedCategoryNames = categories.length > 0
+            ? categories.map(cat => cat.name)
+            : Object.keys(itemsByCategory).sort();
+
+        orderedCategoryNames.forEach(categoryName => {
+            const categoryItems = itemsByCategory[categoryName];
+            if (categoryItems && categoryItems.length > 0) {
+                const section = document.createElement('section');
+                section.className = 'menu-section';
+                section.id = `section_${categoryName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+                section.innerHTML = `<h2><em>${categoryName}</em></h2><div class="menu-grid"></div>`;
+
+                const grid = section.querySelector('.menu-grid');
+                const fragment = document.createDocumentFragment();
+
+                const sortedItems = [...categoryItems].sort((a, b) => {
+                    // Trier les articles disponibles en premier, puis alphabétiquement
+                    if (a.disponibilite && !b.disponibilite) return -1;
+                    if (!a.disponibilite && b.disponibilite) return 1;
+                    return a.nom_plat.localeCompare(b.nom_plat);
+                });
+
+                sortedItems.forEach(item => {
+                    const dishCard = createDishCard(item);
+                    fragment.appendChild(dishCard);
+                });
+
+                grid.appendChild(fragment);
+                menuSectionsContainer.appendChild(section);
+            }
+        });
+
+        applyFiltersAndSearch();
+    }
+
+    function createDishCard(item) {
+        const card = document.createElement('div');
+        card.className = 'dish-card';
+        if (!item.disponibilite) {
+            card.classList.add('unavailable-item');
+        }
+        // Ajout des data-attributs pour le filtrage
+        card.dataset.category = (item.categories || []).map(cat => cat.name.toLowerCase()).join(' ');
+        card.dataset.allergenes = (item.ingredients || []).flatMap(ing => (ing.allergenes || []).map(a => a.nom_allergene.toLowerCase())).join(' ');
+        card.dataset.itemId = item.id_item || `item-${Date.now()}`;
+
+        const imageUrl = item.images && item.images.length > 0 ? `${API_BASE_URL}${item.images[0].url_image}` : null;
+        const price = item.price ? parseFloat(item.price).toFixed(0) : 'N/A';
+        const prepTime = item.prep_time || 'N/A';
+        const description = item.description || 'Aucune description disponible.';
+        const nomPlat = item.nom_plat || 'Plat sans nom';
+        const tags = (item.tags || []).map(tag => tag.name.toLowerCase());
+
+        const nutritionalInfo = item.nutritional_info || '';
+
+        let flagsHtml = '';
+        if (tags.includes('nouveau') || tags.includes('new')) {
+            flagsHtml += '<i class="flag new">new</i>';
+        }
+        if (tags.includes('populaire') || tags.includes('featured')) {
+            flagsHtml += '<i class="flag featured">POPULAIRE</i>';
         }
 
-        // Met à jour l'horloge toutes les secondes
-        setInterval(updateClock, 1000);
-        // Appelle une première fois pour éviter un délai d'une seconde au chargement
-        updateClock();
+        let dietIconsHtml = '';
+        if (tags.includes('vegetarien') || tags.includes('vegetarian')) {
+            dietIconsHtml += '<span class="diet-icon vegetarian">Végétarien</span>';
+        }
+        if (tags.includes('vegan') || tags.includes('plant-based')) {
+            dietIconsHtml += '<span class="diet-icon vegan">Vegan</span>';
+        }
+        // Exemple d'ajout d'autres tags comme "Sans gluten" si vos données le contiennent
+        if (tags.includes('sans gluten') || tags.includes('gluten-free')) {
+            dietIconsHtml += '<span class="diet-icon gluten-free">Sans Gluten</span>';
+        }
 
+        let joursDispoHtml = '';
+        if (item.jours_disponibilite && item.jours_disponibilite.length > 0) {
+            const jours = item.jours_disponibilite.map(jour => jour.nom).join(', ');
+            joursDispoHtml = `<div><i class="fas fa-calendar-alt"></i> <strong>Jours:</strong> ${jours}</div>`;
+        }
 
-        // Navigation et chargement automatique des sections
-        document.querySelectorAll(".nav-item").forEach(item => {
-            item.addEventListener("click", (e) => {
-                e.preventDefault(); // Empêche le rechargement par le lien #
-                const sectionId = item.dataset.section;
-                if (sectionId) {
-                    showSection(sectionId);
-                    document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
-                    item.classList.add("active");
+        let additionalTagsHtml = '';
+        const relevantTags = tags.filter(t => !['nouveau', 'new', 'populaire', 'featured', 'vegetarien', 'vegetarian', 'vegan', 'plant-based', 'sans gluten', 'gluten-free'].includes(t));
+        if (relevantTags.length > 0) {
+            additionalTagsHtml = `<div><i class="fas fa-tag"></i> <strong>Tags:</strong> ${relevantTags.join(', ')}</div>`;
+        }
 
-                    // Redirection précise vers le haut de la section
-                    const targetSection = document.getElementById(`${sectionId}-section`);
-                    if (targetSection) {
-                        // Utiliser scrollIntoView avec 'start' pour scroller au début de l'élément
-                        // Ajout d'un petit décalage pour la barre de titre fixe
-                        const headerOffset = 80; // Hauteur de votre header fixe
-                        const elementPosition = targetSection.getBoundingClientRect().top + window.pageYOffset;
-                        window.scrollTo({
-                            top: elementPosition - headerOffset,
-                            behavior: "smooth"
-                        });
+        card.innerHTML = `
+            ${flagsHtml}
+            <div class="dish-image">
+                ${imageUrl ? `<img src="${imageUrl}" alt="${nomPlat}">` : '<span><i class="fas fa-utensils"></i></span>'}
+            </div>
+            <h3 class="dish-title">${nomPlat}</h3>
+            ${nutritionalInfo ? `<div class="dish-nutritional">${nutritionalInfo}</div>` : ''}
+            <p class="dish-description">${description}</p>
+            <div class="dish-info">
+                <div><i class="fas fa-hourglass-half"></i> <strong>Préparation:</strong> ${prepTime} min</div>
+                ${joursDispoHtml}
+                ${additionalTagsHtml}
+            </div>
+            <div class="dish-price">${price} FCFA</div>
+            <div class="dish-diet-icons">${dietIconsHtml}</div>
+            <div class="rating-section">
+                <h4>Votre avis:</h4>
+                <div class="stars" data-item-id="${card.dataset.itemId}">
+                    <span class="star" data-value="1"><i class="far fa-star"></i></span>
+                    <span class="star" data-value="2"><i class="far fa-star"></i></span>
+                    <span class="star" data-value="3"><i class="far fa-star"></i></span>
+                    <span class="star" data-value="4"><i class="far fa-star"></i></span>
+                    <span class="star" data-value="5"><i class="far fa-star"></i></span>
+                </div>
+                <textarea class="comment-box" placeholder="Laissez un commentaire sur ${nomPlat}..."></textarea>
+                <button class="submit-comment"><i class="fas fa-paper-plane"></i> Soumettre l'avis</button>
+            </div>
+        `;
+
+        const dishImageDiv = card.querySelector('.dish-image');
+        if (imageUrl) {
+            dishImageDiv.addEventListener('click', (e) => {
+                e.stopPropagation();
+                zoomImage(imageUrl);
+            });
+        }
+        setupRatingForCard(card);
+
+        // Ouvre la modale de détails du plat au clic sur la carte
+        card.addEventListener('click', (e) => {
+            // S'assurer que le clic n'est pas sur le système de notation ou l'image de zoom
+            if (!e.target.closest('.rating-section') && !e.target.closest('.dish-image') && item.disponibilite) {
+                openDishDetailModal(item);
+            }
+        });
+
+        return card;
+    }
+
+    // --- Gestion des Filtres et de la Recherche ---
+
+    function attachFilterEvents() {
+        filtersContainer.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.onclick = null; // Supprime les anciens listeners
+            btn.addEventListener('click', function() {
+                const filterType = this.dataset.filterType;
+                const filterValue = this.dataset.filter;
+
+                if (filterType === 'category') {
+                    // Désactiver tous les autres filtres de catégorie
+                    filtersContainer.querySelectorAll('.filter-btn[data-filter-type="category"]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    activeCategoryFilter = filterValue;
+                } else if (filterType === 'allergene') {
+                    // Activer/désactiver l'allergène
+                    this.classList.toggle('active');
+                    if (this.classList.contains('active')) {
+                        activeAllergeneFilters.add(filterValue);
+                    } else {
+                        activeAllergeneFilters.delete(filterValue);
                     }
                 }
+
+                // Fermer la sous-nav sur mobile si elle est ouverte et qu'on a cliqué un filtre
+                if (window.innerWidth <= 992 && subNavCategories.classList.contains('expanded')) {
+                    toggleMobileFilters();
+                }
+
+                applyFiltersAndSearch();
+                scrollToTopBanner();
             });
         });
-
-        async function showSection(sectionId) {
-            document.querySelectorAll(".section").forEach(section => section.classList.add("hidden"));
-            document.getElementById(`${sectionId}-section`).classList.remove("hidden");
-
-            const sectionTitles = {
-                "overview": "Aperçu du Tableau de Bord",
-                "profile": "Mon Profil",
-                "items": "Gestion des Plats",
-                "menus": "Gestion des Menus",
-                "qr-codes": "Mes QR Codes",
-                "reviews": "Avis Clients",
-                "stats": "Statistiques"
-            };
-            document.getElementById("current-section-title").textContent = sectionTitles[sectionId] || "Tableau de Bord";
-
-            // Gérer la visibilité des boutons d'action dans le header
-            document.getElementById("add-item-btn").classList.add("hidden");
-            document.getElementById("add-menu-btn").classList.add("hidden");
-            document.getElementById("generate-qr-main-btn").classList.add("hidden");
-
-            if (sectionId === "items") {
-                document.getElementById("add-item-btn").classList.remove("hidden");
-            } else if (sectionId === "menus") {
-                document.getElementById("add-menu-btn").classList.remove("hidden");
-            } else if (sectionId === "qr-codes") {
-                document.getElementById("generate-qr-main-btn").classList.remove("hidden");
-            }
-
-            if (token) {
-                // Charger les données de la section active
-                
-                    loadOverview();
-                    loadProfile();
-                   loadItems(); 
-                   loadMenus();
-                     loadQRCodes(); 
-                   loadReviews(); 
-                  loadStats(); 
-                
-            } else {
-                window.location.href = frontendUrls + "";
-            }
-        }
-
-        // Nouvelle fonction pour afficher les messages (toasts)
-        function showMessage(message, isError = false) {
-            const toastContainer = document.getElementById("toast-container");
-            const toast = document.createElement("div");
-            toast.className = `toast-message ${isError ? "toast-error" : "toast-success"}`;
-            toast.innerHTML = `
-                <span>${message}</span>
-                <button class="close-toast-btn"><i class="fas fa-times"></i></button>
-            `;
-
-            toastContainer.appendChild(toast);
-
-            // Gérer la fermeture automatique
-            const timeoutId = setTimeout(() => {
-                toast.remove();
-            }, 5000); // Disparaît après 5 secondes
-
-            // Gérer la fermeture manuelle
-            toast.querySelector(".close-toast-btn").addEventListener("click", () => {
-                clearTimeout(timeoutId); // Annuler le timeout automatique
-                toast.remove();
-            });
-        }
-
-
-        function logout() {
-            localStorage.removeItem("token");
-            token = null;
-            window.location.href = frontendUrls + "";
-        }
-
-        // Modals
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.remove("hidden");
-            document.body.classList.add("modal-open");
-            // Appeler les fonctions de chargement spécifiques à la modale
-            if (modalId === "create-item-modal") loadItemModalData();
-            if (modalId === "create-menu-modal") loadMenuModalData();
-            if (modalId === "generate-qr-modal") loadQRModalMenus();
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.add("hidden");
-            document.body.classList.remove("modal-open");
-            if (modalId === "create-item-modal") {
-                selectedImages = [];
-                selectedIngredients = [];
-                document.getElementById("create-item-form").reset();
-                document.getElementById("image-preview").innerHTML = "";
-                document.getElementById("item-ingredients").innerHTML = "";
-                // Réinitialiser les selects multiples
-                Array.from(document.getElementById("item-categories").options).forEach(opt => opt.selected = false);
-                Array.from(document.getElementById("item-tags").options).forEach(opt => opt.selected = false);
-                Array.from(document.getElementById("item-days").options).forEach(opt => opt.selected = false);
-            }
-            if (modalId === "create-menu-modal") {
-                selectedMenuItems = [];
-                document.getElementById("create-menu-form").reset();
-                document.getElementById("menu-items").innerHTML = "";
-                document.getElementById("menu-preview").innerHTML = "<h4>Aperçu de l'ordre du menu:</h4>"; // Réinitialiser le titre
-                Array.from(document.getElementById("menu-days").options).forEach(opt => opt.selected = false);
-            }
-        }
-
-        // Drag and Drop
-        function handleDrop(event) {
-            event.preventDefault();
-            event.currentTarget.classList.remove("dragover");
-            // Pour le drop d'images
-            if (event.currentTarget.classList.contains("drop-zone")) {
-                const files = event.dataTransfer.files;
-                handleFiles(files);
-            }
-            // Pour le réordonnancement des listes sortables
-            // La logique de réorganisation est déjà gérée par dragover,
-            // il faut juste s'assurer que le drop met à jour la liste sous-jacente.
-            updateSelectedLists(event.currentTarget.id);
-        }
-
-        function handleFileSelect(event) {
-            handleFiles(event.target.files);
-        }
-
-        function handleFiles(files) {
-            const imagePreview = document.getElementById("image-preview");
-            for (let file of files) {
-                if (file.type.startsWith("image/")) {
-                    selectedImages.push(file);
-                    const reader = new FileReader();
-                    reader.onload = e => {
-                        const imgWrapper = document.createElement("div");
-                        imgWrapper.className = "uploaded-image-wrapper";
-                        imgWrapper.innerHTML = `
-                            <img src="${e.target.result}" class="uploaded-image">
-                            <button type="button" class="remove-image-btn" onclick="removeImage('${file.name}', this)"><i class="fas fa-times-circle"></i></button>
-                        `;
-                        imagePreview.appendChild(imgWrapper);
-                    };
-                    reader.readAsDataURL(file);
-                }
-            }
-        }
-
-        function removeImage(fileName, button) {
-            selectedImages = selectedImages.filter(img => img.name !== fileName);
-            button.closest('.uploaded-image-wrapper').remove();
-        }
-
-        // Ingredients
-        async function loadItemModalData() {
-            try {
-                // Ensure allCategories, allTags, allDays are populated for filters and multi-selects
-                const [categories, tags, days, ingredients] = await Promise.all([
-                    fetch(frontendUrls + "api/categories", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
-                    fetch(frontendUrls + "api/tags", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
-                    fetch(frontendUrls + "api/jours").then(r => r.json()),
-                    fetch(frontendUrls + "api/ingredients").then(r => r.json())
-                ]);
-
-                allCategories = categories;
-                allTags = tags;
-                allDays = days;
-
-                const catSelect = document.getElementById("item-categories");
-                catSelect.innerHTML = categories.map(c => `<option value="${c.id_category}">${c.name}</option>`).join("");
-                const tagSelect = document.getElementById("item-tags");
-                tagSelect.innerHTML = tags.map(t => `<option value="${t.id_tag}">${t.name}</option>`).join("");
-                const daySelect = document.getElementById("item-days");
-                daySelect.innerHTML = days.map(d => `<option value="${d.id_jour}">${d.nom}</option>`).join("");
-                const ingSelect = document.getElementById("ingredient-select");
-                ingSelect.innerHTML = ingredients.map(i => `<option value="${i.id_ingredient}">${i.nom_ingredient}</option>`).join("");
-            } catch (error) {
-                showMessage("Erreur lors du chargement des données pour le plat: " + error.message, true);
-            }
-        }
-
-        function addItemIngredient() {
-            const select = document.getElementById("ingredient-select");
-            const quantityInput = document.getElementById("ingredient-quantity");
-            const selectedOption = select.options[select.selectedIndex];
-
-            if (!selectedOption || selectedOption.value === "") {
-                showMessage("Veuillez sélectionner un ingrédient.", true);
-                return;
-            }
-            if (quantityInput.value.trim() === "") {
-                showMessage("Veuillez entrer une quantité pour l'ingrédient.", true);
-                return;
-            }
-
-            const ingredientId = selectedOption.value;
-            const ingredientName = selectedOption.text;
-            const quantity = quantityInput.value.trim();
-
-            if (selectedIngredients.some(i => i.id === ingredientId)) {
-                showMessage("Cet ingrédient a déjà été ajouté.", true);
-                return;
-            }
-
-            selectedIngredients.push({ id: ingredientId, quantity: quantity, name: ingredientName });
-            const div = document.createElement("div");
-            div.className = "sortable-item ingredient-item";
-            div.dataset.id = ingredientId;
-            div.draggable = true;
-            div.innerHTML = `
-                <span>${ingredientName} - ${quantity}</span>
-                <button type="button" onclick="removeIngredient('${ingredientId}', this)" class="remove-btn"><i class="fas fa-times"></i></button>
-            `;
-            document.getElementById("item-ingredients").appendChild(div);
-            quantityInput.value = "";
-            select.selectedIndex = 0;
-        }
-
-        function removeIngredient(id, button) {
-            selectedIngredients = selectedIngredients.filter(i => i.id !== id);
-            button.closest('.sortable-item').remove();
-        }
-
-        // Menu Items
-        async function loadMenuModalData() {
-            try {
-                const items = await fetch(frontendUrls + "api/items", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
-                const select = document.getElementById("item-select");
-                select.innerHTML = `<option value="">-- Sélectionner un plat --</option>` + items.map(i => `<option value="${i.id_item}">${i.nom_plat}</option>`).join("");
-                allItems = items; // Important pour l'aperçu du menu
-
-                // Charger aussi les jours pour le formulaire de menu
-                const days = await fetch(frontendUrls + "api/jours").then(r => r.json());
-                const menuDaysSelect = document.getElementById("menu-days");
-                menuDaysSelect.innerHTML = days.map(d => `<option value="${d.id_jour}">${d.nom}</option>`).join("");
-
-            } catch (error) {
-                showMessage("Erreur lors du chargement des données pour le menu: " + error.message, true);
-            }
-        }
-
-        function addMenuItem() {
-            const select = document.getElementById("item-select");
-            const selectedOption = select.options[select.selectedIndex];
-            const itemId = selectedOption.value;
-            const itemName = selectedOption.text;
-
-            if (!itemId || itemId === "") {
-                showMessage("Veuillez sélectionner un plat.", true);
-                return;
-            }
-
-            if (selectedMenuItems.includes(itemId)) {
-                showMessage("Ce plat a déjà été ajouté au menu.", true);
-                return;
-            }
-
-            selectedMenuItems.push(itemId);
-            const div = document.createElement("div");
-            div.className = "sortable-item menu-item-draggable";
-            div.dataset.id = itemId;
-            div.draggable = true;
-            div.innerHTML = `
-                <span>${itemName}</span>
-                <button type="button" onclick="removeMenuItem('${itemId}', this)" class="remove-btn"><i class="fas fa-times"></i></button>
-            `;
-            document.getElementById("menu-items").appendChild(div);
-            updateMenuPreview();
-            select.selectedIndex = 0; // Réinitialiser le select
-        }
-
-        function removeMenuItem(id, button) {
-            selectedMenuItems = selectedMenuItems.filter(i => i !== id);
-            button.closest('.sortable-item').remove();
-            updateMenuPreview();
-        }
-
-        function updateMenuPreview() {
-            const preview = document.getElementById("menu-preview");
-            // S'assurer que allItems est bien peuplé
-            if (allItems.length === 0) {
-                preview.innerHTML = "<h4>Aperçu de l'ordre du menu:</h4><p>Chargement des plats...</p>";
-                // Tenter de recharger les items si vide, ou gérer l'erreur
-                // loadMenuModalData(); // Ne pas appeler ici, cela peut créer une boucle ou un comportement inattendu
-                return;
-            }
-
-            const itemsMap = new Map(allItems.map(item => [item.id_item, item.nom_plat]));
-            if (selectedMenuItems.length === 0) {
-                preview.innerHTML = "<h4>Aperçu de l'ordre du menu:</h4><p>Ajoutez des plats pour voir l'aperçu.</p>";
-                return;
-            }
-            preview.innerHTML = "<h4>Aperçu de l'ordre du menu:</h4>" + selectedMenuItems.map(id => {
-                const itemName = itemsMap.get(id) || "Plat inconnu (ID: " + id + ")";
-                return `<div class="preview-item"><i class="fas fa-chevron-right"></i> ${itemName}</div>`;
-            }).join("");
-        }
-
-        // Sortable Lists
-        function makeSortable(id) {
-            const list = document.getElementById(id);
-            if (!list) {
-                console.warn(`Sortable list with ID '${id}' not found.`);
-                return;
-            }
-            list.addEventListener("dragstart", e => {
-                if (e.target.classList.contains('sortable-item')) {
-                    e.target.classList.add("dragging");
-                    e.dataTransfer.setData("text/plain", e.target.dataset.id);
-                    e.dataTransfer.effectAllowed = "move";
-                }
-            });
-            list.addEventListener("dragend", e => {
-                if (e.target.classList.contains('sortable-item')) {
-                    e.target.classList.remove("dragging");
-                }
-            });
-            list.addEventListener("dragover", e => {
-                e.preventDefault();
-                const draggingItem = document.querySelector(".dragging");
-                if (!draggingItem) return;
-
-                const afterElement = getDragAfterElement(list, e.clientY);
-                if (afterElement == null) {
-                    list.appendChild(draggingItem);
-                } else {
-                    list.insertBefore(draggingItem, afterElement);
-                }
-            });
-            list.addEventListener("drop", e => {
-                e.preventDefault();
-                updateSelectedLists(id); // Met à jour la liste JS après le drop
-            });
-        }
-
-        function getDragAfterElement(container, y) {
-            const draggableElements = [...container.querySelectorAll(".sortable-item:not(.dragging)")];
-            return draggableElements.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offset = y - box.top - box.height / 2;
-                if (offset < 0 && offset > closest.offset) {
-                    return { offset: offset, element: child };
-                } else {
-                    return closest;
-                }
-            }, { offset: Number.NEGATIVE_INFINITY }).element;
-        }
-
-        function updateSelectedLists(listId) {
-            const listElement = document.getElementById(listId);
-            const itemsInOrder = Array.from(listElement.querySelectorAll('.sortable-item')).map(item => item.dataset.id);
-
-            if (listId === "item-ingredients") {
-                selectedIngredients = itemsInOrder.map(id => {
-                    const original = selectedIngredients.find(ing => ing.id === id);
-                    return original ? { ...original } : null;
-                }).filter(Boolean);
-            } else if (listId === "menu-items") {
-                selectedMenuItems = itemsInOrder;
-                updateMenuPreview();
-            }
-        }
-
-
-        // Overview
-        async function loadOverview() {
-            try {
-                const [items, menus, qrCodes, reviews] = await Promise.all([
-                    fetch(frontendUrls + "api/items", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
-                    fetch(frontendUrls + "api/menus", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
-                    fetch(frontendUrls + "api/qrcodes", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
-                    fetch(frontendUrls + "api/avis", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json())
-                ]);
-                document.getElementById("items-count").textContent = items.length;
-                document.getElementById("menus-count").textContent = menus.length;
-                document.getElementById("qr-scans").textContent = qrCodes.reduce((sum, qr) => sum + qr.scans, 0);
-                document.getElementById("avg-rating").textContent = reviews.length ? (reviews.reduce((sum, r) => sum + r.note, 0) / reviews.length).toFixed(1) : "0";
-            } catch (error) {
-                showMessage("Erreur lors du chargement de l'aperçu: " + error.message, true);
-            }
-        }
-
-        // Profile
-        async function loadProfile() {
-            try {
-                const response = await fetch(frontendUrls + "api/etablissement/me", { headers: { "Authorization": `Bearer ${token}` } });
-                if (!response.ok) throw new Error('Failed to fetch profile');
-                const profile = await response.json();
-                document.getElementById("profile-name").value = profile.nom_etablissement;
-                document.getElementById("profile-email").value = profile.email_pro;
-                document.getElementById("profile-phone").value = profile.numtel;
-                document.getElementById("profile-address").value = profile.adresse_physique;
-                document.getElementById("profile-latitude").value = profile.latitude;
-                document.getElementById("profile-longitude").value = profile.longitude;
-            } catch (error) {
-                showMessage("Erreur lors du chargement du profil: " + error.message, true);
-            }
-        }
-
-        document.getElementById("profile-form").addEventListener("submit", async e => {
-            e.preventDefault();
-            const data = {
-                nom_etablissement: document.getElementById("profile-name").value,
-                email_pro: document.getElementById("profile-email").value,
-                numtel: document.getElementById("profile-phone").value,
-                adresse_physique: document.getElementById("profile-address").value,
-                latitude: parseFloat(document.getElementById("profile-latitude").value),
-                longitude: parseFloat(document.getElementById("profile-longitude").value)
-            };
-            try {
-                const response = await fetch(frontendUrls + "api/etablissement/me", {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                    body: JSON.stringify(data)
-                });
-                if (response.ok) {
-                    showMessage("Profil mis à jour !");
-                } else {
-                    showMessage((await response.json()).error, true);
-                }
-            } catch (error) {
-                showMessage("Erreur serveur lors de la mise à jour du profil: " + error.message, true);
-            }
-        });
-
-        // Items
-        async function loadItems() {
-            try {
-                const [items, categories, tags, days] = await Promise.all([
-                    fetch(frontendUrls + "api/items", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
-                    fetch(frontendUrls + "api/categories", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
-                    fetch(frontendUrls + "api/tags", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
-                    fetch(frontendUrls + "api/jours").then(r => r.json())
-                ]);
-                allItems = items; // Stocker tous les items
-                allCategories = categories; // Stocker toutes les catégories
-                allTags = tags; // Stocker tous les tags
-                allDays = days; // Stocker tous les jours
-
-                const catFilter = document.getElementById("item-category-filter");
-                catFilter.innerHTML = `<option value="">Toutes catégories</option>` + allCategories.map(c => `<option value="${c.id_category}">${c.name}</option>`).join("");
-                catFilter.onchange = filterItems;
-
-                const dayFilter = document.getElementById("item-day-filter-items");
-                dayFilter.innerHTML = `<option value="">Tous les jours</option>` + allDays.map(d => `<option value="${d.id_jour}">${d.nom}</option>`).join("");
-                dayFilter.onchange = filterItems;
-
-                renderItems(allItems); // Afficher tous les items au début
-            } catch (error) {
-                showMessage("Erreur lors du chargement des plats: " + error.message, true);
-            }
-        }
-
-        function renderItems(itemsToRender) {
-            const list = document.getElementById("items-list");
-            if (itemsToRender.length === 0) {
-                list.innerHTML = `<p class="no-data-message">Aucun plat trouvé. Ajoutez-en un via le bouton "Ajouter Plat" !</p>`;
-                return;
-            }
-            list.innerHTML = itemsToRender.map(item => `
-                <div class="menu-item-card">
-                    <div class="item-image-container">
-                        ${item.images && item.images.length ? `<img src="${frontendUrls}${item.images[0].url_image}" alt="${item.nom_plat}" class="item-image">` : `<span class="placeholder-icon"><i class="fas fa-pizza-slice"></i></span>`}
-                    </div>
-                    <h3 class="item-title">${item.nom_plat}</h3>
-                    <p class="item-description">${item.description || "Sans description"}</p>
-                    <div class="item-details">
-                        <span class="item-price">${item.price} FCFA</span>
-                        <span class="item-prep-time"><i class="fas fa-hourglass-half"></i> ${item.prep_time} min</span>
-                    </div>
-                    <div class="item-days-availability">
-                        ${item.jours_disponibilite && item.jours_disponibilite.length > 0 ?
-                            `<i class="fas fa-clock"></i> ${item.jours_disponibilite.map(j => j.nom).join(', ')}`
-                            : `<i class="fas fa-times-circle"></i> Non spécifié`}
-                    </div>
-                    <div class="item-actions">
-                        <button class="btn btn-secondary" onclick="editItem('${item.id_item}')"><i class="fas fa-edit"></i> Modifier</button>
-                        <button class="btn btn-tertiary" onclick="duplicateItem('${item.id_item}')"><i class="fas fa-copy"></i> Dupliquer</button>
-                        <button class="btn btn-danger" onclick="deleteItem('${item.id_item}')"><i class="fas fa-trash-alt"></i> Supprimer</button>
-                    </div>
-                </div>
-            `).join("");
-        }
-
-        function filterItems() {
-            const categoryFilter = document.getElementById("item-category-filter").value;
-            const dayFilter = document.getElementById("item-day-filter-items").value;
-
-            let filtered = allItems;
-
-            if (categoryFilter) {
-                filtered = filtered.filter(item => item.categories.some(cat => cat.id_category.toString() === categoryFilter));
-            }
-            if (dayFilter) {
-                filtered = filtered.filter(item => item.jours_disponibilite.some(day => day.id_jour.toString() === dayFilter));
-            }
-            renderItems(filtered);
-        }
-
-        document.getElementById("create-item-form").addEventListener("submit", async e => {
-            e.preventDefault();
-
-            const formData = new FormData();
-
-            formData.append("nom_plat", document.getElementById("item-name").value);
-            formData.append("description", document.getElementById("item-description").value);
-            formData.append("price", document.getElementById("item-price").value);
-            formData.append("prep_time", document.getElementById("item-prep-time").value);
-            formData.append("disponibilite", document.getElementById("item-availability").value === "true");
-
-            // Récupérer les IDs des catégories, tags et jours sélectionnés (multiples)
-            Array.from(document.getElementById("item-categories").selectedOptions).forEach(o => {
-                formData.append("category_ids", o.value);
-            });
-
-            Array.from(document.getElementById("item-tags").selectedOptions).forEach(o => {
-                formData.append("tag_ids", o.value);
-            });
-
-            Array.from(document.getElementById("item-days").selectedOptions).forEach(o => {
-                formData.append("jour_ids", o.value);
-            });
-
-            selectedIngredients.forEach(i => {
-                formData.append("ingredient_ids", i.id);
-                formData.append("quantites", i.quantity);
-            });
-
-            selectedImages.forEach(img => {
-                formData.append("image_files", img);
-            });
-
-            try {
-                const response = await fetch(frontendUrls + "api/items", {
-                    method: "POST",
-                    headers: { "Authorization": `Bearer ${token}` }, // Pas de Content-Type pour FormData
-                    body: formData
-                });
-
-                if (response.ok) {
-                    showMessage("Plat créé avec succès !");
-                    closeModal("create-item-modal");
-                    loadItems(); // Recharger les items après création
-                } else {
-                    const errorData = await response.json();
-                    showMessage(errorData.detail || errorData.error || "Erreur lors de la création du plat", true);
-                }
-
-            } catch (err) {
-                showMessage("Erreur serveur lors de la création du plat: " + err.message, true);
-            }
-        });
-
-
-        async function editItem(id) {
-            showMessage("Modification non implémentée pour l'ID: " + id, true);
-            // Logique pour charger l'item, pré-remplir la modale et gérer la soumission PUT
-        }
-
-        async function duplicateItem(id) {
-            try {
-                const itemToDuplicate = allItems.find(item => item.id_item === id);
-                if (!itemToDuplicate) {
-                    showMessage("Plat à dupliquer introuvable.", true);
-                    return;
-                }
-
-                const data = {
-                    nom_plat: `${itemToDuplicate.nom_plat} (Copie)`,
-                    description: itemToDuplicate.description,
-                    price: itemToDuplicate.price,
-                    prep_time: itemToDuplicate.prep_time,
-                    disponibilite: itemToDuplicate.disponibilite,
-                    category_ids: itemToDuplicate.categories.map(c => c.id_category),
-                    tag_ids: itemToDuplicate.tags.map(t => t.id_tag),
-                    jour_ids: itemToDuplicate.jours_disponibilite.map(j => j.id_jour),
-                    // Assurez-vous que les ingrédients sont passés avec leurs quantités
-                    ingredient_ids: itemToDuplicate.ingredients.map(i => i.id_ingredient),
-                    quantites: itemToDuplicate.ingredients.map(i => i.pivot ? i.pivot.quantite : "1 unité") // Adaptez si votre pivot structure est différente
-                };
-
-                const response = await fetch(frontendUrls + "api/items", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                    body: JSON.stringify(data)
-                });
-
-                if (response.ok) {
-                    showMessage("Plat dupliqué !");
-                    loadItems();
-                } else {
-                    const errorData = await response.json();
-                    showMessage(errorData.detail || errorData.error || "Erreur lors de la duplication", true);
-                }
-            } catch (error) {
-                showMessage("Erreur serveur lors de la duplication: " + error.message, true);
-            }
-        }
-
-        async function deleteItem(id) {
-            if (!confirm("Êtes-vous sûr de vouloir supprimer cet item ?")) {
-                return;
-            }
-            try {
-                const response = await fetch(frontendUrls + `api/items/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if (response.ok) {
-                    showMessage("Plat supprimé avec succès !");
-                    loadItems();
-                } else {
-                    const data = await response.json();
-                    showMessage("Erreur : " + (data.detail || data.error || "suppression échouée"), true);
-                }
-            } catch (error) {
-                showMessage("Erreur réseau pendant la suppression du plat: " + error.message, true);
-            }
-        }
-
-
-        async function loadMenus() {
-            try {
-                const [menus, days] = await Promise.all([
-                    fetch(frontendUrls + "api/menus", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
-                    fetch(frontendUrls + "api/jours").then(r => r.json())
-                ]);
-                allMenus = menus;
-                allDays = days; // S'assurer que allDays est à jour pour le filtre
-
-                const dayFilter = document.getElementById("menu-day-filter");
-                dayFilter.innerHTML = `<option value="">Tous les jours</option>` + allDays.map(d => `<option value="${d.id_jour}">${d.nom}</option>`).join("");
-                dayFilter.onchange = filterMenus;
-
-                renderMenus(allMenus);
-            } catch (error) {
-                showMessage("Erreur lors du chargement des menus: " + error.message, true);
-            }
-        }
-
-        function renderMenus(menusToRender) {
-            const list = document.getElementById("menus-list");
-
-            if (menusToRender.length === 0) {
-                list.innerHTML = `<p class="no-data-message">Aucun menu trouvé. Créez-en un via le bouton "Créer Menu" !</p>`;
-                return;
-            }
-
-            list.innerHTML = menusToRender.map(menu => `
-                <div class="menu-card">
-                    <div class="menu-card-header">
-                        <h3 class="menu-title">${menu.nom}</h3>
-                        <div class="menu-actions-group">
-                            <button class="btn btn-icon btn-secondary" aria-label="Modifier" title="Modifier le menu" onclick="editMenu('${menu.id_menu}')">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-icon btn-tertiary" aria-label="Générer QR" title="Générer un QR code" onclick="openModalWithMenuId('generate-qr-modal', '${menu.id_menu}')">
-                                <i class="fas fa-qrcode"></i>
-                            </button>
-                            <button class="btn btn-icon btn-tertiary" aria-label="Exporter PDF" title="Exporter en PDF" onclick="exportPDF('${menu.id_menu}')">
-                                <i class="fas fa-file-pdf"></i>
-                            </button>
-                            <button class="btn btn-icon btn-tertiary" aria-label="Partager" title="Partager le menu" onclick="shareMenu('${menu.id_menu}')">
-                                <i class="fas fa-share-alt"></i>
-                            </button>
-                            <button class="btn btn-icon btn-danger" aria-label="Supprimer" title="Supprimer le menu" onclick="deleteMenu('${menu.id_menu}')">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <p class="menu-description">${menu.description || "Aucune description"}</p>
-                    <p class="menu-meta">
-                        ${menu.items.length} plats • Créé le ${new Date(menu.created_at || Date.now()).toLocaleDateString('fr-FR')}
-                    </p>
-                    <div class="menu-days-availability">
-                        ${menu.jours_disponibilite && menu.jours_disponibilite.length > 0 ?
-                            `<i class="fas fa-clock"></i> Disponible: ${menu.jours_disponibilite.map(j => j.nom).join(', ')}`
-                            : `<i class="fas fa-times-circle"></i> Jours non spécifiés`}
-                    </div>
-                    <div class="menu-items-list">
-                        <h4>Plats inclus:</h4>
-                        ${menu.items.length > 0 ? menu.items.map(item => `
-                            <div class="menu-item-entry">
-                                <span>${item.nom_plat}</span>
-                                <span>${item.price} FCFA</span>
-                            </div>
-                        `).join("") : `<p class="no-items-message">Aucun plat dans ce menu.</p>`}
-                    </div>
-                </div>
-            `).join("");
-        }
-
-        function filterMenus() {
-            const dayFilter = document.getElementById("menu-day-filter").value;
-
-            let filtered = allMenus;
-
-            if (dayFilter) {
-                filtered = filtered.filter(menu => menu.jours_disponibilite.some(day => day.id_jour.toString() === dayFilter));
-            }
-            renderMenus(filtered);
-        }
-
-
-        document.getElementById("create-menu-form").addEventListener("submit", async e => {
-            e.preventDefault();
-            const data = {
-                nom: document.getElementById("menu-name").value,
-                description: document.getElementById("menu-description").value,
-                jour_ids: Array.from(document.getElementById("menu-days").selectedOptions).map(o => o.value),
-                item_ids: selectedMenuItems
-            };
-            try {
-                const response = await fetch(frontendUrls + "api/menus", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                    body: JSON.stringify(data)
-                });
-                if (response.ok) {
-                    showMessage("Menu créé !");
-                    closeModal("create-menu-modal");
-                    loadMenus();
-                } else {
-                    const errorData = await response.json();
-                    showMessage(errorData.detail || errorData.error || "Erreur lors de la création du menu", true);
-                }
-            } catch (error) {
-                showMessage("Erreur serveur lors de la création du menu: " + error.message, true);
-            }
-        });
-
-        async function editMenu(id) {
-            showMessage("Modification non implémentée pour l'ID: " + id, true);
-        }
-
-        async function deleteMenu(id) {
-            if (!confirm("Êtes-vous sûr de vouloir supprimer ce menu ?")) {
-                return;
-            }
-            try {
-                const response = await fetch(frontendUrls + `api/menus/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (response.ok) {
-                    showMessage("Menu supprimé avec succès !");
-                    loadMenus();
-                } else {
-                    const data = await response.json();
-                    showMessage("Erreur lors de la suppression du menu: " + (data.detail || data.error || "Échec"), true);
-                }
-            } catch (error) {
-                showMessage("Erreur réseau lors de la suppression du menu: " + error.message, true);
-            }
-        }
-
-        // Fonction pour ouvrir la modale QR et pré-sélectionner un menu
-        function openModalWithMenuId(modalId, menuId = null) {
-            openModal(modalId);
-            if (menuId) {
-                // S'assurer que les menus sont chargés avant de tenter de sélectionner
-                const selectElement = document.getElementById("modal-qr-menu");
-                if (selectElement) {
-                    // Petite attente pour que loadQRModalMenus ait fini de peupler
-                    // Un setTimeout de 0ms permet d'exécuter après que le DOM ait été mis à jour
-                    setTimeout(() => {
-                        selectElement.value = menuId;
-                    }, 0);
-                }
-            }
-        }
-
-
-        async function generateQR(menuId) {
-            try {
-                const response = await fetch(frontendUrls + "api/qrcodes", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                    body: JSON.stringify({ menu_id: menuId })
-                });
-
-                if (response.ok) {
-                    showMessage("QR Code généré !");
-                    closeModal("generate-qr-modal"); // Fermer la modale après génération réussie
-                    loadQRCodes();
-                } else {
-                    const errorData = await response.json();
-                    showMessage(errorData.detail || errorData.error || "Erreur lors de la génération du QR Code", true);
-                }
-            } catch (error) {
-                showMessage("Erreur serveur lors de la génération du QR Code: " + error.message, true);
-            }
-        }
-
-        async function loadQRModalMenus() {
-            try {
-                const menus = await fetch(frontendUrls + "api/menus", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
-                const modalQrMenuSelect = document.getElementById("modal-qr-menu");
-                const qrMenuSelect = document.getElementById("qr-menu-select"); // Aussi le select dans la section principale
-
-                const optionsHtml = `<option value="">-- Sélectionner un menu --</option>` + menus.map(m => `<option value="${m.id_menu}">${m.nom}</option>`).join("");
-
-                if (modalQrMenuSelect) {
-                    modalQrMenuSelect.innerHTML = optionsHtml;
-                }
-                if (qrMenuSelect) {
-                    qrMenuSelect.innerHTML = optionsHtml;
-                }
-            } catch (error) {
-                showMessage("Erreur lors du chargement des menus pour la modale QR: " + error.message, true);
-            }
-        }
-
-        // Écouteur pour le formulaire de génération de QR dans la section QR Codes (avec le select interne)
-        document.getElementById("qr-code-form").addEventListener("submit", async e => {
-            e.preventDefault();
-            const menuId = document.getElementById("qr-menu-select").value;
-            if (menuId && menuId !== "") {
-                await generateQR(menuId);
-            } else {
-                showMessage("Veuillez sélectionner un menu à générer.", true);
-            }
-        });
-
-        // Écouteur pour le formulaire de génération de QR dans la modale (bouton principal "Générer QR")
-        document.getElementById("generate-qr-modal-form").addEventListener("submit", async e => {
-            e.preventDefault();
-            const menuId = document.getElementById("modal-qr-menu").value;
-            if (menuId && menuId !== "") {
-                await generateQR(menuId);
-            } else {
-                showMessage("Veuillez sélectionner un menu.", true);
-            }
-        });
-
-
-        async function exportPDF(menuId) {
-            try {
-                const response = await fetch(frontendUrls + `api/menus/${menuId}/export-pdf`, {
-                    headers: { "Authorization": `Bearer ${token}` }
-                });
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = `menu_${menuId}.pdf`;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                    window.URL.revokeObjectURL(url);
-                    showMessage("PDF exporté !");
-                } else {
-                    const errorData = await response.json();
-                    showMessage(errorData.detail || errorData.error || "Erreur lors de l'exportation du PDF", true);
-                }
-            } catch (error) {
-                showMessage("Erreur lors de l'exportation du PDF: " + error.message, true);
-            }
-        }
-
-        async function shareMenu(menuId) {
-            const url = frontendUrls + `menus/${menuId}`;
-            try {
-                if (navigator.share) {
-                    await navigator.share({
-                        title: 'Découvrez notre menu DailyMenu',
-                        url: url,
-                    });
-                    showMessage("Menu partagé avec succès !");
-                } else {
-                    await navigator.clipboard.writeText(url);
-                    showMessage("Lien du menu copié dans le presse-papiers !");
-                }
-            } catch (err) {
-                showMessage("Échec du partage/copie du lien: " + err.message, true);
-            }
-        }
-
-        // QR Codes
-        async function loadQRCodes() {
-            try {
-                const qrCodes = await fetch(frontendUrls + "api/qrcodes", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
-                const list = document.getElementById("qr-codes-list");
-
-                if (qrCodes.length === 0) {
-                    list.innerHTML = `<p class="no-data-message">Aucun QR Code généré. Utilisez le bouton "Générer QR Code" pour en créer un !</p>`;
-                } else {
-                    list.innerHTML = qrCodes.map(q => `
-                        <div class="qr-code-card">
-                            <div class="qr-code-img-container">
-                                <img src="${frontendUrls}${q.url}" alt="QR Code pour ${q.menu_id}" class="qr-code-image">
-                            </div>
-                            <div class="qr-code-details">
-                                <h4 class="qr-code-title">Menu ID: ${q.menu_id}</h4>
-                                <p class="qr-code-scans"><i class="fas fa-qrcode"></i> ${q.scans} scans</p>
-                                <p class="qr-code-link"><a href="${frontendUrls}menus/${q.menu_id}" target="_blank">Voir le Menu</a></p>
-                            </div>
-                            <div class="qr-code-actions">
-                                <button class="btn btn-secondary" onclick="downloadQR('${q.id_qrcode}')"><i class="fas fa-download"></i> Télécharger</button>
-                                <button class="btn btn-tertiary" onclick="shareQRLink('${frontendUrls}menus/${q.menu_id}')"><i class="fas fa-share-alt"></i> Partager Lien</button>
-                                <button class="btn btn-danger" onclick="deleteQR('${q.id_qrcode}')"><i class="fas fa-trash-alt"></i> Supprimer</button>
-                            </div>
-                        </div>
-                    `).join("");
-                }
-
-                // Peupler le select dans la section QR Codes si un menu est sélectionné
-                loadQRModalMenus(); // Cette fonction peuple les deux selects de QR codes
-            } catch (error) {
-                showMessage("Erreur lors du chargement des QR codes: " + error.message, true);
-            }
-        }
-
-        async function downloadQR(id) {
-            try {
-                const qr = await fetch(frontendUrls + `api/qrcodes/${id}`, { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
-                const a = document.createElement("a");
-                a.href = frontendUrls + qr.url;
-                a.download = `qr-code-${qr.menu_id || id}.png`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                showMessage("QR Code téléchargé !");
-            } catch (error) {
-                showMessage("Erreur lors du téléchargement du QR Code: " + error.message, true);
-            }
-        }
-
-        async function shareQRLink(url) {
-            try {
-                if (navigator.share) {
-                    await navigator.share({
-                        title: 'Découvrez ce QR Code de menu',
-                        url: url,
-                    });
-                    showMessage("Lien du QR Code partagé avec succès !");
-                } else {
-                    await navigator.clipboard.writeText(url);
-                    showMessage("URL du QR Code copié dans le presse-papiers !");
-                }
-            } catch (err) {
-                showMessage("Échec du partage/copie du lien du QR Code: " + err.message, true);
-            }
-        }
-
-        async function deleteQR(id) {
-            if (!confirm("Êtes-vous sûr de vouloir supprimer ce QR Code ?")) {
-                return;
-            }
-            try {
-                const response = await fetch(frontendUrls + `api/qrcodes/${id}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if (response.ok) {
-                    showMessage("QR Code supprimé avec succès !");
-                    loadQRCodes();
-                } else {
-                    const data = await response.json();
-                    showMessage("Erreur lors de la suppression du QR Code: " + (data.detail || data.error || "Échec"), true);
-                }
-            } catch (error) {
-                showMessage("Erreur réseau lors de la suppression du QR Code: " + error.message, true);
-            }
-        }
-
-
-        // Avis
-        async function loadReviews() {
-            try {
-                const reviews = await fetch(frontendUrls + "api/avis", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
-                const list = document.getElementById("reviews-list");
-
-                if (reviews.length === 0) {
-                    list.innerHTML = `<p class="no-data-message">Aucun avis trouvé.</p>`;
-                    document.getElementById("avg-rating-stats").textContent = "0.0";
-                    document.getElementById("total-reviews").textContent = "0";
-                    document.getElementById("positive-reviews").textContent = "0";
-                    document.getElementById("improve-reviews").textContent = "0";
-                    return;
-                }
-
-                list.innerHTML = reviews.map(r => `
-                    <div class="review-card">
-                        <div class="review-header">
-                            <div class="reviewer-avatar">${r.id_personne ? r.id_personne.toString().charAt(0).toUpperCase() : 'U'}</div>
-                            <div class="reviewer-info">
-                                <h4 class="reviewer-id">Utilisateur #${r.id_personne || 'Inconnu'}</h4>
-                                <div class="review-stars">${"★".repeat(r.note)}${"☆".repeat(5-r.note)}</div>
-                            </div>
-                            <span class="review-date">${new Date(r.date_avis).toLocaleDateString('fr-FR')}</span>
-                        </div>
-                        <p class="review-comment">${r.commentaires || "Pas de commentaire."}</p>
-                        <p class="review-rating-text">Note: <strong>${r.note}/5</strong></p>
-                    </div>
-                `).join("");
-                document.getElementById("avg-rating-stats").textContent = reviews.length ? (reviews.reduce((a, r) => a + r.note, 0) / reviews.length).toFixed(1) : "0.0";
-                document.getElementById("total-reviews").textContent = reviews.length;
-                document.getElementById("positive-reviews").textContent = reviews.filter(r => r.note >= 4).length;
-                document.getElementById("improve-reviews").textContent = reviews.filter(r => r.note < 4).length;
-            } catch (error) {
-                showMessage("Erreur lors du chargement des avis: " + error.message, true);
-            }
-        }
-
-        // Stats
-        async function loadStats() {
-            try {
-                const items = await fetch(frontendUrls + "api/items", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
-                // Assuming 'views' property exists on item objects
-                const popular = items.sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
-                const popularList = document.getElementById("popular-items");
-
-                if (popular.length === 0) {
-                    popularList.innerHTML = `<p class="no-data-message">Aucune statistique de vue disponible pour le moment.</p>`;
-                    return;
-                }
-
-                popularList.innerHTML = popular.map(item => `
-                    <div class="stat-item-card">
-                        <span>${item.nom_plat}</span>
-                        <span class="stat-value">${item.views || 0} vues</span>
-                    </div>
-                `).join("");
-            } catch (error) {
-                showMessage("Erreur lors du chargement des statistiques: " + error.message, true);
-            }
-        }
-
-        // Initialisation à la charge de la page
-        document.addEventListener("DOMContentLoaded", () => {
-            makeSortable("item-ingredients");
-            makeSortable("menu-items");
-
-            // Initialisation de l'horloge
-            updateClock();
-
-            if (token) {
-                const hash = window.location.hash.substring(1); // Remove '#'
-                const initialSection = hash || "overview";
-                // Assurez-vous que la section est chargée AVANT de tenter de scroller
-                showSection(initialSection).then(() => {
-                    // Si un hash est présent dans l'URL, scroller vers la section correspondante
-                    if (hash) {
-                        const targetSection = document.getElementById(`${hash}-section`);
-                        if (targetSection) {
-                            const headerOffset = 80; // Hauteur de votre header fixe
-                            const elementPosition = targetSection.getBoundingClientRect().top + window.pageYOffset;
-                            window.scrollTo({
-                                top: elementPosition - headerOffset,
-                                behavior: "smooth"
-                            });
+    }
+
+    function applyFiltersAndSearch() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        let hasVisibleItems = false;
+
+        document.querySelectorAll('.menu-section').forEach(section => {
+            let sectionHasVisibleItems = false;
+            const dishes = section.querySelectorAll('.dish-card');
+
+            dishes.forEach(dish => {
+                const title = dish.querySelector('.dish-title').textContent.toLowerCase();
+                const descriptionElement = dish.querySelector('.dish-description');
+                const description = descriptionElement ? descriptionElement.textContent.toLowerCase() : '';
+                const infoTextElement = dish.querySelector('.dish-info');
+                const infoText = infoTextElement ? infoTextElement.textContent.toLowerCase() : '';
+
+                const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm) || infoText.includes(searchTerm);
+
+                // Vérification du filtre de catégorie (un seul actif)
+                const dishCategories = dish.dataset.category.split(' ').filter(c => c);
+                const matchesCategory = activeCategoryFilter === 'all' || dishCategories.includes(activeCategoryFilter);
+
+                // Vérification des filtres allergènes (tous les actifs doivent correspondre)
+                let matchesAllergenes = true;
+                if (activeAllergeneFilters.size > 0) {
+                    const dishAllergenes = dish.dataset.allergenes.split(' ').filter(a => a);
+                    // Pour chaque allergène actif dans les filtres, le plat NE DOIT PAS contenir cet allergène
+                    for (let filterAllergene of activeAllergeneFilters) {
+                        const allergeneName = filterAllergene.replace('allergene-', '');
+                        if (dishAllergenes.includes(allergeneName)) {
+                            matchesAllergenes = false; // Le plat contient un allergène qu'on veut exclure
+                            break;
                         }
                     }
-                });
+                }
 
-            } else {
-                window.location.href = frontendUrls + "start/";
-            }
+                const shouldShow = matchesSearch && matchesCategory && matchesAllergenes;
+                toggleVisibility(dish, shouldShow);
 
-            const sidebar = document.getElementById('sidebar');
-            const backdrop = document.getElementById('backdrop');
-            const openSidebarBtn = document.getElementById('open-sidebar');
-            const closeSidebarBtn = document.getElementById('close-sidebar');
-
-            function toggleSidebar() {
-                sidebar.classList.toggle('sidebar-hidden');
-                backdrop.classList.toggle('hidden');
-                document.body.classList.toggle('modal-open'); // Empêche le scroll du body sur mobile
-            }
-
-            openSidebarBtn?.addEventListener('click', toggleSidebar);
-            closeSidebarBtn?.addEventListener('click', toggleSidebar);
-            backdrop?.addEventListener('click', toggleSidebar);
-
-            // Close sidebar on navigation click for mobile
-            document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    if (window.innerWidth < 768) {
-                        toggleSidebar();
-                    }
-                });
+                if (shouldShow) {
+                    sectionHasVisibleItems = true;
+                    hasVisibleItems = true;
+                }
             });
 
-            // Gérer le cas où la sidebar doit être visible par défaut sur grand écran
-            function handleResize() {
-                if (window.innerWidth >= 768) {
-                    sidebar.classList.remove('sidebar-hidden');
-                    backdrop.classList.add('hidden');
-                    document.body.classList.remove('modal-open');
-                } else {
-                    // S'assurer qu'elle est cachée si elle ne devrait pas être ouverte
-                    if (!sidebar.classList.contains('sidebar-hidden') && !backdrop.classList.contains('hidden')) {
-                         // Si la sidebar est ouverte et le backdrop visible (donc forcée par le JS mobile)
-                         // Ne rien faire, elle doit rester ouverte jusqu'à ce que l'utilisateur la ferme
-                    } else {
-                        sidebar.classList.add('sidebar-hidden');
-                        backdrop.classList.add('hidden');
-                        document.body.classList.remove('modal-open');
-                    }
-                }
-            }
-
-            window.addEventListener('resize', handleResize);
-            handleResize(); // Appel initial pour définir l'état correct
+            toggleVisibility(section, sectionHasVisibleItems);
         });
 
-    </script>
+        toggleVisibility(noResultsMessage, !hasVisibleItems);
+    }
+
+    function setupSearch() {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            toggleVisibility(clearSearchBtn, searchTerm.length > 0);
+            applyFiltersAndSearch();
+        });
+
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            toggleVisibility(clearSearchBtn, false);
+            applyFiltersAndSearch();
+        });
+    }
+
+    function scrollToTopBanner() {
+        const topBanner = document.querySelector('.top-banner');
+        if (topBanner) {
+            topBanner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    // --- Zoom d'Image (Modal) ---
+    function zoomImage(imageUrl) {
+        modalImage.src = imageUrl;
+        imageZoomModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeZoomModal() {
+        imageZoomModal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    closeModalBtn.addEventListener('click', closeZoomModal);
+    imageZoomModal.addEventListener('click', (event) => {
+        if (event.target === imageZoomModal || event.target.closest('.close-modal-btn')) {
+            closeZoomModal();
+        }
+    });
+
+    // --- Modale de Détails du Plat ---
+    function openDishDetailModal(item) {
+        const imageUrl = item.images && item.images.length > 0 ? `${API_BASE_URL}${item.images[0].url_image}` : '';
+        const price = item.price ? parseFloat(item.price).toFixed(0) : 'N/A';
+        const prepTime = item.prep_time || 'N/A';
+        const description = item.description || 'Aucune description disponible.';
+        const nomPlat = item.nom_plat || 'Plat sans nom';
+        const nutritionalInfo = item.nutritional_info || '';
+        const tags = (item.tags || []).map(tag => tag.name.toLowerCase());
+
+        detailDishImage.src = imageUrl || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='; // Image vide si pas d'URL
+        detailDishImage.alt = nomPlat;
+        detailDishTitle.textContent = nomPlat;
+        detailDishNutritional.textContent = nutritionalInfo;
+        detailDishPrice.textContent = `${price} FCFA`;
+        detailDishDescription.textContent = description;
+        detailDishPrepTime.innerHTML = `<i class="fas fa-hourglass-half"></i> <strong>Préparation:</strong> ${prepTime} min`;
+
+        let joursDispoHtml = 'Non spécifié';
+        if (item.jours_disponibilite && item.jours_disponibilite.length > 0) {
+            joursDispoHtml = item.jours_disponibilite.map(jour => jour.nom).join(', ');
+        }
+        detailDishAvailability.innerHTML = `<i class="fas fa-calendar-alt"></i> <strong>Disponibilité:</strong> ${joursDispoHtml}`;
+
+        const relevantTags = tags.filter(t => !['nouveau', 'new', 'populaire', 'featured', 'vegetarien', 'vegetarian', 'vegan', 'plant-based', 'sans gluten', 'gluten-free'].includes(t));
+        detailDishTags.innerHTML = relevantTags.length > 0 ? `<i class="fas fa-tag"></i> <strong>Tags:</strong> ${relevantTags.join(', ')}` : '<i class="fas fa-tag"></i> <strong>Tags:</strong> Aucun';
+
+        detailDishAllergensList.innerHTML = '';
+        const allItemAllergenes = (item.ingredients || []).flatMap(ing => (ing.allergenes || []));
+        if (allItemAllergenes.length > 0) {
+            const uniqueAllergenes = [...new Set(allItemAllergenes.map(a => a.nom_allergene))];
+            uniqueAllergenes.forEach(allergeneName => {
+                const li = document.createElement('li');
+                li.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${allergeneName.charAt(0).toUpperCase() + allergeneName.slice(1)}`;
+                detailDishAllergensList.appendChild(li);
+            });
+        } else {
+            const li = document.createElement('li');
+            li.textContent = 'Aucun allergène majeur connu.';
+            detailDishAllergensList.appendChild(li);
+        }
+
+        // Réinitialiser le système de notation pour la modale
+        detailRatingSection.querySelector('.stars').dataset.itemId = item.id_item;
+        detailRatingSection.querySelector('.comment-box').value = '';
+        detailRatingSection.querySelector('.comment-box').readOnly = false;
+        detailRatingSection.querySelector('.submit-comment').disabled = false;
+        detailRatingSection.querySelectorAll('.star i').forEach(starIcon => starIcon.className = 'far fa-star');
+        setupRatingForCard(detailRatingSection); // Ré-initialise la logique de notation pour la modale
+
+        dishDetailModal.classList.add('active');
+        document.body.style.overflow = 'hidden'; // Empêche le défilement du body
+    }
+
+    function closeDishDetailModal() {
+        dishDetailModal.classList.remove('active');
+        document.body.style.overflow = ''; // Rétablit le défilement du body
+    }
+
+    closeDetailModalBtn.addEventListener('click', closeDishDetailModal);
+    dishDetailModal.addEventListener('click', (event) => {
+        if (event.target === dishDetailModal || event.target.closest('.close-detail-modal-btn')) {
+            closeDishDetailModal();
+        }
+    });
+
+    // --- Système de Notation et Commentaires ---
+    function setupRatingForCard(container) { // Prend le conteneur (carte ou modale)
+        let reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+        const starsContainer = container.querySelector('.stars');
+        const itemId = starsContainer.dataset.itemId;
+        const stars = starsContainer.querySelectorAll('.star');
+        const commentBox = container.querySelector('.comment-box');
+        const submitBtn = container.querySelector('.submit-comment');
+
+        let currentRating = 0;
+
+        const existingReview = reviews.find(r => r.itemId === itemId);
+        if (existingReview) {
+            currentRating = existingReview.rating;
+            commentBox.value = existingReview.comment;
+            stars.forEach((star, index) => {
+                star.querySelector('i').className = index < currentRating ? 'fas fa-star' : 'far fa-star';
+            });
+            commentBox.readOnly = true;
+            submitBtn.disabled = true;
+        } else {
+            commentBox.readOnly = false;
+            submitBtn.disabled = false;
+            commentBox.value = '';
+            currentRating = 0; // Réinitialiser pour les nouvelles cartes
+            stars.forEach(s => s.querySelector('i').className = 'far fa-star');
+        }
+
+
+        starsContainer.onmouseover = (event) => {
+            if (commentBox.readOnly) return;
+            const hoveredStar = event.target.closest('.star');
+            if (hoveredStar) {
+                const value = parseInt(hoveredStar.dataset.value);
+                stars.forEach((star, index) => {
+                    star.querySelector('i').className = index < value ? 'fas fa-star' : 'far fa-star';
+                });
+            }
+        };
+
+        starsContainer.onmouseout = () => {
+            if (commentBox.readOnly) return;
+            stars.forEach((star, index) => {
+                star.querySelector('i').className = index < currentRating ? 'fas fa-star' : 'far fa-star';
+            });
+        };
+
+        stars.forEach((star) => {
+            star.onclick = null; // Supprimer les anciens listeners
+            star.addEventListener('click', function() {
+                if (commentBox.readOnly) return;
+                currentRating = parseInt(this.dataset.value);
+                stars.forEach((s, i) => {
+                    s.querySelector('i').className = i < currentRating ? 'fas fa-star' : 'far fa-star';
+                });
+            });
+        });
+
+        submitBtn.onclick = null; // Supprimer les anciens listeners
+        submitBtn.addEventListener('click', () => {
+            const comment = commentBox.value.trim();
+
+            if (currentRating === 0 && !comment) {
+                alert('Veuillez donner une note ou un commentaire.');
+                return;
+            }
+
+            const existingReviewIndex = reviews.findIndex(r => r.itemId === itemId);
+            if (existingReviewIndex !== -1) {
+                alert('Vous avez déjà laissé un avis pour ce plat. Vous ne pouvez pas le modifier.');
+                return;
+            }
+
+            const now = new Date();
+            reviews.push({
+                itemId,
+                rating: currentRating,
+                comment,
+                timestamp: now.toISOString()
+            });
+            localStorage.setItem('reviews', JSON.stringify(reviews));
+
+            alert(`Merci pour votre note de ${currentRating} étoile(s) et votre commentaire !`);
+            commentBox.value = '';
+            currentRating = 0;
+            stars.forEach(s => s.querySelector('i').className = 'far fa-star');
+            commentBox.readOnly = true;
+            submitBtn.disabled = true;
+        });
+    }
+
+    // --- Détection du Réseau ---
+    function setupNetworkDetection() {
+        window.addEventListener('online', () => {
+            toggleVisibility(offlineIndicator, false);
+            if (menuData === null) {
+                loadMenuData();
+            }
+        });
+        window.addEventListener('offline', () => {
+            toggleVisibility(offlineIndicator, true);
+        });
+    }
+
+    // --- Gestion de la visibilité des filtres sur mobile ---
+    function toggleMobileFilters() {
+        if (subNavCategories) {
+            subNavCategories.classList.toggle('expanded');
+            mobileFilterToggleButton.classList.toggle('active');
+        }
+    }
+
+    function setupMobileFiltersToggle() {
+        if (mobileFilterToggleButton && subNavCategories) {
+            mobileFilterToggleButton.addEventListener('click', toggleMobileFilters);
+
+            // Cacher par défaut sur les petits écrans au chargement
+            if (window.innerWidth <= 992) {
+                subNavCategories.classList.remove('expanded'); // S'assurer qu'il est fermé
+            }
+        }
+    }
+
+    // --- Génération des particules ---
+    function generateParticles(count) {
+        document.querySelectorAll('.particle').forEach(p => p.remove());
+
+        for (let i = 0; i < count; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.top = `${Math.random() * 100}%`;
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.animation = `float ${6 + Math.random() * 4}s ease-in-out infinite`;
+            particle.style.animationDelay = `${Math.random() * 6}s`;
+            document.body.appendChild(particle);
+        }
+        let styleSheet = document.getElementById('particle-animation-style');
+        if (!styleSheet) {
+            styleSheet = document.createElement("style");
+            styleSheet.type = "text/css";
+            styleSheet.id = "particle-animation-style";
+            document.head.appendChild(styleSheet);
+        }
+        styleSheet.innerText = `@keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }`;
+    }
+
+    // --- Initialisation de l'Application ---
+    document.addEventListener('DOMContentLoaded', function() {
+        generateParticles(8);
+        loadMenuData();
+        setupSearch();
+        setupNetworkDetection();
+        setupMobileFiltersToggle();
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 992) {
+            // Sur desktop, toujours montrer la sub-nav
+            if (subNavCategories) subNavCategories.classList.remove('expanded');
+            if (mobileFilterToggleButton) mobileFilterToggleButton.classList.remove('active');
+        } else {
+            // Sur mobile, cacher par défaut (si pas déjà ouvert par le bouton)
+            if (subNavCategories && !mobileFilterToggleButton.classList.contains('active')) {
+                subNavCategories.classList.remove('expanded');
+            }
+        }
+    });
+
+})();</script>
 </body>
 </html>

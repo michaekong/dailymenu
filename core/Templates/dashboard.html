@@ -6,8 +6,6 @@
     <title>DailyMenu - Tableau de Bord Administration</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght%40700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-
 <style>
     :root {
     /* Couleurs de base - ajustées */
@@ -67,18 +65,19 @@ body {
     overflow-x: hidden;
 }
 
-/* Empêche le scroll du body quand une modale est ouverte */
+/* Empêche le scroll du body quand une modale ou sidebar mobile est ouverte */
 body.modal-open {
     overflow: hidden;
 }
 
 /* --- Layout Principal du Dashboard --- */
-.dashboard-wrapper {
-    display: flex;
-    width: 100%;
-    min-height: 100vh;
-    background: var(--background-light);
-}
+/* .dashboard-wrapper { */
+    /* Ancien wrapper, maintenant le body est le conteneur principal flex */
+    /* display: flex; */
+    /* width: 100%; */
+    /* min-height: 100vh; */
+    /* background: var(--background-light); */
+/* } */
 
 /* --- Barre Latérale (Sidebar) --- */
 .sidebar {
@@ -89,7 +88,7 @@ body.modal-open {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    position: fixed;
+    position: fixed; /* Rendre la sidebar fixe */
     top: 0;
     left: 0;
     height: 100%;
@@ -99,17 +98,19 @@ body.modal-open {
     overflow-y: auto;
 }
 
+/* État initial caché pour mobile, géré par JS pour grand écran */
 .sidebar-hidden {
     transform: translateX(-100%);
 }
 
 .sidebar-header {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column; /* Pour empiler logo et horloge */
     align-items: center;
     padding-bottom: 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: 30px;
+    position: relative; /* Pour positionner le bouton de fermeture */
 }
 
 .sidebar-header .logo-title {
@@ -121,19 +122,31 @@ body.modal-open {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-bottom: 10px; /* Espace entre le logo et l'horloge */
 }
 .sidebar-header .logo-title .fas {
     color: var(--rouge-vif);
 }
 
+.live-clock {
+    font-family: 'Montserrat', sans-serif;
+    font-size: var(--font-sm);
+    color: var(--rose-pale);
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
 .close-sidebar-btn {
-    display: none;
+    display: none; /* Caché par défaut sur desktop */
     background: none;
     border: none;
     color: var(--rose-pale);
     font-size: var(--font-sm);
     cursor: pointer;
     transition: color 0.2s ease;
+    position: absolute;
+    top: 10px;
+    right: 10px;
 }
 .close-sidebar-btn:hover {
     color: var(--rouge-vif);
@@ -181,19 +194,36 @@ body.modal-open {
     color: var(--jaune-creme);
 }
 
+/* Backdrop for mobile sidebar */
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Couleur transparente */
+    z-index: 950; /* Entre la sidebar et le contenu principal */
+    transition: opacity 0.3s ease;
+    opacity: 1;
+}
+.backdrop.hidden {
+    opacity: 0;
+    pointer-events: none; /* Permet de cliquer à travers quand caché */
+}
 
 /* --- Main Content Area --- */
 .main-content {
     flex-grow: 1;
-    margin-left: var(--sidebar-width);
+    margin-left: var(--sidebar-width); /* Espace pour la sidebar sur desktop */
     background: var(--background-light);
     min-height: 100vh;
     transition: margin-left 0.3s ease-in-out;
     position: relative;
+    /* padding-top: var(--header-height); */ /* Ajustement si le header est fixed et non sticky */
 }
 
 .open-sidebar-btn {
-    display: none;
+    display: none; /* Caché par défaut sur desktop */
     position: fixed;
     top: 20px;
     left: 20px;
@@ -224,9 +254,12 @@ body.modal-open {
     align-items: center;
     border-bottom: 1px solid var(--border-color);
     box-shadow: 0 2px 10px var(--shadow-light);
-    position: sticky;
+    position: sticky; /* Rendre le header fixe en haut */
     top: 0;
     z-index: 500;
+    width: calc(100% - var(--sidebar-width)); /* Ajustement pour la sidebar */
+    margin-left: var(--sidebar-width); /* Décalage pour la sidebar */
+    transition: width 0.3s ease-in-out, margin-left 0.3s ease-in-out;
 }
 .main-header h1 {
     font-family: 'Playfair Display', serif;
@@ -926,14 +959,43 @@ body.modal-open {
     gap: 10px;
     margin-top: 15px;
 }
-.uploaded-image {
+.uploaded-image-wrapper {
+    position: relative;
     width: 100%;
     height: 100px;
-    object-fit: cover;
     border-radius: 8px;
+    overflow: hidden;
     border: 1px solid var(--border-color);
     box-shadow: 0 2px 8px var(--shadow-light);
 }
+.uploaded-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.remove-image-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--rouge-vif);
+    font-size: 1.2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background 0.2s, transform 0.2s;
+}
+.remove-image-btn:hover {
+    background: white;
+    transform: scale(1.1);
+}
+
 
 .sortable-list {
     min-height: 50px;
@@ -1003,6 +1065,13 @@ body.modal-open {
 .preview-item .fas {
     color: var(--rouge-doux);
 }
+.menu-preview-list h4 {
+    font-size: var(--font-xs);
+    color: var(--rouge-brique);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
 
 /* Modals */
 .modal {
@@ -1074,30 +1143,31 @@ body.modal-open {
 @media (max-width: 768px) {
     .sidebar {
         width: 250px;
-        transform: translateX(-100%);
+        transform: translateX(-100%); /* Caché par défaut sur mobile */
     }
-    .sidebar:not(.sidebar-hidden) {
+    .sidebar:not(.sidebar-hidden) { /* Quand la sidebar est active */
         transform: translateX(0);
     }
 
     .main-content {
-        margin-left: 0;
-        padding-top: 70px;
+        margin-left: 0; /* Pas de décalage sur mobile */
+        padding-top: calc(var(--header-height) + 10px); /* Ajustement pour le header fixe */
     }
 
     .open-sidebar-btn {
-        display: flex;
+        display: flex; /* Afficher le bouton hamburger */
     }
     .close-sidebar-btn {
-        display: block;
+        display: block; /* Afficher le bouton de fermeture dans la sidebar */
     }
 
     .main-header {
+        width: 100%; /* Occupe toute la largeur */
+        margin-left: 0; /* Pas de décalage */
         padding: 15px 20px;
         flex-direction: column;
         align-items: flex-start;
-        position: fixed;
-        width: 100%;
+        position: fixed; /* Le header devient fixe */
         top: 0;
         left: 0;
     }
@@ -1165,43 +1235,30 @@ body.modal-open {
         right: 15px;
     }
 
-    .backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 900;
-    }
+    /* Le backdrop est géré par JS en ajoutant/retirant la classe .hidden */
+    /* .backdrop styles are already defined above and managed by JS */
 }
-
-/* Version mobile de la sidebar ouverte pour le backdrop et le main content */
-@media (max-width: 768px) {
-    .sidebar:not(.sidebar-hidden) + .backdrop {
-        display: block;
-    }
-}
-    </style>
+</style>
 </head>
 <body>
 
     <div id="backdrop" class="backdrop hidden"></div>
 
-    <aside id="sidebar" class="sidebar">
+    <aside id="sidebar" class="sidebar sidebar-hidden">
         <div class="sidebar-header">
             <h2 class="logo-title"><i class="fas fa-utensils"></i> DailyMenu Admin</h2>
+            <div id="live-clock" class="live-clock"></div>
             <button id="close-sidebar" class="close-sidebar-btn"><i class="fas fa-times"></i></button>
         </div>
         <nav class="sidebar-nav">
             <ul>
-                <li><a href="#" class="nav-item active" data-section="overview"><i class="fas fa-tachometer-alt"></i> Aperçu</a></li>
-                <li><a href="#" class="nav-item" data-section="profile"><i class="fas fa-user-cog"></i> Mon Profil</a></li>
-                <li><a href="#" class="nav-item" data-section="items"><i class="fas fa-burger"></i> Plats</a></li>
-                <li><a href="#" class="nav-item" data-section="menus"><i class="fas fa-book-open"></i> Menus</a></li>
-                <li><a href="#" class="nav-item" data-section="qr-codes"><i class="fas fa-qrcode"></i> QR Codes</a></li>
-                <li><a href="#" class="nav-item" data-section="reviews"><i class="fas fa-star-half-alt"></i> Avis</a></li>
-                <li><a href="#" class="nav-item" data-section="stats"><i class="fas fa-chart-line"></i> Statistiques</a></li>
+                <li><a href="#overview" class="nav-item active" data-section="overview"><i class="fas fa-tachometer-alt"></i> Aperçu</a></li>
+                <li><a href="#profile" class="nav-item" data-section="profile"><i class="fas fa-user-cog"></i> Mon Profil</a></li>
+                <li><a href="#items" class="nav-item" data-section="items"><i class="fas fa-burger"></i> Plats</a></li>
+                <li><a href="#menus" class="nav-item" data-section="menus"><i class="fas fa-book-open"></i> Menus</a></li>
+                <li><a href="#qr-codes" class="nav-item" data-section="qr-codes"><i class="fas fa-qrcode"></i> QR Codes</a></li>
+                <li><a href="#reviews" class="nav-item" data-section="reviews"><i class="fas fa-star-half-alt"></i> Avis</a></li>
+                <li><a href="#stats" class="nav-item" data-section="stats"><i class="fas fa-chart-line"></i> Statistiques</a></li>
                 <li><a href="#" class="nav-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
             </ul>
         </nav>
@@ -1310,8 +1367,9 @@ body.modal-open {
                 <h3>Générer un nouveau QR Code</h3>
                 <form id="qr-code-form">
                     <div class="form-group">
-                        <label for="qr-menu">Sélectionner un Menu:</label>
-                        <select id="qr-menu-select" required></select> </div>
+                        <label for="qr-menu-select">Sélectionner un Menu:</label>
+                        <select id="qr-menu-select" required></select>
+                    </div>
                     <button type="submit" class="btn btn-primary"><i class="fas fa-qrcode"></i> Générer QR Code</button>
                 </form>
             </div>
@@ -1404,8 +1462,9 @@ body.modal-open {
                     </div>
 
                 <h3>Images</h3>
-                <div class="drop-zone" ondragover="event.preventDefault(); this.classList.add('dragover');" ondragleave="this.classList.remove('dragover');">
-                    Glissez & déposez des images ici ou <input type="file" multiple accept="image/*" onchange="handleFileSelect(event)">
+                <div class="drop-zone" ondragover="event.preventDefault(); this.classList.add('dragover');" ondragleave="this.classList.remove('dragover');" onclick="document.getElementById('image-upload-input').click();">
+                    Glissez & déposez des images ici ou cliquez pour sélectionner
+                    <input type="file" id="image-upload-input" multiple accept="image/*" onchange="handleFileSelect(event)" style="display: none;">
                 </div>
                 <div id="image-preview" class="image-preview-grid">
                     </div>
@@ -1441,6 +1500,7 @@ body.modal-open {
                 <div id="menu-items" class="sortable-list" ondragover="event.preventDefault();" ondrop="handleDrop(event);">
                     </div>
                 <div id="menu-preview" class="menu-preview-list">
+                    <h4>Aperçu de l'ordre du menu:</h4>
                     </div>
 
                 <button type="submit" class="btn btn-primary mt-4"><i class="fas fa-plus-circle"></i> Créer Menu</button>
@@ -1452,7 +1512,8 @@ body.modal-open {
         <div class="modal-content">
             <span class="close-modal-btn" onclick="closeModal('generate-qr-modal')"><i class="fas fa-times-circle"></i></span>
             <h2>Générer un QR Code</h2>
-            <form id="generate-qr-modal-form" class="form-modal"> <div class="form-group">
+            <form id="generate-qr-modal-form" class="form-modal">
+                <div class="form-group">
                     <label for="modal-qr-menu">Sélectionner un Menu:</label>
                     <select id="modal-qr-menu" required></select>
                 </div>
@@ -1463,28 +1524,60 @@ body.modal-open {
 
 
     <script>
-        const frontendUrls = "http://127.0.0.1:8000/";
+        //const frontendUrls = "http://127.0.0.1:8000/";
+        const frontendUrls = "https://dailymenu.onrender.com/"; // Assurez-vous que cette URL est correcte
         let token = localStorage.getItem("token");
-        let allItems = []; // Stocker tous les items pour les filtres
+        let allItems = []; // Stocker tous les items pour les filtres et l'aperçu du menu
         let allMenus = []; // Stocker tous les menus pour les filtres
-        let allDays = []; // Stocker tous les jours pour les filtres
+        let allCategories = []; // Stocker toutes les catégories
+        let allTags = []; // Stocker tous les tags
+        let allDays = []; // Stocker tous les jours
         let selectedImages = [];
         let selectedIngredients = [];
         let selectedMenuItems = [];
 
 
-        // Navigation
+        // Horloge en direct
+        function updateClock() {
+            const now = new Date();
+            const options = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            const timeString = now.toLocaleTimeString('fr-FR', options);
+            document.getElementById('live-clock').textContent = timeString;
+        }
+
+        // Met à jour l'horloge toutes les secondes
+        setInterval(updateClock, 1000);
+        // Appelle une première fois pour éviter un délai d'une seconde au chargement
+        updateClock();
+
+
+        // Navigation et chargement automatique des sections
         document.querySelectorAll(".nav-item").forEach(item => {
-            item.addEventListener("click", () => {
-                if (item.dataset.section) {
-                    showSection(item.dataset.section);
+            item.addEventListener("click", (e) => {
+                e.preventDefault(); // Empêche le rechargement par le lien #
+                const sectionId = item.dataset.section;
+                if (sectionId) {
+                    showSection(sectionId);
                     document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
                     item.classList.add("active");
+
+                    // Redirection précise vers le haut de la section
+                    const targetSection = document.getElementById(`${sectionId}-section`);
+                    if (targetSection) {
+                        // Utiliser scrollIntoView avec 'start' pour scroller au début de l'élément
+                        // Ajout d'un petit décalage pour la barre de titre fixe
+                        const headerOffset = 80; // Hauteur de votre header fixe
+                        const elementPosition = targetSection.getBoundingClientRect().top + window.pageYOffset;
+                        window.scrollTo({
+                            top: elementPosition - headerOffset,
+                            behavior: "smooth"
+                        });
+                    }
                 }
             });
         });
 
-        function showSection(sectionId) {
+        async function showSection(sectionId) {
             document.querySelectorAll(".section").forEach(section => section.classList.add("hidden"));
             document.getElementById(`${sectionId}-section`).classList.remove("hidden");
 
@@ -1515,13 +1608,13 @@ body.modal-open {
             if (token) {
                 // Charger les données de la section active
                 switch (sectionId) {
-                    case "overview": loadOverview(); break;
-                    case "profile": loadProfile(); break;
-                    case "items": loadItems(); break;
-                    case "menus": loadMenus(); break;
-                    case "qr-codes": loadQRCodes(); break;
-                    case "reviews": loadReviews(); break;
-                    case "stats": loadStats(); break;
+                    case "overview": await loadOverview(); break;
+                    case "profile": await loadProfile(); break;
+                    case "items": await loadItems(); break;
+                    case "menus": await loadMenus(); break;
+                    case "qr-codes": await loadQRCodes(); break;
+                    case "reviews": await loadReviews(); break;
+                    case "stats": await loadStats(); break;
                 }
             } else {
                 window.location.href = frontendUrls + "start/";
@@ -1587,7 +1680,7 @@ body.modal-open {
                 selectedMenuItems = [];
                 document.getElementById("create-menu-form").reset();
                 document.getElementById("menu-items").innerHTML = "";
-                document.getElementById("menu-preview").innerHTML = "";
+                document.getElementById("menu-preview").innerHTML = "<h4>Aperçu de l'ordre du menu:</h4>"; // Réinitialiser le titre
                 Array.from(document.getElementById("menu-days").options).forEach(opt => opt.selected = false);
             }
         }
@@ -1612,30 +1705,45 @@ body.modal-open {
         }
 
         function handleFiles(files) {
+            const imagePreview = document.getElementById("image-preview");
             for (let file of files) {
                 if (file.type.startsWith("image/")) {
                     selectedImages.push(file);
                     const reader = new FileReader();
                     reader.onload = e => {
-                        const img = document.createElement("img");
-                        img.src = e.target.result;
-                        img.className = "uploaded-image";
-                        document.getElementById("image-preview").appendChild(img);
+                        const imgWrapper = document.createElement("div");
+                        imgWrapper.className = "uploaded-image-wrapper";
+                        imgWrapper.innerHTML = `
+                            <img src="${e.target.result}" class="uploaded-image">
+                            <button type="button" class="remove-image-btn" onclick="removeImage('${file.name}', this)"><i class="fas fa-times-circle"></i></button>
+                        `;
+                        imagePreview.appendChild(imgWrapper);
                     };
                     reader.readAsDataURL(file);
                 }
             }
         }
 
+        function removeImage(fileName, button) {
+            selectedImages = selectedImages.filter(img => img.name !== fileName);
+            button.closest('.uploaded-image-wrapper').remove();
+        }
+
         // Ingredients
         async function loadItemModalData() {
             try {
+                // Ensure allCategories, allTags, allDays are populated for filters and multi-selects
                 const [categories, tags, days, ingredients] = await Promise.all([
                     fetch(frontendUrls + "api/categories", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
                     fetch(frontendUrls + "api/tags", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
                     fetch(frontendUrls + "api/jours").then(r => r.json()),
                     fetch(frontendUrls + "api/ingredients").then(r => r.json())
                 ]);
+
+                allCategories = categories;
+                allTags = tags;
+                allDays = days;
+
                 const catSelect = document.getElementById("item-categories");
                 catSelect.innerHTML = categories.map(c => `<option value="${c.id_category}">${c.name}</option>`).join("");
                 const tagSelect = document.getElementById("item-tags");
@@ -1651,15 +1759,21 @@ body.modal-open {
 
         function addItemIngredient() {
             const select = document.getElementById("ingredient-select");
-            const quantity = document.getElementById("ingredient-quantity").value;
+            const quantityInput = document.getElementById("ingredient-quantity");
             const selectedOption = select.options[select.selectedIndex];
-            const ingredientId = selectedOption.value;
-            const ingredientName = selectedOption.text;
 
-            if (!ingredientId || !quantity) {
-                showMessage("Veuillez sélectionner un ingrédient et entrer une quantité.", true);
+            if (!selectedOption || selectedOption.value === "") {
+                showMessage("Veuillez sélectionner un ingrédient.", true);
                 return;
             }
+            if (quantityInput.value.trim() === "") {
+                showMessage("Veuillez entrer une quantité pour l'ingrédient.", true);
+                return;
+            }
+
+            const ingredientId = selectedOption.value;
+            const ingredientName = selectedOption.text;
+            const quantity = quantityInput.value.trim();
 
             if (selectedIngredients.some(i => i.id === ingredientId)) {
                 showMessage("Cet ingrédient a déjà été ajouté.", true);
@@ -1676,7 +1790,7 @@ body.modal-open {
                 <button type="button" onclick="removeIngredient('${ingredientId}', this)" class="remove-btn"><i class="fas fa-times"></i></button>
             `;
             document.getElementById("item-ingredients").appendChild(div);
-            document.getElementById("ingredient-quantity").value = "";
+            quantityInput.value = "";
             select.selectedIndex = 0;
         }
 
@@ -1688,9 +1802,15 @@ body.modal-open {
         // Menu Items
         async function loadMenuModalData() {
             try {
-                const items = await fetch(frontendUrls + "api/items", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
+                // Ensure allItems is populated first
+                if (allItems.length === 0) {
+                     const items = await fetch(frontendUrls + "api/items", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
+                     allItems = items;
+                }
+
                 const select = document.getElementById("item-select");
-                select.innerHTML = items.map(i => `<option value="${i.id_item}">${i.nom_plat}</option>`).join("");
+                select.innerHTML = `<option value="">-- Sélectionner un plat --</option>` + allItems.map(i => `<option value="${i.id_item}">${i.nom_plat}</option>`).join("");
+
 
                 // Charger aussi les jours pour le formulaire de menu
                 const days = await fetch(frontendUrls + "api/jours").then(r => r.json());
@@ -1708,7 +1828,7 @@ body.modal-open {
             const itemId = selectedOption.value;
             const itemName = selectedOption.text;
 
-            if (!itemId) {
+            if (!itemId || itemId === "") {
                 showMessage("Veuillez sélectionner un plat.", true);
                 return;
             }
@@ -1729,7 +1849,7 @@ body.modal-open {
             `;
             document.getElementById("menu-items").appendChild(div);
             updateMenuPreview();
-            select.selectedIndex = 0;
+            select.selectedIndex = 0; // Réinitialiser le select
         }
 
         function removeMenuItem(id, button) {
@@ -1740,10 +1860,22 @@ body.modal-open {
 
         function updateMenuPreview() {
             const preview = document.getElementById("menu-preview");
-            // Utiliser la liste originale de tous les items pour retrouver les noms par ID
+            // S'assurer que allItems est bien peuplé
+            if (allItems.length === 0) {
+                preview.innerHTML = "<h4>Aperçu de l'ordre du menu:</h4><p>Chargement des plats...</p>";
+                // Tenter de recharger les items si vide, ou gérer l'erreur
+                // loadMenuModalData(); // Ne pas appeler ici, cela peut créer une boucle ou un comportement inattendu
+                return;
+            }
+
             const itemsMap = new Map(allItems.map(item => [item.id_item, item.nom_plat]));
-            preview.innerHTML = selectedMenuItems.map(id => {
-                const itemName = itemsMap.get(id) || "Plat inconnu";
+            if (selectedMenuItems.length === 0) {
+                preview.innerHTML = "<h4>Aperçu de l'ordre du menu:</h4><p>Ajoutez des plats pour voir l'aperçu.</p>";
+                return;
+            }
+            preview.innerHTML = "<h4>Aperçu de l'ordre du menu:</h4>" + selectedMenuItems.map(id => {
+                // Utiliser la map pour trouver le nom du plat
+                const itemName = itemsMap.get(id) || "Plat inconnu (ID: " + id + ")";
                 return `<div class="preview-item"><i class="fas fa-chevron-right"></i> ${itemName}</div>`;
             }).join("");
         }
@@ -1770,13 +1902,13 @@ body.modal-open {
             list.addEventListener("dragover", e => {
                 e.preventDefault();
                 const draggingItem = document.querySelector(".dragging");
+                if (!draggingItem) return;
+
                 const afterElement = getDragAfterElement(list, e.clientY);
-                if (draggingItem) {
-                    if (afterElement == null) {
-                        list.appendChild(draggingItem);
-                    } else {
-                        list.insertBefore(draggingItem, afterElement);
-                    }
+                if (afterElement == null) {
+                    list.appendChild(draggingItem);
+                } else {
+                    list.insertBefore(draggingItem, afterElement);
                 }
             });
             list.addEventListener("drop", e => {
@@ -1803,11 +1935,10 @@ body.modal-open {
             const itemsInOrder = Array.from(listElement.querySelectorAll('.sortable-item')).map(item => item.dataset.id);
 
             if (listId === "item-ingredients") {
-                // Maintenir les objets ingrédients complets avec name et quantity
                 selectedIngredients = itemsInOrder.map(id => {
                     const original = selectedIngredients.find(ing => ing.id === id);
-                    return original ? { ...original } : null; // Retourne une copie ou null
-                }).filter(Boolean); // Retire les null si un élément n'est pas trouvé
+                    return original ? { ...original } : null;
+                }).filter(Boolean);
             } else if (listId === "menu-items") {
                 selectedMenuItems = itemsInOrder;
                 updateMenuPreview();
@@ -1836,7 +1967,9 @@ body.modal-open {
         // Profile
         async function loadProfile() {
             try {
-                const profile = await fetch(frontendUrls + "api/etablissement/me", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
+                const response = await fetch(frontendUrls + "api/etablissement/me", { headers: { "Authorization": `Bearer ${token}` } });
+                if (!response.ok) throw new Error('Failed to fetch profile');
+                const profile = await response.json();
                 document.getElementById("profile-name").value = profile.nom_etablissement;
                 document.getElementById("profile-email").value = profile.email_pro;
                 document.getElementById("profile-phone").value = profile.numtel;
@@ -1877,20 +2010,23 @@ body.modal-open {
         // Items
         async function loadItems() {
             try {
-                const [items, categories, days] = await Promise.all([
+                const [items, categories, tags, days] = await Promise.all([
                     fetch(frontendUrls + "api/items", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
                     fetch(frontendUrls + "api/categories", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
+                    fetch(frontendUrls + "api/tags", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
                     fetch(frontendUrls + "api/jours").then(r => r.json())
                 ]);
                 allItems = items; // Stocker tous les items
+                allCategories = categories; // Stocker toutes les catégories
+                allTags = tags; // Stocker tous les tags
                 allDays = days; // Stocker tous les jours
 
                 const catFilter = document.getElementById("item-category-filter");
-                catFilter.innerHTML = `<option value="">Toutes catégories</option>` + categories.map(c => `<option value="${c.id_category}">${c.name}</option>`).join("");
+                catFilter.innerHTML = `<option value="">Toutes catégories</option>` + allCategories.map(c => `<option value="${c.id_category}">${c.name}</option>`).join("");
                 catFilter.onchange = filterItems;
 
                 const dayFilter = document.getElementById("item-day-filter-items");
-                dayFilter.innerHTML = `<option value="">Tous les jours</option>` + days.map(d => `<option value="${d.id_jour}">${d.nom}</option>`).join("");
+                dayFilter.innerHTML = `<option value="">Tous les jours</option>` + allDays.map(d => `<option value="${d.id_jour}">${d.nom}</option>`).join("");
                 dayFilter.onchange = filterItems;
 
                 renderItems(allItems); // Afficher tous les items au début
@@ -1901,10 +2037,14 @@ body.modal-open {
 
         function renderItems(itemsToRender) {
             const list = document.getElementById("items-list");
+            if (itemsToRender.length === 0) {
+                list.innerHTML = `<p class="no-data-message">Aucun plat trouvé. Ajoutez-en un via le bouton "Ajouter Plat" !</p>`;
+                return;
+            }
             list.innerHTML = itemsToRender.map(item => `
                 <div class="menu-item-card">
                     <div class="item-image-container">
-                        ${item.images && item.images.length ? `<img src="${item.images[0].url_image}" alt="${item.nom_plat}" class="item-image">` : `<span class="placeholder-icon"><i class="fas fa-pizza-slice"></i></span>`}
+                        ${item.images && item.images.length ? `<img src="${frontendUrls}${item.images[0].url_image}" alt="${item.nom_plat}" class="item-image">` : `<span class="placeholder-icon"><i class="fas fa-pizza-slice"></i></span>`}
                     </div>
                     <h3 class="item-title">${item.nom_plat}</h3>
                     <p class="item-description">${item.description || "Sans description"}</p>
@@ -1952,6 +2092,7 @@ body.modal-open {
             formData.append("prep_time", document.getElementById("item-prep-time").value);
             formData.append("disponibilite", document.getElementById("item-availability").value === "true");
 
+            // Récupérer les IDs des catégories, tags et jours sélectionnés (multiples)
             Array.from(document.getElementById("item-categories").selectedOptions).forEach(o => {
                 formData.append("category_ids", o.value);
             });
@@ -1986,7 +2127,7 @@ body.modal-open {
                     loadItems(); // Recharger les items après création
                 } else {
                     const errorData = await response.json();
-                    showMessage(errorData.error || "Erreur lors de la création du plat", true);
+                    showMessage(errorData.detail || errorData.error || "Erreur lors de la création du plat", true);
                 }
 
             } catch (err) {
@@ -2017,13 +2158,12 @@ body.modal-open {
                     category_ids: itemToDuplicate.categories.map(c => c.id_category),
                     tag_ids: itemToDuplicate.tags.map(t => t.id_tag),
                     jour_ids: itemToDuplicate.jours_disponibilite.map(j => j.id_jour),
+                    // Assurez-vous que les ingrédients sont passés avec leurs quantités
                     ingredient_ids: itemToDuplicate.ingredients.map(i => i.id_ingredient),
-                    // Si votre backend a besoin des quantités pour les duplicatas, elles devront être incluses
-                    // Pour l'instant, je vais les définir comme une valeur par défaut ou tenter de les récupérer si l'API les fournit dans l'objet item
-                    quantites: itemToDuplicate.ingredients.map(i => i.pivot ? i.pivot.quantite : "Quantité par défaut") // Supposons que la quantité est dans un pivot
+                    quantites: itemToDuplicate.ingredients.map(i => i.pivot ? i.pivot.quantite : "1 unité") // Adaptez si votre pivot structure est différente
                 };
 
-                const response = await fetch(frontendUrls + "api/items", { // L'API FastAPI gérera la duplication via POST s'il y a une route dédiée
+                const response = await fetch(frontendUrls + "api/items", {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
                     body: JSON.stringify(data)
@@ -2034,7 +2174,7 @@ body.modal-open {
                     loadItems();
                 } else {
                     const errorData = await response.json();
-                    showMessage(errorData.error || "Erreur lors de la duplication", true);
+                    showMessage(errorData.detail || errorData.error || "Erreur lors de la duplication", true);
                 }
             } catch (error) {
                 showMessage("Erreur serveur lors de la duplication: " + error.message, true);
@@ -2055,7 +2195,7 @@ body.modal-open {
                     loadItems();
                 } else {
                     const data = await response.json();
-                    showMessage("Erreur : " + (data.error || "suppression échouée"), true);
+                    showMessage("Erreur : " + (data.detail || data.error || "suppression échouée"), true);
                 }
             } catch (error) {
                 showMessage("Erreur réseau pendant la suppression du plat: " + error.message, true);
@@ -2065,15 +2205,17 @@ body.modal-open {
 
         async function loadMenus() {
             try {
-                const [menus, days] = await Promise.all([
+                const [menus, items, days] = await Promise.all([
                     fetch(frontendUrls + "api/menus", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
+                    fetch(frontendUrls + "api/items", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()), // Assurez-vous de charger les items ici
                     fetch(frontendUrls + "api/jours").then(r => r.json())
                 ]);
                 allMenus = menus;
-                allDays = days; // S'assurer que allDays est à jour
+                allItems = items; // Important: Mettre à jour allItems ici pour qu'il soit disponible pour updateMenuPreview
+                allDays = days; // S'assurer que allDays est à jour pour le filtre
 
                 const dayFilter = document.getElementById("menu-day-filter");
-                dayFilter.innerHTML = `<option value="">Tous les jours</option>` + days.map(d => `<option value="${d.id_jour}">${d.nom}</option>`).join("");
+                dayFilter.innerHTML = `<option value="">Tous les jours</option>` + allDays.map(d => `<option value="${d.id_jour}">${d.nom}</option>`).join("");
                 dayFilter.onchange = filterMenus;
 
                 renderMenus(allMenus);
@@ -2086,7 +2228,7 @@ body.modal-open {
             const list = document.getElementById("menus-list");
 
             if (menusToRender.length === 0) {
-                list.innerHTML = `<p class="no-data-message">Aucun menu trouvé. Créez-en un !</p>`;
+                list.innerHTML = `<p class="no-data-message">Aucun menu trouvé. Créez-en un via le bouton "Créer Menu" !</p>`;
                 return;
             }
 
@@ -2098,7 +2240,7 @@ body.modal-open {
                             <button class="btn btn-icon btn-secondary" aria-label="Modifier" title="Modifier le menu" onclick="editMenu('${menu.id_menu}')">
                                 <i class="fas fa-edit"></i>
                             </button>
-                            <button class="btn btn-icon btn-tertiary" aria-label="Générer QR" title="Générer un QR code" onclick="generateQR('${menu.id_menu}')">
+                            <button class="btn btn-icon btn-tertiary" aria-label="Générer QR" title="Générer un QR code" onclick="openModalWithMenuId('generate-qr-modal', '${menu.id_menu}')">
                                 <i class="fas fa-qrcode"></i>
                             </button>
                             <button class="btn btn-icon btn-tertiary" aria-label="Exporter PDF" title="Exporter en PDF" onclick="exportPDF('${menu.id_menu}')">
@@ -2114,7 +2256,7 @@ body.modal-open {
                     </div>
                     <p class="menu-description">${menu.description || "Aucune description"}</p>
                     <p class="menu-meta">
-                        ${menu.items.length} plats • Créé le ${new Date(menu.created_at || Date.now()).toLocaleDateString()}
+                        ${menu.items.length} plats • Créé le ${new Date(menu.created_at || Date.now()).toLocaleDateString('fr-FR')}
                     </p>
                     <div class="menu-days-availability">
                         ${menu.jours_disponibilite && menu.jours_disponibilite.length > 0 ?
@@ -2166,7 +2308,7 @@ body.modal-open {
                     loadMenus();
                 } else {
                     const errorData = await response.json();
-                    showMessage(errorData.error || "Erreur lors de la création du menu", true);
+                    showMessage(errorData.detail || errorData.error || "Erreur lors de la création du menu", true);
                 }
             } catch (error) {
                 showMessage("Erreur serveur lors de la création du menu: " + error.message, true);
@@ -2191,10 +2333,26 @@ body.modal-open {
                     loadMenus();
                 } else {
                     const data = await response.json();
-                    showMessage("Erreur lors de la suppression du menu: " + (data.error || "Échec"), true);
+                    showMessage("Erreur lors de la suppression du menu: " + (data.detail || data.error || "Échec"), true);
                 }
             } catch (error) {
                 showMessage("Erreur réseau lors de la suppression du menu: " + error.message, true);
+            }
+        }
+
+        // Fonction pour ouvrir la modale QR et pré-sélectionner un menu
+        function openModalWithMenuId(modalId, menuId = null) {
+            openModal(modalId);
+            if (menuId) {
+                // S'assurer que les menus sont chargés avant de tenter de sélectionner
+                const selectElement = document.getElementById("modal-qr-menu");
+                if (selectElement) {
+                    // Petite attente pour que loadQRModalMenus ait fini de peupler
+                    // Un setTimeout de 0ms permet d'exécuter après que le DOM ait été mis à jour
+                    setTimeout(() => {
+                        selectElement.value = menuId;
+                    }, 0);
+                }
             }
         }
 
@@ -2209,10 +2367,11 @@ body.modal-open {
 
                 if (response.ok) {
                     showMessage("QR Code généré !");
+                    closeModal("generate-qr-modal"); // Fermer la modale après génération réussie
                     loadQRCodes();
                 } else {
                     const errorData = await response.json();
-                    showMessage(errorData.error || "Erreur lors de la génération du QR Code", true);
+                    showMessage(errorData.detail || errorData.error || "Erreur lors de la génération du QR Code", true);
                 }
             } catch (error) {
                 showMessage("Erreur serveur lors de la génération du QR Code: " + error.message, true);
@@ -2223,8 +2382,15 @@ body.modal-open {
             try {
                 const menus = await fetch(frontendUrls + "api/menus", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
                 const modalQrMenuSelect = document.getElementById("modal-qr-menu");
-                if (modalQrMenuSelect) { // Vérifier si l'élément existe
-                    modalQrMenuSelect.innerHTML = menus.map(m => `<option value="${m.id_menu}">${m.nom}</option>`).join("");
+                const qrMenuSelect = document.getElementById("qr-menu-select"); // Aussi le select dans la section principale
+
+                const optionsHtml = `<option value="">-- Sélectionner un menu --</option>` + menus.map(m => `<option value="${m.id_menu}">${m.nom}</option>`).join("");
+
+                if (modalQrMenuSelect) {
+                    modalQrMenuSelect.innerHTML = optionsHtml;
+                }
+                if (qrMenuSelect) {
+                    qrMenuSelect.innerHTML = optionsHtml;
                 }
             } catch (error) {
                 showMessage("Erreur lors du chargement des menus pour la modale QR: " + error.message, true);
@@ -2234,8 +2400,8 @@ body.modal-open {
         // Écouteur pour le formulaire de génération de QR dans la section QR Codes (avec le select interne)
         document.getElementById("qr-code-form").addEventListener("submit", async e => {
             e.preventDefault();
-            const menuId = document.getElementById("qr-menu-select").value; // Utilisez l'ID corrigé
-            if (menuId) {
+            const menuId = document.getElementById("qr-menu-select").value;
+            if (menuId && menuId !== "") {
                 await generateQR(menuId);
             } else {
                 showMessage("Veuillez sélectionner un menu à générer.", true);
@@ -2246,9 +2412,8 @@ body.modal-open {
         document.getElementById("generate-qr-modal-form").addEventListener("submit", async e => {
             e.preventDefault();
             const menuId = document.getElementById("modal-qr-menu").value;
-            if (menuId) {
+            if (menuId && menuId !== "") {
                 await generateQR(menuId);
-                closeModal("generate-qr-modal"); // Fermer la modale après génération
             } else {
                 showMessage("Veuillez sélectionner un menu.", true);
             }
@@ -2273,7 +2438,7 @@ body.modal-open {
                     showMessage("PDF exporté !");
                 } else {
                     const errorData = await response.json();
-                    showMessage(errorData.error || "Erreur lors de l'exportation du PDF", true);
+                    showMessage(errorData.detail || errorData.error || "Erreur lors de l'exportation du PDF", true);
                 }
             } catch (error) {
                 showMessage("Erreur lors de l'exportation du PDF: " + error.message, true);
@@ -2283,10 +2448,18 @@ body.modal-open {
         async function shareMenu(menuId) {
             const url = frontendUrls + `menus/${menuId}`;
             try {
-                await navigator.clipboard.writeText(url);
-                showMessage("Lien du menu copié dans le presse-papiers !");
+                if (navigator.share) {
+                    await navigator.share({
+                        title: 'Découvrez notre menu DailyMenu',
+                        url: url,
+                    });
+                    showMessage("Menu partagé avec succès !");
+                } else {
+                    await navigator.clipboard.writeText(url);
+                    showMessage("Lien du menu copié dans le presse-papiers !");
+                }
             } catch (err) {
-                showMessage("Échec de la copie du lien: " + err, true);
+                showMessage("Échec du partage/copie du lien: " + err.message, true);
             }
         }
 
@@ -2298,32 +2471,28 @@ body.modal-open {
 
                 if (qrCodes.length === 0) {
                     list.innerHTML = `<p class="no-data-message">Aucun QR Code généré. Utilisez le bouton "Générer QR Code" pour en créer un !</p>`;
-                    return;
+                } else {
+                    list.innerHTML = qrCodes.map(q => `
+                        <div class="qr-code-card">
+                            <div class="qr-code-img-container">
+                                <img src="${frontendUrls}${q.url}" alt="QR Code pour ${q.menu_id}" class="qr-code-image">
+                            </div>
+                            <div class="qr-code-details">
+                                <h4 class="qr-code-title">Menu ID: ${q.menu_id}</h4>
+                                <p class="qr-code-scans"><i class="fas fa-qrcode"></i> ${q.scans} scans</p>
+                                <p class="qr-code-link"><a href="${frontendUrls}menus/${q.menu_id}" target="_blank">Voir le Menu</a></p>
+                            </div>
+                            <div class="qr-code-actions">
+                                <button class="btn btn-secondary" onclick="downloadQR('${q.id_qrcode}')"><i class="fas fa-download"></i> Télécharger</button>
+                                <button class="btn btn-tertiary" onclick="shareQRLink('${frontendUrls}menus/${q.menu_id}')"><i class="fas fa-share-alt"></i> Partager Lien</button>
+                                <button class="btn btn-danger" onclick="deleteQR('${q.id_qrcode}')"><i class="fas fa-trash-alt"></i> Supprimer</button>
+                            </div>
+                        </div>
+                    `).join("");
                 }
 
-                list.innerHTML = qrCodes.map(q => `
-                    <div class="qr-code-card">
-                        <div class="qr-code-img-container">
-                            <img src="${frontendUrls}${q.url}" alt="QR Code pour ${q.menu_id}" class="qr-code-image">
-                        </div>
-                        <div class="qr-code-details">
-                            <h4 class="qr-code-title">Menu ID: ${q.menu_id}</h4>
-                            <p class="qr-code-scans"><i class="fas fa-qrcode"></i> ${q.scans} scans</p>
-                            <p class="qr-code-link"><a href="${frontendUrls}menus/${q.menu_id}" target="_blank">Voir le Menu</a></p>
-                        </div>
-                        <div class="qr-code-actions">
-                            <button class="btn btn-secondary" onclick="downloadQR('${q.id_qrcode}')"><i class="fas fa-download"></i> Télécharger</button>
-                            <button class="btn btn-tertiary" onclick="shareQRLink('${frontendUrls}menus/${q.menu_id}')"><i class="fas fa-share-alt"></i> Partager Lien</button>
-                            <button class="btn btn-danger" onclick="deleteQR('${q.id_qrcode}')"><i class="fas fa-trash-alt"></i> Supprimer</button>
-                        </div>
-                    </div>
-                `).join("");
-
                 // Peupler le select dans la section QR Codes si un menu est sélectionné
-                const qrMenuSelect = document.getElementById("qr-menu-select");
-                const menus = await fetch(frontendUrls + "api/menus", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
-                qrMenuSelect.innerHTML = menus.map(m => `<option value="${m.id_menu}">${m.nom}</option>`).join("");
-
+                loadQRModalMenus(); // Cette fonction peuple les deux selects de QR codes
             } catch (error) {
                 showMessage("Erreur lors du chargement des QR codes: " + error.message, true);
             }
@@ -2346,10 +2515,18 @@ body.modal-open {
 
         async function shareQRLink(url) {
             try {
-                await navigator.clipboard.writeText(url);
-                showMessage("URL du QR Code copié dans le presse-papiers !");
+                if (navigator.share) {
+                    await navigator.share({
+                        title: 'Découvrez ce QR Code de menu',
+                        url: url,
+                    });
+                    showMessage("Lien du QR Code partagé avec succès !");
+                } else {
+                    await navigator.clipboard.writeText(url);
+                    showMessage("URL du QR Code copié dans le presse-papiers !");
+                }
             } catch (err) {
-                showMessage("Échec de la copie du lien du QR Code: " + err, true);
+                showMessage("Échec du partage/copie du lien du QR Code: " + err.message, true);
             }
         }
 
@@ -2367,7 +2544,7 @@ body.modal-open {
                     loadQRCodes();
                 } else {
                     const data = await response.json();
-                    showMessage("Erreur lors de la suppression du QR Code: " + (data.error || "Échec"), true);
+                    showMessage("Erreur lors de la suppression du QR Code: " + (data.detail || data.error || "Échec"), true);
                 }
             } catch (error) {
                 showMessage("Erreur réseau lors de la suppression du QR Code: " + error.message, true);
@@ -2398,7 +2575,7 @@ body.modal-open {
                                 <h4 class="reviewer-id">Utilisateur #${r.id_personne || 'Inconnu'}</h4>
                                 <div class="review-stars">${"★".repeat(r.note)}${"☆".repeat(5-r.note)}</div>
                             </div>
-                            <span class="review-date">${new Date(r.date_avis).toLocaleDateString()}</span>
+                            <span class="review-date">${new Date(r.date_avis).toLocaleDateString('fr-FR')}</span>
                         </div>
                         <p class="review-comment">${r.commentaires || "Pas de commentaire."}</p>
                         <p class="review-rating-text">Note: <strong>${r.note}/5</strong></p>
@@ -2417,6 +2594,7 @@ body.modal-open {
         async function loadStats() {
             try {
                 const items = await fetch(frontendUrls + "api/items", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
+                // Assuming 'views' property exists on item objects
                 const popular = items.sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
                 const popularList = document.getElementById("popular-items");
 
@@ -2436,13 +2614,33 @@ body.modal-open {
             }
         }
 
-        // Initialisation
+        // Initialisation à la charge de la page
         document.addEventListener("DOMContentLoaded", () => {
             makeSortable("item-ingredients");
             makeSortable("menu-items");
 
+            // Initialisation de l'horloge
+            updateClock();
+
             if (token) {
-                showSection("overview"); // Charge la section d'aperçu par défaut
+                const hash = window.location.hash.substring(1); // Remove '#'
+                const initialSection = hash || "overview";
+                // Assurez-vous que la section est chargée AVANT de tenter de scroller
+                showSection(initialSection).then(() => {
+                    // Si un hash est présent dans l'URL, scroller vers la section correspondante
+                    if (hash) {
+                        const targetSection = document.getElementById(`${hash}-section`);
+                        if (targetSection) {
+                            const headerOffset = 80; // Hauteur de votre header fixe
+                            const elementPosition = targetSection.getBoundingClientRect().top + window.pageYOffset;
+                            window.scrollTo({
+                                top: elementPosition - headerOffset,
+                                behavior: "smooth"
+                            });
+                        }
+                    }
+                });
+
             } else {
                 window.location.href = frontendUrls + "start/";
             }
@@ -2455,24 +2653,43 @@ body.modal-open {
             function toggleSidebar() {
                 sidebar.classList.toggle('sidebar-hidden');
                 backdrop.classList.toggle('hidden');
+                document.body.classList.toggle('modal-open'); // Empêche le scroll du body sur mobile
             }
 
             openSidebarBtn?.addEventListener('click', toggleSidebar);
             closeSidebarBtn?.addEventListener('click', toggleSidebar);
             backdrop?.addEventListener('click', toggleSidebar);
 
-            document.querySelectorAll('.nav-item').forEach(item => {
+            // Close sidebar on navigation click for mobile
+            document.querySelectorAll('.sidebar-nav .nav-item').forEach(item => {
                 item.addEventListener('click', () => {
                     if (window.innerWidth < 768) {
                         toggleSidebar();
                     }
-                    if (item.dataset.section) {
-                        showSection(item.dataset.section);
-                        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-                        item.classList.add('active');
-                    }
                 });
             });
+
+            // Gérer le cas où la sidebar doit être visible par défaut sur grand écran
+            function handleResize() {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('sidebar-hidden');
+                    backdrop.classList.add('hidden');
+                    document.body.classList.remove('modal-open');
+                } else {
+                    // S'assurer qu'elle est cachée si elle ne devrait pas être ouverte
+                    if (!sidebar.classList.contains('sidebar-hidden') && !backdrop.classList.contains('hidden')) {
+                         // Si la sidebar est ouverte et le backdrop visible (donc forcée par le JS mobile)
+                         // Ne rien faire, elle doit rester ouverte jusqu'à ce que l'utilisateur la ferme
+                    } else {
+                        sidebar.classList.add('sidebar-hidden');
+                        backdrop.classList.add('hidden');
+                        document.body.classList.remove('modal-open');
+                    }
+                }
+            }
+
+            window.addEventListener('resize', handleResize);
+            handleResize(); // Appel initial pour définir l'état correct
         });
 
     </script>
