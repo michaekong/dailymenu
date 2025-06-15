@@ -518,7 +518,7 @@ def create_qrcode(request, data: QRCodeIn):
         menu = Menu.objects.get(id_menu=data.menu_id, etablissement=request.auth)
 
         # Génère l'URL cible pour le menu
-        target_url = f"{settings.FRONTEND_URL}menus/{data.menu_id}"
+        target_url = f"{settings.FRONTEND_URL}menus/{data.menu_id}/"
         print(target_url)
 
         # Génère le QR code
