@@ -16,12 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from core.api import api,public_api
+from core.api import api
 from core.views import *
 from django.conf import settings
 from django.conf.urls.static import static
 
-api.add_router("/public", public_api)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', api.urls),

@@ -3,523 +3,867 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menu - dailyMenu</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Menu Restaurant - Interface Client</title>
     <style>
         :root {
             --rouge-brique: #8B2323;
             --rouge-doux: #A24E4E;
+            --rouge-fonce: #5A0A0A;
             --rose-pale: #E7D3D3;
             --jaune-creme: #FFF1CF;
             --bleu-clair: #CCE5FF;
-            --gris-fonce: #4B5563;
-            --vert-succes: #D1FAE5;
+            --noir-doux: #2C1A1A;
+            --glass-bg: rgba(44, 26, 26, 0.85);
+            --glass-light: rgba(231, 211, 211, 0.2);
+            --glow-shadow: 0 0 25px rgba(162, 78, 78, 0.8);
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .bg-rouge-brique { background-color: var(--rouge-brique); }
-        .bg-rouge-doux { background-color: var(--rouge-doux); }
-        .bg-rose-pale { background-color: var(--rose-pale); }
-        .bg-jaune-creme { background-color: var(--jaune-creme); }
-        .bg-bleu-clair { background-color: var(--bleu-clair); }
-        .bg-vert-succes { background-color: var(--vert-succes); }
-        .text-rouge-brique { color: var(--rouge-brique); }
-        .text-rouge-doux { color: var(--rouge-doux); }
-        .border-rouge-doux { border-color: var(--rouge-doux); }
-        .hover-rouge-brique:hover { background-color: var(--rouge-brique); }
-        .gradient-bg {
-            background: linear-gradient(135deg, var(--jaune-creme) 0%, var(--rose-pale) 50%, var(--bleu-clair) 100%);
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--rose-pale), #F5E6E6, #FADEDE);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--noir-doux);
         }
-        .card-shadow {
-            box-shadow: 0 8px 20px rgba(139, 35, 35, 0.1);
+
+        /* Animations de fond */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 20%, rgba(139, 35, 35, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(162, 78, 78, 0.08) 0%, transparent 50%);
+            animation: dance 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
         }
-        .menu-item {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+        @keyframes dance {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.1) rotate(2deg); }
+            50% { transform: scale(1.05) rotate(-1deg); }
+            75% { transform: scale(1.15) rotate(1deg); }
         }
-        .menu-item:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(139, 35, 35, 0.15);
+
+        /* Particules flottantes */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: var(--rouge-brique);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.6;
+            box-shadow: 0 0 10px var(--rouge-brique);
         }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        /* Container principal */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
         }
-        .modal {
-            backdrop-filter: blur(10px);
-            background-color: rgba(139, 35, 35, 0.2);
+
+        /* Header avec glassmorphisme */
+        .header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: var(--glow-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(162, 78, 78, 0.3);
+            animation: slideDown 0.8s ease-out;
         }
-        .star-rating .star {
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .header h1 {
+            color: var(--rose-pale);
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .header p {
+            text-align: center;
+            color: var(--rose-pale);
+            font-size: 1.1rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        /* Section QR Code */
+        .qr-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: var(--glow-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(162, 78, 78, 0.3);
+            animation: slideLeft 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes slideLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .qr-code {
+            width: 150px;
+            height: 150px;
+            background: var(--jaune-creme);
+            border-radius: 15px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            animation: rotate 4s linear infinite;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Barre de recherche */
+        .search-container {
+            position: relative;
+            margin-bottom: 30px;
+            animation: slideRight 0.8s ease-out 0.4s both;
+        }
+
+        @keyframes slideRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            border: none;
+            border-radius: 25px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            font-size: 1.1rem;
+            color: var(--rose-pale);
+            box-shadow: var(--glow-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(162, 78, 78, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .search-bar::placeholder {
+            color: rgba(231, 211, 211, 0.7);
+        }
+
+        .search-bar:focus {
+            outline: none;
+            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(162, 78, 78, 0.8);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--rose-pale);
+            font-size: 1.2rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(-50%); }
+            50% { transform: translateY(-60%); }
+        }
+
+        /* Filtres */
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .filter-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            color: var(--rose-pale);
+            font-weight: 600;
             cursor: pointer;
-            color: #d1d5db;
-            transition: color 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(162, 78, 78, 0.3);
         }
-        .star-rating .star.selected {
-            color: #f59e0b;
+
+        .filter-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: var(--glow-shadow);
+            background: var(--rouge-doux);
+            color: white;
         }
-        .zoom-image {
-            max-height: 85vh;
-            max-width: 95vw;
-            object-fit: contain;
+
+        .filter-btn.active {
+            background: var(--rouge-brique);
+            color: white;
+            transform: scale(1.1);
         }
+
+        /* Grille des plats */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .dish-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--glow-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(162, 78, 78, 0.3);
+            transition: all 0.3s ease;
+            animation: scaleIn 0.8s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .dish-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 0 40px rgba(162, 78, 78, 0.8);
+        }
+
+        .dish-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, var(--jaune-creme), var(--bleu-clair));
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .dish-image:hover {
+            transform: scale(1.1);
+            border-radius: 10px;
+        }
+
+        .dish-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--rose-pale);
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .dish-description {
+            color: rgba(231, 211, 211, 0.8);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .dish-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--rose-pale);
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* Système d'avis */
+        .rating-section {
+            border-top: 1px solid rgba(231, 211, 211, 0.3);
+            padding-top: 15px;
+        }
+
+        .stars {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .star {
+            color: #FFD700;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .star:hover {
+            transform: scale(1.3);
+            text-shadow: 0 0 10px #FFD700;
+        }
+
+        .comment-box {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(231, 211, 211, 0.2);
+            backdrop-filter: blur(10px);
+            margin-top: 10px;
+            resize: vertical;
+            min-height: 60px;
+            color: var(--rose-pale);
+            border: 1px solid rgba(162, 78, 78, 0.2);
+        }
+
+        .comment-box::placeholder {
+            color: rgba(231, 211, 211, 0.6);
+        }
+
+        /* Indicateurs de chargement */
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: var(--noir-doux);
+            font-size: 1.2rem;
+        }
+
         .spinner {
-            border: 4px solid var(--rose-pale);
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(231, 211, 211, 0.3);
             border-top: 4px solid var(--rouge-brique);
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
             animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .fab {
+
+        /* Mode hors-ligne */
+        .offline-indicator {
             position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            z-index: 50;
+            top: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            color: var(--rose-pale);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            animation: slideInRight 0.5s ease-out;
+            border: 1px solid rgba(162, 78, 78, 0.3);
+            box-shadow: var(--glow-shadow);
         }
-        .error-message {
-            background-color: var(--rose-pale);
-            border: 2px solid var(--rouge-doux);
-            color: var(--rouge-brique);
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 500;
-            margin-bottom: 16px;
-            animation: fadeIn 0.3s ease-in-out;
+
+        @keyframes slideInRight {
+            from { transform: translateX(100px); }
+            to { transform: translateX(0); }
         }
-        .success-message {
-            background-color: var(--vert-succes);
-            color: var(--gris-fonce);
-            padding: 12px;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: 500;
-            margin-bottom: 16px;
-            animation: fadeIn 0.3s ease-in-out;
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                gap: 10px;
+            }
+
+            .filter-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
         }
-        .invalid-input {
-            border-color: var(--rouge-brique);
-            animation: shake 0.3s ease-in-out;
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
+        .etablissement-section {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+    box-shadow: var(--glow-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(162, 78, 78, 0.3);
+    animation: slideLeft 0.8s ease-out 0.2s both;
+}
+.etablissement-section h3 {
+    color: var(--rose-pale);
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+.etablissement-section p {
+    color: rgba(231, 211, 211, 0.8);
+    font-size: 1rem;
+}
     </style>
 </head>
-<body class="gradient-bg min-h-screen flex flex-col">
-    <!-- En-tête -->
-    <header class="bg-rouge-brique text-white p-4 sticky top-0 z-20 shadow-lg">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <span class="text-3xl">🍽️</span>
-                <h1 class="text-xl font-bold">dailyMenu</h1>
-            </div>
-        </div>
-    </header>
+<body>
+    <!-- Particules animées -->
+    <div class="particle" style="top: 10%; left: 20%; animation-delay: 0s;"></div>
+    <div class="particle" style="top: 30%; left: 80%; animation-delay: 1s;"></div>
+    <div class="particle" style="top: 60%; left: 10%; animation-delay: 2s;"></div>
+    <div class="particle" style="top: 80%; left: 70%; animation-delay: 3s;"></div>
 
-    <!-- Bouton flottant pour filtres -->
-    <button id="toggle-filters" class="fab bg-rouge-doux text-white p-4 rounded-full shadow-lg hover:bg-rouge-brique transition-transform transform hover:scale-105" aria-label="Ouvrir les filtres">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1m-4 8H4m8 8H4"></path>
-        </svg>
-    </button>
-
-    <!-- Filtres -->
-    <div id="filters" class="hidden bg-white p-6 shadow-lg max-w-7xl mx-auto mt-4 rounded-xl card-shadow">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div>
-                <label for="search-input" class="block text-rouge-brique font-semibold mb-2 text-sm">Recherche</label>
-                <input type="text" id="search-input" placeholder="Rechercher un plat..." class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm focus:ring-2 focus:ring-rouge-doux">
-            </div>
-            <div>
-                <label for="category-filter" class="block text-rouge-brique font-semibold mb-2 text-sm">Catégorie</label>
-                <select id="category-filter" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm focus:ring-2 focus:ring-rouge-doux">
-                    <option value="">Toutes</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-rouge-brique font-semibold mb-2 text-sm">Allergènes à exclure</label>
-                <div id="allergen-filter" class="space-y-2 max-h-32 overflow-y-auto"></div>
-            </div>
-        </div>
+    <!-- Indicateur hors-ligne -->
+    <div class="offline-indicator" id="offlineIndicator" style="display: none;">
+        📱 Mode hors-ligne activé
     </div>
 
-    <!-- Contenu principal -->
-    <main class="flex-1 p-4 sm:p-6 max-w-7xl mx-auto">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl sm:text-3xl font-bold text-rouge-brique">Menu</h2>
-            <div id="loading" class="hidden spinner"></div>
+    <div class="container">
+        <!-- En-tête -->
+        <header class="header">
+            <h1>🍽️ Menu Restaurant</h1>
+            <p>Interface Client Responsive - Thème Dance</p>
+        </header>
+
+        <!-- Section QR Code -->
+        <section class="qr-section">
+            <div class="qr-code">📱</div>
+            <h3>Scannez le QR Code pour accéder au menu</h3>
+            <p>Interface responsive • Chargement rapide < 3 secondes</p>
+        </section>
+
+        <!-- Barre de recherche -->
+        <div class="search-container">
+            <input type="text" class="search-bar" placeholder="Recherchez un plat, ingrédient..." id="searchInput">
+            <span class="search-icon">🔍</span>
         </div>
-        <div id="menu-items" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-    </main>
 
-    <!-- Section Avis -->
-    <section class="bg-white p-6 max-w-7xl mx-auto mb-6 rounded-xl card-shadow">
-        <h3 class="text-xl sm:text-2xl font-bold text-rouge-brique mb-4">Donner un avis</h3>
-        <div id="review-message" class="hidden"></div>
-        <form id="review-form" class="space-y-6">
-            <div class="star-rating flex justify-center space-x-3" role="radiogroup" aria-label="Notez l'établissement">
-                <span class="star text-3xl" data-value="1" role="radio" aria-checked="false">★</span>
-                <span class="star text-3xl" data-value="2" role="radio" aria-checked="false">★</span>
-                <span class="star text-3xl" data-value="3" role="radio" aria-checked="false">★</span>
-                <span class="star text-3xl" data-value="4" role="radio" aria-checked="false">★</span>
-                <span class="star text-3xl" data-value="5" role="radio" aria-checked="false">★</span>
-            </div>
-            <input type="hidden" id="rating" name="rating" value="0">
-            <div>
-                <label for="comment" class="block text-rouge-brique font-semibold mb-2 text-sm">Commentaire (optionnel)</label>
-                <textarea id="comment" class="w-full p-3 border-2 border-rose-pale rounded-lg bg-jaune-creme h-28 text-sm focus:ring-2 focus:ring-rouge-doux" placeholder="Partagez votre expérience..." maxlength="500"></textarea>
-            </div>
-            <button type="submit" class="w-full bg-rouge-brique text-white p-3 rounded-lg font-semibold hover:bg-rouge-doux transition-transform transform hover:scale-105" aria-label="Soumettre l'avis">Soumettre</button>
-        </form>
-        <h3 class="text-xl sm:text-2xl font-bold text-rouge-brique mt-8 mb-4">Historique de vos avis</h3>
-        <div id="review-history" class="space-y-4"></div>
-    </section>
+        <!-- Filtres -->
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">Tous</button>
+            <button class="filter-btn" data-filter="entrees">Entrées</button>
+            <button class="filter-btn" data-filter="plats">Plats</button>
+            <button class="filter-btn" data-filter="desserts">Desserts</button>
+            <button class="filter-btn" data-filter="sans-gluten">Sans Gluten</button>
+            <button class="filter-btn" data-filter="vegetarien">Végétarien</button>
+        </div>
 
-    <!-- Modal Zoom Image -->
-    <div id="image-zoom-modal" class="modal hidden fixed inset-0 flex items-center justify-center z-50">
-        <div class="relative bg-white rounded-xl p-4">
-            <button id="close-zoom" class="absolute top-2 right-2 text-rouge-doux text-2xl hover:text-rouge-brique" aria-label="Fermer le zoom">×</button>
-            <img id="zoom-image" class="zoom-image" src="" alt="Image agrandie">
+        <!-- Chargement -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            Chargement du menu...
+        </div>
+
+        <!-- Grille des plats (sera remplie dynamiquement) -->
+        <div class="menu-grid" id="menuGrid" style="display: none;">
+            <!-- Les plats seront chargés dynamiquement depuis l'API -->
         </div>
     </div>
 
     <script>
-        const API_BASE_URL = 'http://localhost:8000/api'; // À remplacer par l'URL de votre API
-        const menuId = window.location.pathname.split('/').pop(); // Extrait menu_id de l'URL
+       // Configuration API
+const API_BASE_URL = 'http://127.0.0.1:8000'; // Corrigé pour supprimer le double "/api"
+//const API_BASE_URL ="https://dailymenu.onrender.com/";
+// Extraire menu_id depuis l'URL
+const getMenuIdFromUrl = () => {
+    const path = window.location.pathname;
+    const match = path.match(/\/menus\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
+    return match ? match[1] : 'eb95505e-6bc2-439f-be3c-1d8e7f7df721'; // Valeur par défaut
+};
+const MENU_ID = getMenuIdFromUrl();
 
-        // Afficher le spinner de chargement
-        function showLoading(show) {
-            document.getElementById('loading').classList.toggle('hidden', !show);
+// Variables globales
+let menuData = null;
+let allItems = [];
+let categories = [];
+let allergenes = [];
+
+// Fonction pour retenter la requête API
+async function fetchWithRetry(url, retries = 3, delay = 1000) {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return await response.json();
+        } catch (error) {
+            if (attempt === retries) throw error;
+            await new Promise(resolve => setTimeout(resolve, delay * attempt));
         }
+    }
+}
 
-        // Afficher un message (erreur ou succès)
-        function showMessage(text, type = 'error') {
-            const message = document.getElementById('review-message');
-            message.textContent = text;
-            message.classList.remove('hidden', 'error-message', 'success-message');
-            message.classList.add(type === 'success' ? 'success-message' : 'error-message');
-            setTimeout(() => message.classList.add('hidden'), 5000);
+// Chargement des données depuis l'API
+async function loadMenuData() {
+    const loading = document.getElementById('loading');
+    const menuGrid = document.getElementById('menuGrid');
+    try {
+        const data = await fetchWithRetry(`${API_BASE_URL}/api/api/public/menu/${MENU_ID}`);
+        menuData = data.menu || {};
+        allItems = data.menu.items || [];
+        categories = data.categories || [];
+        allergenes = data.allergenes || [];
+        const etablissement = data.etablissement || {};
+        const qrcodeUrl = data.qrcode;
+
+        // Stocker dans localStorage pour mode hors-ligne
+        localStorage.setItem('menuCache', JSON.stringify(data));
+
+        // Mise à jour de l'interface
+        updateMenuTitle();
+        updateEtablissementInfo(etablissement);
+        updateQRCode(qrcodeUrl);
+        generateCategoryFilters();
+        displayMenuItems(allItems);
+
+        // Masquer le chargement et afficher le menu
+        loading.style.display = 'none';
+        menuGrid.style.display = 'grid';
+    } catch (error) {
+        console.error('Erreur:', error);
+        // Essayer de charger depuis le cache
+        const cachedData = localStorage.getItem('menuCache');
+        if (cachedData) {
+            const data = JSON.parse(cachedData);
+            menuData = data.menu || {};
+            allItems = data.menu.items || [];
+            categories = data.categories || [];
+            allergenes = data.allergenes || [];
+            updateMenuTitle();
+            generateCategoryFilters();
+            displayMenuItems(allItems);
+            loading.style.display = 'none';
+            menuGrid.style.display = 'grid';
+            document.getElementById('offlineIndicator').style.display = 'block';
+        } else {
+            loading.innerHTML = `
+                <div style="color: var(--rouge-brique);">
+                    ❌ Erreur de chargement du menu<br>
+                    <small>Vérifiez votre connexion ou réessayez plus tard</small>
+                </div>
+            `;
         }
+    }
+}
 
-        // Valider le commentaire
-        function validateComment(comment) {
-            if (comment.length > 500) {
-                return { valid: false, error: 'Le commentaire ne doit pas dépasser 500 caractères.' };
+// Mise à jour du titre du menu
+function updateMenuTitle() {
+    if (menuData) {
+        document.querySelector('.header h1').textContent = `🍽️ ${menuData.nom || 'Menu Restaurant'}`;
+        document.querySelector('.header p').textContent = menuData.description || 'Menu du restaurant - Interface responsive';
+    }
+}
+// Nouvelle fonction pour mettre à jour les infos de l'établissement
+function updateEtablissementInfo(etablissement) {
+    const etablissementSection = document.createElement('section');
+    etablissementSection.className = 'etablissement-section';
+    etablissementSection.innerHTML = `
+        <h3>${etablissement.nom_etablissement || 'Restaurant'}</h3>
+        <p>📍 ${etablissement.adresse_physique || 'Adresse non disponible'}</p>
+        <p>📞 ${etablissement.numtel || 'Numéro non disponible'}</p>
+        <p>📧 ${etablissement.email_pro || 'Email non disponible'}</p>
+    `;
+    document.querySelector('.container').insertBefore(etablissementSection, document.querySelector('.qr-section'));
+}
+
+// Nouvelle fonction pour mettre à jour le QR code
+function updateQRCode(qrcodeUrl) {
+    const qrCodeDiv = document.querySelector('.qr-code');
+    if (qrcodeUrl) {
+        qrCodeDiv.innerHTML = `<img src="${qrcodeUrl}" alt="QR Code" style="width: 100%; height: 100%; border-radius: 15px;">`;
+    } else {
+        qrCodeDiv.innerHTML = '📱 Aucun QR code disponible';
+    }
+}
+
+// Génération dynamique des filtres de catégories
+function generateCategoryFilters() {
+    const filtersContainer = document.querySelector('.filters');
+    const allButton = filtersContainer.querySelector('[data-filter="all"]');
+    filtersContainer.innerHTML = '';
+    filtersContainer.appendChild(allButton);
+
+    // Ajouter les catégories depuis l'API
+    const uniqueCategories = [...new Set(categories.map(cat => cat.name))];
+    uniqueCategories.forEach(categoryName => {
+        const button = document.createElement('button');
+        button.className = 'filter-btn';
+        button.dataset.filter = categoryName.toLowerCase();
+        button.textContent = categoryName.charAt(0).toUpperCase() + categoryName.slice(1);
+        filtersContainer.appendChild(button);
+    });
+
+    // Ajouter les filtres allergènes
+    allergenes.forEach(allergene => {
+        const button = document.createElement('button');
+        button.className = 'filter-btn allergene-filter';
+        button.dataset.filter = `allergene-${allergene.nom_allergene.toLowerCase()}`;
+        button.textContent = `Sans ${allergene.nom_allergene}`;
+        button.style.background = 'var(--rouge-doux)';
+        filtersContainer.appendChild(button);
+    });
+
+    // Réattacher les événements
+    attachFilterEvents();
+}
+
+// Affichage des éléments du menu
+function displayMenuItems(items) {
+    const menuGrid = document.getElementById('menuGrid');
+    menuGrid.innerHTML = '';
+    items.forEach(item => {
+        const dishCard = createDishCard(item);
+        menuGrid.appendChild(dishCard);
+    });
+}
+
+// Création d'une carte de plat
+function createDishCard(item) {
+    const card = document.createElement('div');
+    card.className = 'dish-card';
+    card.dataset.category = (item.categories || []).map(cat => cat.name.toLowerCase()).join(' ');
+    card.dataset.allergenes = (item.ingredients || []).flatMap(ing => (ing.allergenes || []).map(a => a.nom_allergene.toLowerCase())).join(' ');
+
+    // Gestion de l'image
+    const imageUrl = item.images && item.images.length > 0 ? `${API_BASE_URL}${item.images[0].url_image}` : null;
+
+    // Disponibilité
+    const availabilityText = item.disponibilite ? '✅ Disponible' : '❌ Indisponible';
+    const availabilityColor = item.disponibilite ? 'var(--rose-pale)' : 'var(--rouge-doux)';
+
+    // Jours de disponibilité
+    const joursDisponibilite = (item.jours_disponibilite || []).map(jour => jour.nom).join(', ');
+
+    // Tags
+    const tags = (item.tags || []).map(tag => tag.name).join(', ');
+
+    // Ingrédients
+    const ingredients = (item.ingredients || []).map(ing => ing.nom_ingredient).join(', ');
+
+    // Validation des données
+    const price = item.price ? parseFloat(item.price).toFixed(0) : 'N/A';
+    const prepTime = item.prep_time || 'N/A';
+    const description = item.description || 'Aucune description disponible';
+    const nomPlat = item.nom_plat || 'Plat sans nom';
+
+    card.innerHTML = `
+        <div class="dish-image" onclick="zoomImage(this)" style="background-image: ${imageUrl ? `url('${imageUrl}')` : 'none'}; background-size: cover; background-position: center;">
+            ${!imageUrl ? '🍽️' : ''}
+        </div>
+        <h3 class="dish-title">${nomPlat}</h3>
+        <p class="dish-description">${description}</p>
+        <div class="dish-info">
+            <div class="dish-price">${price} FCFA</div>
+            <div style="color: ${availabilityColor}; font-size: 0.9rem; margin-bottom: 5px;">${availabilityText}</div>
+            <div style="color: rgba(231, 211, 211, 0.7); font-size: 0.8rem; margin-bottom: 5px;">
+                ⏱️ ${prepTime} min
+            </div>
+            ${joursDisponibilite ? `<div style="color: rgba(231, 211, 211, 0.7); font-size: 0.8rem; margin-bottom: 5px;">📅 ${joursDisponibilite}</div>` : ''}
+            ${tags ? `<div style="color: rgba(231, 211, 211, 0.6); font-size: 0.8rem; margin-bottom: 5px;">🏷️ ${tags}</div>` : ''}
+            ${ingredients ? `<div style="color: rgba(231, 211, 211, 0.6); font-size: 0.8rem; margin-bottom: 10px;">🥬 ${ingredients}</div>` : ''}
+        </div>
+        <div class="rating-section">
+            <div class="stars" data-item-id="${item.id_item || nomPlat}">
+                <span class="star">⭐</span>
+                <span class="star">⭐</span>
+                <span class="star">⭐</span>
+                <span class="star">⭐</span>
+                <span class="star">☆</span>
+            </div>
+            <textarea class="comment-box" placeholder="Laissez un commentaire sur ${nomPlat}..."></textarea>
+            <button class="submit-comment" style="margin-top: 10px; padding: 8px; border-radius: 10px; background: var(--rouge-brique); color: var(--rose-pale); border: none; cursor: pointer;">Soumettre</button>
+        </div>
+    `;
+    return card;
+}
+
+// Attachement des événements de filtrage
+function attachFilterEvents() {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const filter = this.dataset.filter;
+            filterItems(filter);
+        });
+    });
+}
+
+// Fonction de filtrage
+function filterItems(filter) {
+    alert(filter)
+    const dishes = document.querySelectorAll('.dish-card');
+    dishes.forEach(dish => {
+        let shouldShow = false;
+        if (filter === 'all') {
+            shouldShow = true;
+        } else if (filter.startsWith('allergene-')) {
+            const allergene = filter.split('-')[1].toLowerCase();
+            const dishAllergenes = dish.dataset.allergenes.split(' ').filter(a => a);
+            shouldShow = !dishAllergenes.includes(allergene); // Exclure les plats avec cet allergène
+        } else {
+            shouldShow = dish.dataset.category.includes(filter);
+        }
+        dish.style.display = shouldShow ? 'block' : 'none';
+        if (shouldShow) dish.style.animation = 'scaleIn 0.5s ease-out';
+    });
+}
+
+// Recherche améliorée
+function setupSearch() {
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const dishes = document.querySelectorAll('.dish-card');
+        dishes.forEach(dish => {
+            const title = dish.querySelector('.dish-title').textContent.toLowerCase();
+            const description = dish.querySelector('.dish-description').textContent.toLowerCase();
+            const ingredients = dish.querySelector('.dish-info').textContent.toLowerCase();
+            if (title.includes(searchTerm) || description.includes(searchTerm) || ingredients.includes(searchTerm)) {
+                dish.style.display = 'block';
+            } else {
+                dish.style.display = 'none';
             }
-            const forbiddenWords = ['insulte', 'grossier', 'offensant'];
-            if (forbiddenWords.some(word => comment.toLowerCase().includes(word))) {
-                return { valid: false, error: 'Le commentaire contient des mots inappropriés.' };
-            }
-            return { valid: true };
-        }
+        });
+    });
+}
 
-        // Récupérer les catégories
-        async function fetchCategories() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/categories`, {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+// Zoom sur les images
+function zoomImage(element) {
+    element.style.transform = 'scale(1.5)';
+    element.style.zIndex = '1000';
+    element.style.position = 'relative';
+    setTimeout(() => {
+        element.style.transform = '';
+        element.style.zIndex = '';
+        element.style.position = '';
+    }, 2000);
+}
+
+// Système de notation et commentaires
+function setupRating() {
+    let reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+    document.querySelectorAll('.dish-card').forEach(card => {
+        const starsContainer = card.querySelector('.stars');
+        const itemId = starsContainer.dataset.itemId;
+        const stars = starsContainer.querySelectorAll('.star');
+        const commentBox = card.querySelector('.comment-box');
+        const submitBtn = card.querySelector('.submit-comment');
+
+        stars.forEach((star, index) => {
+            star.addEventListener('click', function() {
+                stars.forEach((s, i) => {
+                    s.textContent = i <= index ? '⭐' : '☆';
+                    s.style.animation = 'twinkle 0.5s ease-in-out';
                 });
-                if (!response.ok) throw new Error('Erreur lors du chargement des catégories');
-                const categories = await response.json();
-                const select = document.getElementById('category-filter');
-                categories.forEach(cat => {
-                    const option = document.createElement('option');
-                    option.value = cat.id_category;
-                    option.textContent = cat.name;
-                    select.appendChild(option);
-                });
-            } catch (error) {
-                showMessage('Impossible de charger les catégories.', 'error');
-                console.error(error);
-            }
-        }
-
-        // Récupérer les allergènes
-        async function fetchAllergens() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/allergenes`);
-                if (!response.ok) throw new Error('Erreur lors du chargement des allergènes');
-                const allergens = await response.json();
-                const container = document.getElementById('allergen-filter');
-                allergens.forEach(allergen => {
-                    const label = document.createElement('label');
-                    label.className = 'flex items-center';
-                    label.innerHTML = `
-                        <input type="checkbox" value="${allergen.id_allergene}" class="allergen-filter mr-2 h-4 w-4 text-rouge-doux focus:ring-rouge-doux border-rose-pale">
-                        ${allergen.nom_allergene}
-                    `;
-                    container.appendChild(label);
-                });
-            } catch (error) {
-                showMessage('Impossible de charger les allergènes.', 'error');
-                console.error(error);
-            }
-        }
-
-        // Récupérer et afficher les items du menu
-        async function fetchMenuItems() {
-            showLoading(true);
-            try {
-                const response = await fetch(`${API_BASE_URL}/menus/${menuId}`, {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-                });
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Menu introuvable');
-                }
-                const menu = await response.json();
-                renderMenuItems(menu.items);
-            } catch (error) {
-                showMessage(`Erreur lors du chargement du menu : ${error.message}`, 'error');
-                console.error(error);
-            } finally {
-                showLoading(false);
-            }
-        }
-
-        // Afficher les items du menu
-        function renderMenuItems(items) {
-            const menuItems = document.getElementById('menu-items');
-            menuItems.innerHTML = '';
-            items.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'menu-item bg-white p-4 rounded-xl card-shadow fade-in';
-                div.dataset.categoryId = item.categories.map(c => c.id_category).join(',');
-                div.innerHTML = `
-                    <img src="${item.images[0]?.url_image || 'https://via.placeholder.com/300x200'}" alt="${item.nom_plat}" class="w-full h-48 object-cover rounded-lg mb-3 cursor-pointer lazy" loading="lazy" onclick="openImageZoom('${item.images[0]?.url_image || ''}')">
-                    <h3 class="text-lg font-bold text-rouge-brique">${item.nom_plat}</h3>
-                    <p class="text-rouge-doux text-sm line-clamp-2">${item.description || 'Aucune description'}</p>
-                    <p class="text-rouge-brique font-semibold mt-2">${item.price} FCFA</p>
-                    <p class="text-rouge-doux text-xs mt-1">Allergènes: ${item.ingredients.flatMap(i => i.allergenes || []).map(a => a.nom_allergene).join(', ') || 'Aucun'}</p>
-                `;
-                menuItems.appendChild(div);
             });
-        }
-
-        // Filtrer les items
-        function filterMenu() {
-            const search = document.getElementById('search-input').value.toLowerCase();
-            const category = document.getElementById('category-filter').value;
-            const allergens = Array.from(document.querySelectorAll('.allergen-filter:checked')).map(el => el.value);
-
-            fetchMenuItems().then(() => {
-                let items = Array.from(document.querySelectorAll('.menu-item'));
-                items.forEach(item => {
-                    const name = item.querySelector('h3').textContent.toLowerCase();
-                    const description = item.querySelector('p').textContent.toLowerCase();
-                    const categoryIds = item.dataset.categoryId.split(',');
-                    const allergenText = item.querySelector('p:last-child').textContent.toLowerCase();
-
-                    const matchesSearch = search ? (name.includes(search) || description.includes(search)) : true;
-                    const matchesCategory = category ? categoryIds.includes(category) : true;
-                    const matchesAllergens = allergens.length === 0 || !allergens.some(id => allergenText.includes(id));
-
-                    item.classList.toggle('hidden', !(matchesSearch && matchesCategory && matchesAllergens));
-                });
-            });
-        }
-
-        // Gestion des filtres
-        document.getElementById('search-input').addEventListener('input', filterMenu);
-        document.getElementById('category-filter').addEventListener('change', filterMenu);
-        document.getElementById('allergen-filter').addEventListener('change', filterMenu);
-        document.getElementById('toggle-filters').addEventListener('click', () => {
-            const filters = document.getElementById('filters');
-            filters.classList.toggle('hidden');
-            filters.classList.toggle('fade-in');
         });
 
-        // Zoom image
-        function openImageZoom(src) {
-            if (!src) return;
-            const modal = document.getElementById('image-zoom-modal');
-            const img = document.getElementById('zoom-image');
-            img.src = src;
-            modal.classList.remove('hidden');
-            modal.classList.add('fade-in');
-        }
-
-        document.getElementById('close-zoom').addEventListener('click', () => {
-            const modal = document.getElementById('image-zoom-modal');
-            modal.classList.add('hidden');
-        });
-
-        // Gestion des avis
-        const reviewForm = document.getElementById('review-form');
-        const ratingStars = document.querySelectorAll('.star');
-        const ratingInput = document.getElementById('rating');
-        const commentInput = document.getElementById('comment');
-
-        // Sélection des étoiles
-        ratingStars.forEach(star => {
-            star.addEventListener('click', () => {
-                const value = star.getAttribute('data-value');
-                ratingInput.value = value;
-                ratingStars.forEach(s => {
-                    s.classList.toggle('selected', s.getAttribute('data-value') <= value);
-                    s.setAttribute('aria-checked', s.getAttribute('data-value') <= value);
-                });
-                ratingInput.classList.remove('invalid-input');
-            });
-        });
-
-        // Soumission d'un avis
-        reviewForm.addEventListener('submit', async e => {
-            e.preventDefault();
-            const rating = parseInt(ratingInput.value);
-            const comment = commentInput.value.trim();
-            const personneId = localStorage.getItem('personne_id') || 1; // Simulé, à gérer via authentification
-
-            // Validation des champs
-            if (!rating) {
-                showMessage('Veuillez sélectionner une note.', 'error');
-                ratingInput.classList.add('invalid-input');
+        submitBtn.addEventListener('click', () => {
+            const rating = starsContainer.querySelectorAll('.star').length - starsContainer.querySelectorAll('.star').length;
+            const comment = commentBox.value.trim();
+            if (rating === 0 && !comment) {
+                alert('Veuillez donner une note ou un commentaire.');
                 return;
             }
 
-            if (comment) {
-                const commentValidation = validateComment(comment);
-                if (!commentValidation.valid) {
-                    showMessage(commentValidation.error, 'error');
-                    commentInput.classList.add('invalid-input');
-                    return;
-                }
+            // Vérifier si l'utilisateur a déjà noté récemment
+            const lastReview = reviews.find(r => r.itemId === itemId);
+            const now = new Date();
+            const canReview = !lastReview || (now - new Date(lastReview.timestamp)) > 15 * 24 * 60 * 60 * 1000;
+
+            if (!canReview) {
+                alert('Vous avez déjà laissé un avis récemment. Veuillez attendre 15 jours.');
+                return;
             }
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/avis`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
-                    body: JSON.stringify({
-                        id_personne: personneId,
-                        note: rating,
-                        commentaire: comment || null
-                    })
-                });
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Erreur lors de la soumission de l’avis');
-                }
-                showMessage('Avis soumis avec succès !', 'success');
-                reviewForm.reset();
-                ratingStars.forEach(s => {
-                    s.classList.remove('selected');
-                    s.setAttribute('aria-checked', 'false');
-                });
-                ratingInput.value = 0;
-                commentInput.classList.remove('invalid-input');
-                fetchReviewHistory();
-            } catch (error) {
-                showMessage(`Erreur : ${error.message}`, 'error');
-                console.error(error);
-            }
+            // Sauvegarder l'avis
+            reviews.push({
+                itemId,
+                rating,
+                comment,
+                timestamp: now.toISOString()
+            });
+            localStorage.setItem('reviews', JSON.stringify(reviews));
+            alert(`Merci pour votre note de ${rating} étoile(s) et votre commentaire !`);
+            commentBox.value = '';
+            stars.forEach(s => s.textContent = '☆');
         });
+    });
+}
 
-        // Récupérer et afficher l'historique des avis
-        async function fetchReviewHistory() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/avis`, {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-                });
-                if (!response.ok) throw new Error('Erreur lors du chargement des avis');
-                const reviews = await response.json();
-                const reviewHistory = document.getElementById('review-history');
-                reviewHistory.innerHTML = '';
-                reviews.forEach((review, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'bg-jaune-creme p-4 rounded-lg card-shadow';
-                    div.innerHTML = `
-                        <p class="text-rouge-brique font-semibold">Note: ${'★'.repeat(review.note)}</p>
-                        <p class="text-rouge-doux text-sm">${review.commentaire || 'Aucun commentaire'}</p>
-                        <p class="text-rouge-doux text-xs">Date: ${new Date(review.date_avis).toLocaleDateString()}</p>
-                        <button class="text-rouge-brique text-sm underline hover:text-rouge-doux" onclick="reportReview(${index})" aria-label="Signaler cet avis">Signaler</button>
-                    `;
-                    reviewHistory.appendChild(div);
-                });
-            } catch (error) {
-                showMessage('Impossible de charger l’historique des avis.', 'error');
-                console.error(error);
-            }
-        }
+// Détection du réseau
+function setupNetworkDetection() {
+    const offlineIndicator = document.getElementById('offlineIndicator');
+    window.addEventListener('online', () => {
+        offlineIndicator.style.display = 'none';
+        loadMenuData(); // Recharger les données fraîches
+    });
+    window.addEventListener('offline', () => {
+        offlineIndicator.style.display = 'block';
+    });
+}
 
-        // Signaler un avis (modération manuelle simulée)
-        window.reportReview = async function(index) {
-            showMessage('Avis signalé pour modération.', 'success');
-            // En production, envoyer une requête à l'API pour signaler l'avis
-            fetchReviewHistory();
-        };
-
-        // Initialisation
-        fetchCategories();
-        fetchAllergens();
-        fetchMenuItems();
-        fetchReviewHistory();
-
-        // Service Worker intégré
-        const serviceWorkerCode = `
-            const CACHE_NAME = 'menu-cache-v2';
-            const urlsToCache = [
-                '/menus/',
-                'https://cdn.tailwindcss.com',
-                '/static/images/placeholder.jpg'
-            ];
-
-            self.addEventListener('install', event => {
-                event.waitUntil(
-                    caches.open(CACHE_NAME).then(cache => {
-                        return cache.addAll(urlsToCache);
-                    })
-                );
-            });
-
-            self.addEventListener('fetch', event => {
-                event.respondWith(
-                    caches.match(event.request).then(response => {
-                        return response || fetch(event.request).then(fetchResponse => {
-                            if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
-                                return fetchResponse;
-                            }
-                            const responseToCache = fetchResponse.clone();
-                            caches.open(CACHE_NAME).then(cache => {
-                                cache.put(event.request, responseToCache);
-                            });
-                            return fetchResponse;
-                        });
-                    })
-                );
-            });
-
-            self.addEventListener('activate', event => {
-                const cacheWhitelist = [CACHE_NAME];
-                event.waitUntil(
-                    caches.keys().then(cacheNames => {
-                        return Promise.all(
-                            cacheNames.map(cacheName => {
-                                if (!cacheWhitelist.includes(cacheName)) {
-                                    return caches.delete(cacheName);
-                                }
-                            })
-                        );
-                    })
-                );
-            });
-        `;
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register(new URL('data:application/javascript,' + encodeURIComponent(serviceWorkerCode), document.baseURI))
-                .then(() => console.log('Service Worker registered'))
-                .catch(err => console.error('Service Worker registration failed:', err));
-        }
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    loadMenuData();
+    setupSearch();
+    setupRating();
+    setupNetworkDetection();
+});
     </script>
 </body>
 </html>

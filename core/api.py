@@ -634,40 +634,126 @@ def test_email(request):
         return {"warning": "Test email sent successfully"}
     except Exception as e:
         return 500, {"error": f"Failed to send email: {str(e)}"}
-public_api = Router()
+from ninja import Router
+from core.models import Menu, Item, Category, Allergene, Donner_Avis, QRCode
+from core.schemas import MenuOut, ItemOut2,MenuOut2, CategoryOut, AllergeneOut, DonnerAvisOut, IngredientOut2, EtablissementOut
+from django.http import Http404
+from typing import List
+from decimal import Decimal
+from ninja.security import HttpBearer
+from django.conf import settings
+import jwt
 
-# 📂 Catégories publiques
-@public_api.get("/public/categories/{etablissement_id}", response=List[CategoryOut])
-def public_list_categories(request, etablissement_id: str):
-    return [
-        CategoryOut(
-            id_category=c.id_category,
-            name=c.name,
-            parent_id=c.parent_id
-        )
-        for c in Category.objects.filter(etablissement_id=etablissement_id)
-    ]
+router = Router()
+@router.get("/public/menu/{menu_id}", response={200: dict, 404: dict, 500: dict})
+def get_public_menu(request, menu_id: str):
+    try:
+        menu = Menu.objects.select_related('etablissement').prefetch_related(
+            'items__categories',
+            'items__tags',
+            'items__ingredients__contenir_allergene_set__id_allergene',
+            'items__jours_disponibilite',
+            'items__images',
+        ).get(id_menu=menu_id)
 
-# 🏷️ Tags publics
-@public_api.get("/public/tags/{etablissement_id}", response=List[TagOut])
-def public_list_tags(request, etablissement_id: str):
-    return [
-        TagOut(
-            id_tag=t.id_tag,
-            name=t.name
-        )
-        for t in Tag.objects.filter(etablissement_id=etablissement_id)
-    ]
+        items = []
+        allergenes_set = {}  # Pour collecter les allergènes uniques
 
-# 🥕 Ingrédients publics
-@public_api.get("/public/ingredients/{etablissement_id}", response=List[IngredientOut])
-def public_list_ingredients(request, etablissement_id: str):
-    return [
-        IngredientOut(
-            id_ingredient=i.id_ingredient,
-            nom_ingredient=i.nom_ingredient,
-            description=i.description or "",
-            categorie=i.categorie
+        for item in menu.items.all():
+            avis_list = Donner_Avis.objects.filter(id_etablissement=menu.etablissement)
+            avg_rating = sum(avis.note for avis in avis_list) / len(avis_list) if avis_list else 0
+
+            ingredients_out = []
+            allergenes_out = []  # Allergènes de cet item uniquement
+
+            for ingredient in item.ingredients.all():
+                allergenes_ingredient = Contenir_Allergene.objects.filter(id_ingredient=ingredient)
+
+                allergenes_this_ingredient = []
+                for allergene in allergenes_ingredient:
+                    allergene_obj = allergene.id_allergene
+                    allergene_data = AllergeneOut(
+                        id_allergene=allergene_obj.id_allergene,
+                        nom_allergene=allergene_obj.nom_allergene,
+                        categorie_allergene=allergene_obj.categorie_allergene,
+                        dangerosite=allergene_obj.dangerosite
+                    )
+                    allergenes_this_ingredient.append(allergene_data)
+                    allergenes_out.append(allergene_data)
+
+                    # Collecte globale
+                    allergenes_set[allergene_obj.id_allergene] = allergene_data
+
+                ingredients_out.append(
+                    IngredientOut2(
+                        id_ingredient=ingredient.id_ingredient,
+                        nom_ingredient=ingredient.nom_ingredient,
+                        description=ingredient.description or "",
+                        categorie=ingredient.categorie,
+                        allergenes=allergenes_this_ingredient
+                    )
+                )
+
+            item_out = ItemOut2(
+                id_item=item.id_item,
+                nom_plat=item.nom_plat,
+                description=item.description or "",
+                disponibilite=item.disponibilite,
+                price=item.price,
+                prep_time=item.prep_time,
+                categories=[CategoryOut(id_category=c.id_category, name=c.name, parent_id=c.parent_id) for c in item.categories.all()],
+                tags=[TagOut(id_tag=t.id_tag, name=t.name) for t in item.tags.all()],
+                ingredients=ingredients_out,
+                jours_disponibilite=[JourOut(id_jour=j.id_jour, nom=j.nom) for j in item.jours_disponibilite.all()],
+                images=[ImageOut(id_image=img.id_image, url_image=img.url_image.url, id_item=img.item.id_item) for img in item.images.all()],
+                average_rating=Decimal(str(round(avg_rating, 2))),
+                allergenes=allergenes_out
+            )
+            items.append(item_out)
+
+        categories = [
+            CategoryOut(
+                id_category=c.id_category,
+                name=c.name,
+                parent_id=c.parent_id
+            ) for c in Category.objects.filter(items__menu=menu).distinct()
+        ]
+
+        etablissement = EtablissementOut(
+            id_etablissement=menu.etablissement.id_etablissement,
+            nom_etablissement=menu.etablissement.nom_etablissement,
+            email_pro=menu.etablissement.email_pro,
+            numtel=menu.etablissement.numtel,
+            adresse_physique=menu.etablissement.adresse_physique,
+            latitude=menu.etablissement.latitude,
+            longitude=menu.etablissement.longitude,
+            is_verified=menu.etablissement.is_verified
         )
-        for i in Ingredient.objects.filter(etablissement_id=etablissement_id)
-    ]
+
+        qrcode_url = None
+        try:
+            qr_code = QRCode.objects.get(menu=menu)
+            qrcode_url = f"{settings.FRONTEND_URL.rstrip('/')}{qr_code.url}"
+        except QRCode.DoesNotExist:
+            pass
+
+        return {
+            "menu": MenuOut2(
+                id_menu=menu.id_menu,
+                nom=menu.nom,
+                description=menu.description or "",
+                items=items,
+            ),
+            "categories": categories,
+            "etablissement": etablissement,
+            "qrcode": qrcode_url,
+            "allergenes": list(allergenes_set.values())  # ✅ Tous les allergènes uniques
+        }
+
+    except Menu.DoesNotExist:
+        return 404, {"error": "Menu not found"}
+    except Exception as e:
+        return 500, {"error": f"Internal server error: {str(e)}"}
+
+
+api.add_router("/api", router)

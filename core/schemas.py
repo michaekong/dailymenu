@@ -200,7 +200,30 @@ class ItemOut(BaseModel):
        from_attributes = True  # ⬅️ obligatoire pour supporter les objets Django
 
 
-
+# Update IngredientOut
+class IngredientOut2(BaseModel):
+    id_ingredient: int
+    nom_ingredient: str
+    description: str
+    categorie: str
+    allergenes: List[AllergeneOut] = []  # Added
+  
+# Update ItemOut
+class ItemOut2(BaseModel):
+    id_item: int
+    nom_plat: str
+    description: str
+    disponibilite: bool
+    price: Decimal
+    prep_time: int
+    categories: List[CategoryOut]
+    tags: List[TagOut]
+    ingredients: List[IngredientOut2]
+    jours_disponibilite: List[JourOut]
+    images: List[ImageOut]
+    allergenes: List[AllergeneOut]  # ✅ C'EST ICI qu'on ajoute le champ
+    average_rating: Decimal
+  
 # Menu Schemas
 class MenuIn(BaseModel):
     nom: str = Field(..., max_length=50)
@@ -210,6 +233,13 @@ class MenuIn(BaseModel):
        from_attributes = True  # ⬅️ obligatoire pour supporter les objets Django
 
 
+class MenuOut2(BaseModel):
+    id_menu: str
+    nom: str
+    description: str
+    items: List[ItemOut2]
+    class Config:
+        from_attributes = True
 
 class MenuOut(BaseModel):
     id_menu: str

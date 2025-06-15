@@ -4,1208 +4,524 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de Bord - dailyMenu</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
-      <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-   
     <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap');
-
-:root {
-    --rouge-brique: #8B2323;
-    --rouge-doux: #A24E4E;
-    --rose-pale: #E7D3D3;
-    --jaune-creme: #FFF1CF;
-    --bleu-clair: #CCE5FF;
-    --glass-bg: rgba(231, 211, 211, 0.3);
-    --glow-shadow: 0 0 20px rgba(162, 78, 78, 0.6);
-}
-
-body {
-    background: linear-gradient(135deg, var(--rose-pale), var(--jaune-creme), var(--bleu-clair));
-    font-family: 'Poppins', sans-serif;
-    color: var(--rouge-brique);
-    overflow-x-hidden;
-    animation: gradientShift 20s ease infinite;
-}
-
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-h1, h2, h3 {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 900;
-    color: var(--rouge-brique);
-    text-shadow: 0 0 10px rgba(139, 35, 35, 0.4);
-}
-
-.bg-glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(162, 78, 78, 0.25);
-}
-
-.card-shadow {
-    box-shadow: var(--glow-shadow), 0 4px 15px rgba(0, 0, 0, 0.15);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card-shadow:hover {
-    transform: translateY(-8px) rotateX(2deg);
-    box-shadow: 0 0 30px rgba(162, 78, 78, 0.8), 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-.btn-primary {
-    background: linear-gradient(45deg, var(--rouge-brique), var(--rouge-doux));
-    color: white;
-    border: none;
-    padding: 0.75rem 1.75rem;
-    border-radius: 0.5rem;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    animation: pulse 2s infinite;
-}
-
-.btn-primary::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.4);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.4s ease, height 0.4s ease;
-}
-
-.btn-primary:hover::after {
-    width: 200%;
-    height: 200%;
-}
-
-.btn-primary:hover {
-    transform: scale(1.1);
-    box-shadow: var(--glow-shadow);
-}
-
-@keyframes pulse {
-    0% { box-shadow: 0 0 5px var(--rouge-doux); }
-    50% { box-shadow: 0 0 25px rgba(162, 78, 78, 0.6); }
-    100% { box-shadow: 0 0 5px var(--rouge-doux); }
-}
-
-.nav-item {
-    padding: 0.5rem 1rem;
-    transition: all 0.3s ease;
-    border-radius: 0.5rem;
-}
-
-.nav-item:hover {
-    background: var(--jaune-creme);
-    transform: translateX(6px);
-    box-shadow: var(--glow-shadow);
-}
-
-.nav-item.active {
-    background: var(--rouge-doux);
-    color: white;
-    box-shadow: var(--glow-shadow);
-}
-
-.sidebar {
-    width: 100%;
-    max-width: 16rem;
-    background: linear-gradient(to bottom, var(--glass-bg), rgba(162, 78, 78, 0.1));
-    backdrop-filter: blur(12px);
-    transition: transform 0.5s cubic-bezier(0.68, -0.45, 0.265, 1.55);
-    box-shadow: var(--glow-shadow);
-}
-
-@media (min-width: 640px) { .sidebar { max-width: 18rem; } }
-@media (min-width: 1024px) { .sidebar { max-width: 20rem; } }
-
-.sidebar-hidden { transform: translateX(-100%); }
-
-.backdrop { transition: opacity 0.4s ease; }
-
-@media (min-width: 768px) {
-    .sidebar { transform: translateX(0) !important; }
-    .backdrop { display: none !important; }
-    #main-content { margin-left: 18rem; }
-}
-
-@media (min-width: 1024px) { #main-content { margin-left: 20rem; } }
-
-main {
-    padding: clamp(0.5rem, 2vw, 1rem);
-    animation: fadeIn 1s ease-out;
-}
-
-@media (min-width: 640px) { main { padding: clamp(1rem, 2.5vw, 1.5rem); } }
-@media (min-width: 768px) { main { padding: clamp(1.5rem, 3vw, 2rem); } }
-@media (min-width: 1024px) { main { padding: clamp(2rem, 3.5vw, 3rem); } }
-
-.fade-in-section {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-}
-
-.fade-in-section.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.modal {
-    background: rgba(139, 35, 35, 0.5);
-    backdrop-filter: blur(15px);
-    animation: zoomIn 0.5s ease-out;
-}
-
-@keyframes zoomIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-.modal-content {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    border: 2px solid var(--rouge-doux);
-    box-shadow: var(--glow-shadow);
-    width: 100%;
-    max-width: calc(90vw - 1rem);
-    max-height: calc(90vh - 2rem);
-    padding: clamp(1rem, 2.5vw, 1.5rem);
-    border-radius: 1rem;
-    overflow-y: auto;
-    animation: pulseModal 3s infinite;
-}
-
-@keyframes pulseModal {
-    0% { box-shadow: 0 0 10px var(--rouge-doux); }
-    50% { box-shadow: 0 0 30px var(--rouge-doux); }
-    100% { box-shadow: 0 0 10px var(--rouge-doux); }
-}
-
-@media (min-width: 640px) { .modal-content { max-width: 36rem; padding: 2rem; } }
-@media (min-width: 768px) { .modal-content { max-width: 44rem; } }
-@media (min-width: 1024px) { .modal-content { max-width: 60rem; } }
-@media (min-width: 1280px) { .modal-content { max-width: 68rem; } }
-
-/* Styles existants pour les groupes de formulaires et les champs... */
-
-/* Votre définition des variables de couleurs */
-:root {
-    --rouge-brique: #8B2323;
-    --rouge-doux: #A24E4E;
-    --rose-pale: #E7D3D3;
-    --jaune-creme: #FFF1CF;
-    --bleu-clair: #CCE5FF;
-    --glass-bg: rgba(231, 211, 211, 0.3);
-    --glow-shadow: 0 0 20px rgba(162, 78, 78, 0.6);
-}
-
-/* Style pour le conteneur du formulaire */
-form, .form-container { /* Ciblez la balise <form> ou un div avec la classe .form-container */
-    background-color: var(--rose-pale); /* L'arrière-plan du formulaire */
-    padding: 2rem; /* Espace intérieur pour que les champs ne soient pas collés aux bords */
-    border-radius: 1rem; /* Bords légèrement arrondis pour une touche douce */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Une ombre très légère pour la profondeur */
-}
-
-/* Les styles précédents pour .form-group, input, label, etc., restent inchangés */
-.form-group {
-    position: relative;
-    margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    padding-left: 3rem;
-    font-size: clamp(0.875rem, 1.75vw, 1rem);
-    border: 1px solid var(--rose-pale);
-    border-radius: 0.5rem;
-    outline: none;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    color: var(--rouge-brique);
-    background-color: var(--jaune-creme);
-}
-
-.form-group textarea {
-    min-height: 5rem;
-    resize: vertical;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-    border-color: var(--rouge-brique);
-    box-shadow: var(--glow-shadow);
-}
-
-.form-group label {
-    position: absolute;
-    top: 0.75rem;
-    left: 1rem;
-    color: var(--rouge-doux);
-    font-size: clamp(0.875rem, 1.75vw, 1rem);
-    pointer-events: none;
-    transition: all 0.2s ease-in-out;
-}
-
-.form-group input:focus + label,
-.form-group input:not(:placeholder-shown) + label,
-.form-group select:focus + label,
-.form-group select:not(:placeholder-shown) + label,
-.form-group textarea:focus + label,
-.form-group textarea:not(:placeholder-shown) + label {
-    top: -0.5rem;
-    left: 0.75rem;
-    font-size: clamp(0.75rem, 1.5vw, 0.875rem);
-    color: var(--rouge-brique);
-    background-color: var(--jaune-creme);
-    padding: 0 0.25rem;
-    border-radius: 0.25rem;
-    z-index: 1;
-}
-
-.form-group .input-icon {
-    position: absolute;
-    top: 50%;
-    left: 0.75rem;
-    transform: translateY(-50%);
-    width: 1.25rem;
-    height: 1.25rem;
-    fill: var(--rouge-doux);
-    transition: fill 0.3s ease;
-    pointer-events: none;
-    z-index: 0;
-}
-
-.form-group input:focus + label + .input-icon,
-.form-group select:focus + label + .input-icon,
-.form-group textarea:focus + label + .input-icon {
-    fill: var(--rouge-brique);
-}
-
-input:focus + .input-icon,
-select:focus + .input-icon,
-textarea:focus + .input-icon {
-    transform: translateY(-50%) scale(1.2);
-    stroke: var(--rouge-brique);
-}
-
-input, textarea, select {
-    background: linear-gradient(45deg, var(--rose-pale), var(--jaune-creme));
-    border: 1px solid var(--rouge-doux);
-    color: var(--rouge-brique);
-    padding: clamp(0.75rem, 1.5vw, 0.875rem) clamp(0.75rem, 1.5vw, 0.875rem) clamp(0.75rem, 1.5vw, 0.875rem) clamp(2.5rem, 3vw, 2.75rem);
-    border-radius: 0.75rem;
-    transition: all 0.3s ease;
-    width: 100%;
-    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
-    position: relative;
-}
-
-input::after, textarea::after, select::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-input:focus::after, textarea:focus::after, select:focus::after {
-    opacity: 1;
-}
-
-input:focus, textarea:focus, select:focus {
-    outline: none;
-    border-color: var(--rouge-brique);
-    box-shadow: 0 0 15px var(--glow-shadow);
-    transform: scale(1.02);
-}
-
-input::placeholder, textarea::placeholder {
-    color: rgba(139, 35, 35, 0.5);
-}
-
-.form-error {
-    color: white;
-    background: var(--rouge-brique);
-    font-size: clamp(0.625rem, 1vw, 0.75rem);
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    margin-top: 0.3rem;
-    opacity: 0;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.form-error.show {
-    opacity: 1;
-    transform: translateX(5px);
-}
-
-/* Cartes d'affichage */
-.item-card, .menu-card {
-    background: var(--glass-bg);
-    border-radius: 1rem;
-    padding: clamp(1rem, 2vw, 1.5rem);
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s ease;
-}
-
-.item-card::before, .menu-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAIElEQVQoU2NkYGBgYGBhYGBgYGBgYGBgYGBgYGBgYBAAAI8AB7fA3ugAAAAASUVORK5CYII=') repeat;
-    opacity: 0.05;
-}
-
-.item-card:hover, .menu-card:hover {
-    transform: scale(1.05) rotateX(3deg);
-}
-
-.item-card .card-icon, .menu-card .card-icon {
-    width: 2rem;
-    height: 2rem;
-    stroke: var(--rouge-doux);
-    margin-bottom: 0.5rem;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.menu-button {
-    padding: 0.5rem;
-    border-radius: 0.5rem;
-    background: var(--glass-bg);
-    border: 1px solid var(--rouge-doux);
-    transition: all 0.3s ease;
-}
-
-.menu-button:hover {
-    background: var(--jaune-creme);
-    transform: scale(1.1);
-}
-
-.menu-button .icon-svg {
-    width: 1.25rem;
-    height: 1.25rem;
-    stroke: var(--rouge-brique);
-}
-
-/* Sections spécifiques */
-#overview-section .stat-card {
-    background: linear-gradient(135deg, var(--rouge-brique), var(--rouge-doux));
-    color: white;
-    border-radius: 0.75rem;
-    padding: clamp(1.5rem, 2vw, 2rem);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-#overview-section .stat-card .icon-svg {
-    width: 2rem;
-    height: 2rem;
-    stroke: var(--jaune-creme);
-    transition: transform 0.3s ease;
-}
-
-#overview-section .stat-card:hover .icon-svg {
-    transform: scale(1.2) rotate(5deg);
-}
-
-#overview-section .stat-card h3 {
-    color: var(--jaune-creme);
-    font-size: clamp(1rem, 2vw, 1.25rem);
-}
-
-#overview-section .stat-card p {
-    font-size: clamp(1.5rem, 3vw, 2.5rem);
-    font-weight: 700;
-}
-
-#profile-section {
-    background: var(--jaune-creme);
-    border-radius: 1rem;
-    padding: clamp(1.5rem, 3vw, 2rem);
-    box-shadow: var(--glow-shadow);
-}
-
-#items-section .filter-container {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    border-radius: 1rem;
-    padding: clamp(1rem, 2vw, 1.5rem);
-    margin-bottom: clamp(1.5rem, 2vw, 2rem);
-    box-shadow: var(--glow-shadow);
-}
-
-#qr-codes-section .qr-code-preview {
-    background: var(--bleu-clair);
-    border-radius: 1rem;
-    padding: clamp(1rem, 2vw, 1.5rem);
-    text-align: center;
-    animation: pulse 2s infinite;
-}
-
-#reviews-section .review-card {
-    background: var(--glass-bg);
-    border-radius: 1rem;
-    padding: clamp(1rem, 2vw, 1.5rem);
-    display: flex;
-    align-items: center;
-}
-
-#reviews-section .review-card .stars {
-    display: flex;
-    gap: 0.25rem;
-}
-
-#reviews-section .review-card .stars svg {
-    width: 1.5rem;
-    height: 1.5rem;
-    fill: var(--jaune-creme);
-    transition: transform 0.3s ease;
-}
-
-#reviews-section .review-card .stars svg:hover {
-    transform: scale(1.3);
-}
-
-#stats-section .chart-placeholder {
-    background: var(--glass-bg);
-    border-radius: 1rem;
-    padding: clamp(2rem, 3vw, 2.5rem);
-    text-align: center;
-    animation: chartLoad 1.2s ease-in-out;
-}
-
-@keyframes chartLoad {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.grid {
-    gap: clamp(0.75rem, 2vw, 1.25rem);
-}
-
-@media (min-width: 640px) { .grid { gap: clamp(1rem, 2.5vw, 1.75rem); } }
-@media (min-width: 768px) { .grid { gap: clamp(1.5rem, 3vw, 2.25rem); } }
-
-#overview-section .grid { grid-template-columns: 1fr; }
-@media (min-width: 640px) { #overview-section .grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { #overview-section .grid { grid-template-columns: repeat(4, 1fr); } }
-
-#items-list { grid-template-columns: 1fr; }
-@media (min-width: 640px) { #items-list { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { #items-list { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 1280px) { #items-list { grid-template-columns: repeat(4, 1fr); } }
-
-#menus-list { grid-template-columns: 1fr; }
-@media (min-width: 640px) { #menus-list { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { #menus-list { grid-template-columns: repeat(3, 1fr); } }
-
-h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
-h3 { font-size: clamp(1rem, 2vw, 1.5rem); color: var(--rouge-doux); }
-p, label, button, select, input, textarea { font-size: clamp(0.875rem, 1.5vw, 1rem); }
-
-@media (min-width: 640px) {
-    h2 { font-size: clamp(2rem, 3.5vw, 2.5rem); }
-    h3 { font-size: clamp(1.25rem, 2.5vw, 1.75rem); }
-    p, label, button, select, input, textarea { font-size: clamp(1rem, 1.75vw, 1.125rem); }
-}
-
-@media (min-width: 1024px) {
-    h2 { font-size: clamp(2.5rem, 4vw, 3rem); }
-    h3 { font-size: clamp(1.5rem, 3vw, 2rem); }
-}
-
-.icon-svg {
-    width: 1.5rem;
-    height: 1.5rem;
-    stroke: currentColor;
-    stroke-width: 2;
-    transition: transform 0.3s ease, stroke 0.3s ease;
-}
-
-.logo-container {
-    display: flex;
-    justify-content: center;
-    padding: clamp(1rem, 2vw, 1.5rem);
-    animation: logoFadeIn 1.2s ease-out;
-}
-
-.logo-svg {
-    display: flex;
-    justify-content: center;
-    align-items: center; /* Center the logo vertically if it's the only item */
-    padding: clamp(1rem, 2vw, 1.5rem);
-    animation: logoFadeIn 1.2s ease-out;
-
-    /* Styling for the logo's size based on your description */
-    width: 250%; /* Take full width available */
-    max-width: 200px; /* Cap the maximum width at 300px */
-    height: auto; /* Maintain aspect ratio */
-    aspect-ratio: 1 / 1; /* Ensures it's square, if your SVG is square */
-    margin-left: auto; /* Center the block container */
-    margin-right: auto; /* Center the block container */    
-}
-keyframes logoFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-@media (max-width: 640px) {
-    .logo-svg {
-        width: 3rem;
-        height: 3rem;
-    }
-}
-
-.logo-container:hover .logo-svg {
-    transform: rotate(10deg) scale(1.1);
-}
-
-@keyframes logoFadeIn {
-    from { opacity: 0; transform: scale(0.8); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-.sidebar {
-    width: 100%;
-    background:  #E7D3D3;
-    backdrop-filter: blur(12px);
-    transition: transform 0.3s ease-in-out;
-    box-shadow: var(--glow-shadow);
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    z-index: 30;
-}
-
-.sidebar-hidden {
-    transform: translateX(-100%);
-}
-
-.backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 20;
-    transition: opacity 0.3s ease-in-out;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.backdrop.visible {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.sidebar {
-    width: 100%;
-    background:  #E7D3D3;
-    backdrop-filter: blur(12px);
-    transition: transform 0.3s ease-in-out;
-    box-shadow: var(--glow-shadow);
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    z-index: 30;
-}
-
-.sidebar-hidden {
-    transform: translateX(-100%);
-}
-
-.backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 20;
-    transition: opacity 0.3s ease-in-out;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.backdrop.visible {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.sidebar-header {
-    position: sticky;
-    top: 0;
-    background:  #E7D3D3;
-    backdrop-filter:  #E7D3D3;
-    z-index: 31;
-    padding: clamp(0.75rem, 2vw, 1rem);
-}
-
-.sidebar-content {
-    padding: clamp(0.75rem, 2vw, 1rem);
-}
-
-.nav-list {
-    overflow-y: auto;
-    max-height: calc(100vh - 240px);
-    scrollbar-width: thin;
-    scrollbar-color: var(--rouge-doux) var(--rose-pale);
-}
-
-.nav-list::-webkit-scrollbar {
-    width: 6px;
-}
-
-.nav-list::-webkit-scrollbar-track {
-    background: var(--rose-pale);
-}
-
-.nav-list::-webkit-scrollbar-thumb {
-    background: var(--rouge-doux);
-    border-radius: 3px;
-}
-
-.search-container {
-    margin-bottom: 1rem;
-}
-
-.logo-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.logo-svg {
-    width: 5rem;
-    height: 5rem;
-    max-width: 120px;
-    transition: transform 0.3s ease;
-}
-
-@media (min-width: 640px) {
-    .sidebar {
-        max-width: 20rem;
-    }
-    .logo-svg {
-        width: 6rem;
-        height: 6rem;
-        max-width: 150px;
-    }
-}
-
-@media (min-width: 768px) {
-    .sidebar {
-        transform: translateX(0);
-        max-width: 22rem;
-    }
-    .sidebar-hidden {
-        transform: translateX(-100%);
-    }
-    .backdrop {
-        display: none;
-    }
-    #main-content {
-        margin-left: 22rem;
-    }
-    .logo-svg {
-        width: 8rem;
-        height: 8rem;
-        max-width: 200px;
-    }
-}
-
-@media (min-width: 1024px) {
-    .sidebar {
-        max-width: 24rem;
-    }
-    #main-content {
-        margin-left: 24rem;
-    }
-}
-</style>
-
+        :root {
+            --rouge-brique: #8B2323;
+            --rouge-doux: #A24E4E;
+            --rose-pale: #E7D3D3;
+            --jaune-creme: #FFF1CF;
+            --bleu-clair: #CCE5FF;
+        }
+        .bg-rouge-brique { background-color: var(--rouge-brique); }
+        .bg-rouge-doux { background-color: var(--rouge-doux); }
+        .bg-rose-pale { background-color: var(--rose-pale); }
+        .bg-jaune-creme { background-color: var(--jaune-creme); }
+        .bg-bleu-clair { background-color: var(--bleu-clair); }
+        .text-rouge-brique { color: var(--rouge-brique); }
+        .text-rouge-doux { color: var(--rouge-doux); }
+        .border-rouge-doux { border-color: var(--rouge-doux); }
+        .border-rouge-brique { border-color: var(--rouge-brique); }
+        .hover-rouge-brique:hover { background-color: var(--rouge-brique); }
+        .hover-rouge-doux:hover { background-color: var(--rouge-doux); }
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--jaune-creme) 0%, var(--rose-pale) 50%, var(--bleu-clair) 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(139, 35, 35, 0.1), 0 5px 10px -5px rgba(139, 35, 35, 0.04);
+        }
+        .nav-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        @media (hover: hover) {
+            .nav-item:hover {
+                background-color: var(--rose-pale);
+                transform: translateX(5px);
+            }
+        }
+        .nav-item.active {
+            background-color: var(--rouge-doux);
+            color: white;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, var(--rouge-brique), var(--rouge-doux));
+            transition: all 0.3s ease;
+            min-height: 48px; /* Increased touch target */
+        }
+        @media (hover: hover) {
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(139, 35, 35, 0.3);
+            }
+        }
+        .stat-card {
+            background: linear-gradient(135deg, white 0%, var(--jaune-creme) 100%);
+            transition: transform 0.3s ease;
+            min-width: 0;
+        }
+        @media (hover: hover) {
+            .stat-card:hover {
+                transform: translateY(-5px);
+            }
+        }
+        .menu-item {
+            background: white;
+            border-left: 4px solid var(--rouge-doux);
+            transition: all 0.3s ease;
+        }
+        @media (hover: hover) {
+            .menu-item:hover {
+                border-left-color: var(--rouge-brique);
+                transform: translateX(5px);
+            }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal {
+            backdrop-filter: blur(10px);
+            background-color: rgba(139, 35, 35, 0.1);
+        }
+        .drag-drop-area {
+            border: 2px dashed var(--rouge-doux);
+            transition: all 0.3s ease;
+        }
+        @media (hover: hover) {
+            .drag-drop-area:hover, .drag-drop-area.dragover {
+                border-color: var(--rouge-brique);
+                background-color: var(--rose-pale);
+            }
+        }
+        .sortable-list {
+            min-height: 100px;
+        }
+        .sortable-item {
+            cursor: move;
+            transition: all 0.2s;
+        }
+        .sortable-item.dragging {
+            opacity: 0.7;
+            transform: scale(1.02);
+        }
+        .sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        .sidebar-hidden {
+            transform: translateX(-100%);
+        }
+        .backdrop {
+            transition: opacity 0.3s ease-in-out;
+        }
+        @media (min-width: 768px) {
+            .sidebar {
+                transform: translateX(0) !important;
+            }
+            .backdrop {
+                display: none !important;
+            }
+        }
+        body {
+            overflow-x: hidden;
+        }
+        /* Responsive form inputs */
+        input, textarea, select {
+            min-height: 48px; /* Touch target */
+        }
+        /* Ensure modals center properly */
+        .modal-content {
+            width: 100%;
+            max-width: 90vw;
+        }
+        @media (min-width: 640px) {
+            .modal-content {
+                max-width: 32rem; /* sm:max-w-lg */
+            }
+        }
+        @media (min-width: 768px) {
+            .modal-content {
+                max-width: 48rem; /* md:max-w-3xl */
+            }
+        }
+        @media (min-width: 1024px) {
+            .modal-content {
+                max-width: 64rem; /* lg:max-w-4xl */
+            }
+        }
+        @media (min-width: 1280px) {
+            .modal-content {
+                max-width: 80rem; /* xl:max-w-5xl */
+            }
+        }
+    </style>
 </head>
-<body class="font-sans">
-<nav id="sidebar" class="sidebar fixed top-0 left-0 h-full bg-glass shadow-lg z-30 sidebar-hidden">
-    <div class="sidebar-header p-4 border-b border-rouge-doux flex justify-between items-center">
-        <div class="logo-container">
-            <svg class="logo-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="150" cy="120" r="90" fill="var(--jaune-creme)" stroke="var(--rouge-brique)" stroke-width="5"/>
-                <rect x="235" y="70" width="8" height="100" rx="4" fill="var(--rouge-brique)" />
-                <path d="M243 70 Q255 120 243 170" fill="var(--rouge-brique)" />
-                <rect x="57" y="70" width="8" height="100" rx="4" fill="var(--rouge-brique)" />
-                <g stroke="var(--rouge-brique)" stroke-width="2">
-                    <line x1="57" y1="75" x2="50" y2="90"/>
-                    <line x1="60" y1="75" x2="53" y2="90"/>
-                    <line x1="63" y1="75" x2="56" y2="90"/>
-                </g>
-                <circle cx="150" cy="120" r="35" fill="white" stroke="var(--rouge-brique)" stroke-width="3"/>
-                <g stroke="var(--rouge-brique)" stroke-width="2">
-                    <line x1="150" y1="85" x2="150" y2="90"/>
-                    <line x1="150" y1="150" x2="150" y2="155"/>
-                    <line x1="115" y1="120" x2="120" y2="120"/>
-                    <line x1="180" y1="120" x2="185" y2="120"/>
-                </g>
-                <line x1="150" y1="120" x2="150" y2="95" stroke="var(--rouge-brique)" stroke-width="3" stroke-linecap="round"/>
-                <line x1="150" y1="120" x2="170" y2="120" stroke="var(--rouge-brique)" stroke-width="2" stroke-linecap="round"/>
-                <circle cx="150" cy="120" r="3" fill="var(--rouge-brique)" />
-                <text x="150" y="250" text-anchor="middle" font-size="24" font-family="Manrope, sans-serif" fill="var(--rouge-brique)">Daily Menu</text>
-            </svg>
-        </div>
-        <button id="close-sidebar" class="md:hidden text-rouge-brique focus:outline-none">
-            <i data-feather="x" class="icon-svg w-6 h-6"></i>
-        </button>
-    </div>
-    <div class="sidebar-content p-4">
-        <h1 class="text-xl sm:text-2xl font-bold text-rouge-brique mb-4">Tableau de Bord</h1>
-        <div class="search-container mb-4">
-            <input type="text" id="nav-search" placeholder="Filtrer les éléments..." class="w-full p-2 rounded-lg bg-rose-pale text-rouge-brique placeholder-rouge-doux focus:outline-none focus:ring-2 focus:ring-rouge-doux">
-        </div>
-        <div class="nav-list overflow-y-auto max-h-[calc(100vh-240px)]">
-            <ul id="nav-items" class="space-y-2">
-                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="overview">
-                    <i data-feather="grid" class="icon-svg text-rouge-doux w-5 h-5"></i>
-                    <span class="text-rouge-brique font-medium text-base">Vue d'ensemble</span>
-                </li>
-                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="profile">
-                    <i data-feather="user" class="icon-svg text-rouge-doux w-5 h-5"></i>
-                    <span class="text-rouge-brique font-medium text-base">Profil</span>
-                </li>
-                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="items">
-                    <i data-feather="package" class="icon-svg text-rouge-doux w-5 h-5"></i>
-                    <span class="text-rouge-brique font-medium text-base">Gestion des Items</span>
-                </li>
-                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="menus">
-                    <i data-feather="menu" class="icon-svg text-rouge-doux w-5 h-5"></i>
-                    <span class="text-rouge-brique font-medium text-base">Gestion des Menus</span>
-                </li>
-                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="qr-codes">
-                    <i data-feather="qr-code" class="icon-svg text-rouge-doux w-5 h-5"></i>
-                    <span class="text-rouge-brique font-medium text-base">QR Codes</span>
-                </li>
-                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="reviews">
-                    <i data-feather="star" class="icon-svg text-rouge-doux w-5 h-5"></i>
-                    <span class="text-rouge-brique font-medium text-base">Avis</span>
-                </li>
-                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="stats">
-                    <i data-feather="bar-chart-2" class="icon-svg text-rouge-doux w-5 h-5"></i>
-                    <span class="text-rouge-brique font-medium text-base">Statistiques</span>
-                </li>
-                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" onclick="logout()">
-                    <i data-feather="log-out" class="icon-svg text-rouge-doux w-5 h-5"></i>
-                    <span class="text-rouge-brique font-medium text-base">Déconnexion</span>
-                </li>
-                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="settings">
-                    <i data-feather="settings" class="icon-svg text-rouge-doux w-5 h-5"></i>
-                    <span class="text-rouge-brique font-medium text-base">Paramètres</span>
-                </li>
-                <li class="nav-item flex items-center space-x-3 p-3 rounded-lg cursor-pointer hover:bg-jaune-creme transition-all" data-section="help">
-                    <i data-feather="help-circle" class="icon-svg text-rouge-doux w-5 h-5"></i>
-                    <span class="text-rouge-brique font-medium text-base">Aide</span>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<body class="gradient-bg min-h-screen">
+    <!-- Backdrop for mobile sidebar -->
+    <div id="backdrop" class="backdrop hidden fixed inset-0 bg-black bg-opacity-50 z-40" onclick="toggleSidebar()"></div>
 
-    <!-- Backdrop -->
-    <div id="backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
-
-    <!-- Main Content -->
-    <main id="main-content" class="transition-all duration-300">
-        <header class="flex justify-between items-center p-4 bg-glass shadow-sm">
-            <button id="open-sidebar" class="md:hidden text-rouge-brique focus:outline-none">
-                <i data-feather="menu" class="icon-svg"></i>
-            </button>
-            <div id="message" class="hidden text-white px-4 py-2 rounded bg-rouge-doux"></div>
-        </header>
-
-        <!-- Sections -->
-        <section id="overview-section" class="section p-4 sm:p-6 fade-in-section">
-            <h2 class="text-2xl sm:text-3xl font-bold mb-6">Vue d'ensemble</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="stat-card card-shadow">
-                    <i data-feather="package" class="icon-svg"></i>
-                    <h3 class="text-lg font-bold">Items</h3>
-                    <p id="items-count" class="text-3xl">0</p>
-                </div>
-                <div class="stat-card card-shadow">
-                    <i data-feather="menu" class="icon-svg"></i>
-                    <h3 class="text-lg font-bold">Menus</h3>
-                    <p id="menus-count" class="text-3xl">0</p>
-                </div>
-                <div class="stat-card card-shadow">
-                    <i data-feather="qr-code" class="icon-svg"></i>
-                    <h3 class="text-lg font-bold">Scans QR</h3>
-                    <p id="qr-scans" class="text-3xl">0</p>
-                </div>
-                <div class="stat-card card-shadow">
-                    <i data-feather="star" class="icon-svg"></i>
-                    <h3 class="text-lg font-bold">Note Moyenne</h3>
-                    <p id="avg-rating" class="text-3xl">0</p>
-                </div>
-            </div>
-            <div class="section-divider"></div>
-        </section>
-
-        <section id="profile-section" class="section hidden p-4 sm:p-6 fade-in-section">
-            <h2 class="text-2xl sm:text-3xl font-bold mb-6">Profil</h2>
-            <form id="profile-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="form-group">
-                    <i data-feather="user" class="input-icon"></i>
-                    <input id="profile-name" type="text" required>
-                    <label for="profile-name">Nom</label>
-                    <span class="form-error">Ce champ est requis</span>
-                </div>
-                <div class="form-group">
-                    <i data-feather="mail" class="input-icon"></i>
-                    <input id="profile-email" type="email" required>
-                    <label for="profile-email">Email</label>
-                    <span class="form-error">Email invalide</span>
-                </div>
-                <div class="form-group">
-                    <i data-feather="phone" class="input-icon"></i>
-                    <input id="profile-phone" type="tel">
-                    <label for="profile-phone">Téléphone</label>
-                </div>
-                <div class="form-group">
-                    <i data-feather="map-pin" class="input-icon"></i>
-                    <input id="profile-address" type="text" >
-                    <label for="profile-address">Adresse</label>
-                </div>
-                <div class="form-group">
-                    <i data-feather="navigation" class="input-icon"></i>
-                    <input id="profile-latitude" type="number" step="any" e">
-                    <label for="profile-latitude">Latitude</label>
-                </div>
-                <div class="form-group">
-                    <i data-feather="navigation" class="input-icon"></i>
-                    <input id="profile-longitude" type="number" step="any" >
-                    <label for="profile-longitude">Longitude</label>
-                </div>
-                <div class="col-span-1 sm:col-span-2">
-                    <button type="submit" class="btn-primary">Enregistrer</button>
-                </div>
-            </form>
-            <div class="section-divider"></div>
-        </section>
-
-        <section id="items-section" class="section hidden p-4 sm:p-6 fade-in-section">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                <h2 class="text-2xl sm:text-3xl font-bold">Gestion des Items</h2>
-                <button onclick="openModal('create-item-modal')" class="btn-primary mt-2 sm:mt-0">Ajouter un Item</button>
-            </div>
-            <div class="filter-container">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="form-group">
-                        <i data-feather="search" class="input-icon"></i>
-                        <input id="item-search" type="text" ">
-                        <label for="item-search">Rechercher</label>
+    <!-- Navigation latérale -->
+    <div class="flex">
+        <nav id="sidebar" class="sidebar w-64 lg:w-72 xl:w-80 bg-white card-shadow h-screen fixed left-0 top-0 overflow-y-auto z-50 md:transform-none sidebar-hidden">
+            <div class="flex justify-between items-center p-6 border-b border-rose-pale">
+                <div class="flex items-center space-x-3">
+                    <div class="text-3xl">🍽️</div>
+                    <div>
+                        <h1 class="text-lg font-bold text-rouge-brique">dailyMenu</h1>
+                        <p class="text-sm text-rouge-doux">Tableau de bord</p>
                     </div>
-                    <div class="form-group">
-                        <i data-feather="filter" class="input-icon"></i>
-                        <select id="item-category-filter" ">
+                </div>
+                <button id="close-sidebar" class="md:hidden text-rouge-doux text-2xl">×</button>
+            </div>
+            <div class="p-4">
+                <ul class="space-y-2">
+                    <li class="nav-item active p-3 rounded-lg" data-section="overview">
+                        <div class="flex items-center space-x-3"><span>📊</span><span>Vue d'ensemble</span></div>
+                    </li>
+                    <li class="nav-item p-3 rounded-lg" data-section="profile">
+                        <div class="flex items-center space-x-3"><span>🏪</span><span>Profil Établissement</span></div>
+                    </li>
+                    <li class="nav-item p-3 rounded-lg" data-section="items">
+                        <div class="flex items-center space-x-3"><span>🍕</span><span>Gestion des Items</span></div>
+                    </li>
+                    <li class="nav-item p-3 rounded-lg" data-section="menus">
+                        <div class="flex items-center space-x-3"><span>📋</span><span>Gestion des Menus</span></div>
+                    </li>
+                    <li class="nav-item p-3 rounded-lg" data-section="qr-codes">
+                        <div class="flex items-center space-x-3"><span>📱</span><span>QR Codes</span></div>
+                    </li>
+                    <li class="nav-item p-3 rounded-lg" data-section="reviews">
+                        <div class="flex items-center space-x-3"><span>⭐</span><span>Avis Clients</span></div>
+                    </li>
+                    <li class="nav-item p-3 rounded-lg" data-section="stats">
+                        <div class="flex items-center space-x-3"><span>📈</span><span>Statistiques</span></div>
+                    </li>
+                    <li class="nav-item p-3 rounded-lg" onclick="logout()">
+                        <div class="flex items-center space-x-3"><span>🚪</span><span>Déconnexion</span></div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Contenu principal -->
+        <main id="main-content" class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto transition-all duration-300">
+            <!-- Hamburger menu for mobile -->
+            <div class="md:hidden mb-4">
+                <button id="open-sidebar" class="btn-primary text-white p-3 rounded-lg">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Message Alert -->
+            <div id="message" class="hidden bg-bleu-clair text-rouge-brique p-4 rounded-lg mb-6 text-center"></div>
+
+            <!-- Vue d'ensemble -->
+            <div id="overview-section" class="section fade-in">
+                <div class="mb-6">
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique mb-2">Vue d'ensemble</h2>
+                    <p class="text-rouge-doux text-sm sm:text-base lg:text-lg">Bienvenue sur votre tableau de bord</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8">
+                    <div class="stat-card p-4 sm:p-6 lg:p-8 rounded-xl card-shadow">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-rouge-doux text-sm sm:text-base lg:text-lg font-medium">Items créés</p>
+                                <p id="items-count" class="text-xl sm:text-2xl lg:text-3xl font-bold text-rouge-brique">0</p>
+                            </div>
+                            <div class="text-2xl sm:text-3xl lg:text-4xl">🍕</div>
+                        </div>
+                    </div>
+                    <div class="stat-card p-4 sm:p-6 lg:p-8 rounded-xl card-shadow">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-rouge-doux text-sm sm:text-base lg:text-lg font-medium">Menus actifs</p>
+                                <p id="menus-count" class="text-xl sm:text-2xl lg:text-3xl font-bold text-rouge-brique">0</p>
+                            </div>
+                            <div class="text-2xl sm:text-3xl lg:text-4xl">📋</div>
+                        </div>
+                    </div>
+                    <div class="stat-card p-4 sm:p-6 lg:p-8 rounded-xl card-shadow">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-rouge-doux text-sm sm:text-base lg:text-lg font-medium">QR scannés</p>
+                                <p id="qr-scans" class="text-xl sm:text-2xl lg:text-3xl font-bold text-rouge-brique">0</p>
+                            </div>
+                            <div class="text-2xl sm:text-3xl lg:text-4xl">📱</div>
+                        </div>
+                    </div>
+                    <div class="stat-card p-4 sm:p-6 lg:p-8 rounded-xl card-shadow">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-rouge-doux text-sm sm:text-base lg:text-lg font-medium">Note moyenne</p>
+                                <p id="avg-rating" class="text-xl sm:text-2xl lg:text-3xl font-bold text-rouge-brique">0</p>
+                            </div>
+                            <div class="text-2xl sm:text-3xl lg:text-4xl">⭐</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow">
+                    <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-rouge-brique mb-4">Actions rapides</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+                        <button class="btn-primary text-white p-3 sm:p-4 lg:p-5 rounded-lg font-semibold text-sm sm:text-base lg:text-lg" onclick="showSection('items')">Créer un nouvel item</button>
+                        <button class="btn-primary text-white p-3 sm:p-4 lg:p-5 rounded-lg font-semibold text-sm sm:text-base lg:text-lg" onclick="showSection('menus')">Créer un nouveau menu</button>
+                        <button class="btn-primary text-white p-3 sm:p-4 lg:p-5 rounded-lg font-semibold text-sm sm:text-base lg:text-lg" onclick="showSection('qr-codes')">Générer QR Code</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profil Établissement -->
+            <div id="profile-section" class="section hidden fade-in">
+                <div class="mb-6">
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique mb-2">Profil Établissement</h2>
+                    <p class="text-rouge-doux text-sm sm:text-base lg:text-lg">Gérez les informations de votre établissement</p>
+                </div>
+                <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow">
+                    <form id="profile-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 max-w-4xl mx-auto">
+                        <div>
+                            <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Nom</label>
+                            <input type="text" id="profile-name" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg">
+                        </div>
+                        <div>
+                            <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Email</label>
+                            <input type="email" id="profile-email" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg">
+                        </div>
+                        <div>
+                            <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Téléphone</label>
+                            <input type="tel" id="profile-phone" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg">
+                        </div>
+                        <div>
+                            <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Adresse</label>
+                            <input type="text" id="profile-address" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg">
+                        </div>
+                        <div>
+                            <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Latitude</label>
+                            <input type="number" step="any" id="profile-latitude" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg">
+                        </div>
+                        <div>
+                            <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Longitude</label>
+                            <input type="number" step="any" id="profile-longitude" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg">
+                        </div>
+                        <div class="lg:col-span-3">
+                            <button type="submit" class="btn-primary text-white px-4 sm:px-6 lg:px-8 py-3 lg:py-4 rounded-lg font-semibold text-sm sm:text-base lg:text-lg">Mettre à jour</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Gestion des Items -->
+            <div id="items-section" class="section hidden fade-in">
+                <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 lg:gap-8">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique mb-2">Gestion des Items</h2>
+                        <p class="text-rouge-doux text-sm sm:text-base lg:text-lg">Créez et gérez vos plats et boissons</p>
+                    </div>
+                    <button class="btn-primary text-white px-4 sm:px-6 lg:px-8 py-3 lg:py-4 rounded-lg font-semibold text-sm sm:text-base lg:text-lg" onclick="openModal('create-item-modal')">+ Nouvel Item</button>
+                </div>
+                <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow mb-6">
+                    <div class="flex flex-col sm:flex-row flex-wrap gap-4 sm:gap-6 lg:gap-8 items-start sm:items-center max-w-4xl mx-auto">
+                        <input type="text" id="item-search" placeholder="Rechercher un item..." class="flex-1 p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme min-w-0 text-sm sm:text-base lg:text-lg">
+                        <select id="item-category-filter" class="p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme w-full sm:w-auto text-sm sm:text-base lg:text-lg">
                             <option value="">Toutes catégories</option>
                         </select>
-                        <label for="item-category-filter">Catégorie</label>
-                    </div>
-                    <div class="form-group">
-                        <i data-feather="calendar" class="input-icon"></i>
-                        <select id="item-day-filter" ">
+                        <select id="item-day-filter" class="p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme w-full sm:w-auto text-sm sm:text-base lg:text-lg">
                             <option value="">Tous les jours</option>
                         </select>
-                        <label for="item-day-filter">Jour</label>
+                    </div>
+                </div>
+                <div id="items-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8"></div>
+            </div>
+
+            <!-- Gestion des Menus -->
+            <div id="menus-section" class="section hidden fade-in">
+                <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6 lg:gap-8">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique mb-2">Gestion des Menus</h2>
+                        <p class="text-rouge-doux text-sm sm:text-base lg:text-lg">Créez et organisez vos menus</p>
+                    </div>
+                    <button class="btn-primary text-white px-4 sm:px-6 lg:px-8 py-3 lg:py-4 rounded-lg font-semibold text-sm sm:text-base lg:text-lg" onclick="openModal('create-menu-modal')">+ Nouveau Menu</button>
+                </div>
+                <div id="menus-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"></div>
+            </div>
+
+            <!-- QR Codes -->
+            <div id="qr-codes-section" class="section hidden fade-in">
+                <div class="mb-6">
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique mb-2">Gestion des QR Codes</h2>
+                    <p class="text-rouge-doux text-sm sm:text-base lg:text-lg">Générez et gérez vos QR codes pour les menus</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                    <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow">
+                        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-rouge-brique mb-4">QR Codes Actifs</h3>
+                        <div id="qr-codes-list" class="space-y-4"></div>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow">
+                        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-rouge-brique mb-4">Générer nouveau QR</h3>
+                        <form id="qr-code-form" class="space-y-4 max-w-md mx-auto">
+                            <div>
+                                <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Menu</label>
+                                <select id="qr-menu" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg"></select>
+                            </div>
+                            <div>
+                                <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Nom du QR Code</label>
+                                <input type="text" id="qr-name" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg" placeholder="Ex: Table 5">
+                            </div>
+                            <button type="submit" class="w-full btn-primary text-white p-3 sm:p-4 lg:p-5 rounded-lg font-semibold text-sm sm:text-base lg:text-lg">Générer</button>
+                        </form>
                     </div>
                 </div>
             </div>
-            <div id="items-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                <!-- Exemple de carte d'item (répétée dynamiquement) -->
-                <div class="item-card card-shadow">
-                    <svg class="card-icon" viewBox="0 0 24 24">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" fill="var(--rouge-doux)"/>
-                    </svg>
-                    <h3 class="text-lg font-bold">Nom de l'item</h3>
-                    <p>Prix: 5000 FCFA</p>
-                    <p>Disponibilité: Oui</p>
-                    <div class="action-buttons">
-                        <button class="menu-button" onclick="editItem('item-id')" aria-label="Modifier">
-                            <i data-feather="edit" class="icon-svg"></i>
-                        </button>
-                        <button class="menu-button" onclick="deleteItem('item-id')" aria-label="Supprimer">
-                            <i data-feather="trash-2" class="icon-svg"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="section-divider"></div>
-        </section>
 
-        <section id="menus-section" class="section hidden p-4 sm:p-6 fade-in-section">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                <h2 class="text-2xl sm:text-3xl font-bold">Gestion des Menus</h2>
-                <button onclick="openModal('create-menu-modal')" class="btn-primary mt-2 sm:mt-0">Ajouter un Menu</button>
-            </div>
-            <div id="menus-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Exemple de carte de menu (répétée dynamiquement) -->
-                <div class="menu-card card-shadow">
-                    <svg class="card-icon" viewBox="0 0 24 24">
-                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" fill="var(--rouge-doux)"/>
-                    </svg>
-                    <h3 class="text-lg font-bold">Nom du menu</h3>
-                    <p>Description: Menu du jour</p>
-                    <div class="action-buttons">
-                        <button class="menu-button" onclick="editMenu('menu-id')" aria-label="Modifier">
-                            <i data-feather="edit" class="icon-svg"></i>
-                        </button>
-                        <button class="menu-button" onclick="deleteMenu('menu-id')" aria-label="Supprimer">
-                            <i data-feather="trash-2" class="icon-svg"></i>
-                        </button>
-                        <button class="menu-button" onclick="generateQR('menu-id')" aria-label="Générer QR">
-                            <i data-feather="qr-code" class="icon-svg"></i>
-                        </button>
-                    </div>
+            <!-- Avis Clients -->
+            <div id="reviews-section" class="section hidden fade-in">
+                <div class="mb-6">
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique mb-2">Avis Clients</h2>
+                    <p class="text-rouge-doux text-sm sm:text-base lg:text-lg">Consultez les retours de vos clients</p>
                 </div>
-            </div>
-            <div class="section-divider"></div>
-        </section>
-
-        <section id="qr-codes-section" class="section hidden p-4 sm:p-6 fade-in-section">
-            <h2 class="text-2xl sm:text-3xl font-bold mb-6">QR Codes</h2>
-            <form id="qr-code-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                <div class="form-group">
-                    <i data-feather="menu" class="input-icon"></i>
-                    <select id="qr-menu" placeholder="Sélectionnez un menu">
-                        <!-- Rempli dynamiquement -->
-                    </select>
-                    <label for="qr-menu">Menu</label>
-                </div>
-                <div class="flex items-end">
-                    <button type="submit" class="btn-primary">Générer QR Code</button>
-                </div>
-            </form>
-            <div id="qr-codes-list" class="space-y-4"></div>
-            <div class="section-divider"></div>
-        </section>
-
-        <section id="reviews-section" class="section hidden p-4 sm:p-6 fade-in-section">
-            <h2 class="text-2xl sm:text-3xl font-bold mb-6">Avis</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                <div class="stat-card card-shadow p-6 rounded-lg text-center">
-                    <i data-feather="star" class="icon-svg"></i>
-                    <h3 class="text-lg font-bold">Note Moyenne</h3>
-                    <p id="avg-rating-stats" class="text-3xl text-rouge-brique">0</p>
-                </div>
-                <div class="stat-card card-shadow p-6 rounded-lg text-center">
-                    <i data-feather="message-circle" class="icon-svg"></i>
-                    <h3 class="text-lg font-bold">Total Avis</h3>
-                    <p id="total-reviews" class="text-3xl text-rouge-brique">0</p>
-                </div>
-                <div class="stat-card card-shadow p-6 rounded-lg text-center">
-                    <i data-feather="thumbs-up" class="icon-svg"></i>
-                    <h3 class="text-lg font-bold">Avis Positifs</h3>
-                    <p id="positive-reviews" class="text-3xl text-rouge-brique">0</p>
-                </div>
-                <div class="stat-card card-shadow p-6 rounded-lg text-center">
-                    <i data-feather="thumbs-down" class="icon-svg"></i>
-                    <h3 class="text-lg font-bold">À Améliorer</h3>
-                    <p id="improve-reviews" class="text-3xl text-rouge-brique">0</p>
-                </div>
-            </div>
-            <div id="reviews-list" class="space-y-4"></div>
-            <div class="section-divider"></div>
-        </section>
-
-        <section id="stats-section" class="section hidden p-4 sm:p-6 fade-in-section">
-            <h2 class="text-2xl sm:text-3xl font-bold mb-6">Statistiques</h2>
-            <h3 class="text-xl font-bold mb-4">Items Populaires</h3>
-            <div id="popular-items" class="space-y-4">
-                <div class="chart-placeholder">Placeholder pour graphique (à implémenter)</div>
-            </div>
-            <div class="section-divider"></div>
-        </section>
-    </main>
-
-    <!-- Modals -->
-    <div id="create-item-modal" class="modal fixed inset-0 flex items-center justify-center z-50 hidden" aria-hidden="true">
-        <div class="modal-content">
-            <div class="flex justify-between items-center p-4 border-b border-rouge-doux">
-                <h2 class="text-xl font-bold">Créer un Item</h2>
-                <button onclick="closeModal('create-item-modal')" class="text-rouge-brique focus:outline-none">
-                    <i data-feather="x" class="icon-svg"></i>
-                </button>
-            </div>
-            <form id="create-item-form" class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="form-group">
-                    <i data-feather="edit-3" class="input-icon"></i>
-                    <input id="item-name" type="text" required>
-                    <label for="item-name">Nom</label>
-                    <span class="form-error">Ce champ est requis</span>
-                </div>
-                <div class="form-group">
-                    <i data-feather="dollar-sign" class="input-icon"></i>
-                    <input id="item-price" type="number" " required>
-                    <label for="item-price">Prix (FCFA)</label>
-                    <span class="form-error">Prix invalide</span>
-                </div>
-                <div class="form-group">
-                    <i data-feather="clock" class="input-icon"></i>
-                    <input id="item-prep-time" type="number"  required>
-                    <label for="item-prep-time">Temps de préparation (min)</label>
-                    <span class="form-error">Temps invalide</span>
-                </div>
-                <div class="form-group">
-                    <i data-feather="check-circle" class="input-icon"></i>
-                    <select id="item-availability" >
-                        <option value="true">Disponible</option>
-                        <option value="false">Non disponible</option>
-                    </select>
-                    <label for="item-availability">Disponibilité</label>
-                </div>
-                <div class="form-group col-span-1 sm:col-span-2">
-                    <i data-feather="file-text" class="input-icon"></i>
-                    <textarea id="item-description" " rows="4"></textarea>
-                    <label for="item-description">Description</label>
-                </div>
-                <div class="form-group">
-                    <i data-feather="tag" class="input-icon"></i>
-                    <select id="item-categories" multiple >
-                        <!-- Rempli dynamiquement -->
-                    </select>
-                    <label for="item-categories">Catégories</label>
-                </div>
-                <div class="form-group">
-                    <i data-feather="hash" class="input-icon"></i>
-                    <select id="item-tags" multiple >
-                        <!-- Rempli dynamiquement -->
-                    </select>
-                    <label for="item-tags">Tags</label>
-                </div>
-                <div class="form-group">
-                    <i data-feather="calendar" class="input-icon"></i>
-                    <select id="item-days" multiple >
-                        <!-- Rempli dynamiquement -->
-                    </select>
-                    <label for="item-days">Jours de disponibilité</label>
-                </div>
-                <div class="col-span-1 sm:col-span-2">
-                    <label class="block mb-1">Images</label>
-                    <div class="drag-drop-area p-4 rounded text-center">
-                        <p>Glissez-déposez des images ici ou</p>
-                        <input type="file" id="image-upload" accept="image/*" multiple class="hidden">
-                        <button type="button" onclick="document.getElementById('image-upload').click()" class="text-rouge-brique underline">sélectionnez des fichiers</button>
-                    </div>
-                    <div id="image-preview" class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4"></div>
-                </div>
-                <div class="col-span-1 sm:col-span-2">
-                    <label class="block mb-1">Ingrédients</label>
-                    <div class="flex flex-col sm:flex-row gap-2 mb-2">
-                        <div class="form-group flex-1">
-                            <i data-feather="shopping-bag" class="input-icon"></i>
-                            <select id="ingredient-select" >
-                                <!-- Rempli dynamiquement -->
-                            </select>
-                            <label for="ingredient-select">Ingrédient</label>
+                <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow mb-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 text-center">
+                        <div>
+                            <div id="avg-rating-stats" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique">0</div>
+                            <div class="text-rouge-doux text-sm sm:text-base lg:text-lg">Note moyenne</div>
                         </div>
-                        <div class="form-group w-full sm:w-1/4">
-                            <i data-feather="plus-circle" class="input-icon"></i>
-                            <input id="ingredient-quantity" type="text" >
-                            <label for="ingredient-quantity">Quantité</label>
+                        <div>
+                            <div id="total-reviews" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique">0</div>
+                            <div class="text-rouge-doux text-sm sm:text-base lg:text-lg">Total avis</div>
                         </div>
-                        <button type="button" onclick="addItemIngredient()" class="btn-primary">Ajouter</button>
+                        <div>
+                            <div id="positive-reviews" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique">0</div>
+                            <div class="text-rouge-doux text-sm sm:text-base lg:text-lg">Avis positifs</div>
+                        </div>
+                        <div>
+                            <div id="improve-reviews" class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique">0</div>
+                            <div class="text-rouge-doux text-sm sm:text-base lg:text-lg">À améliorer</div>
+                        </div>
                     </div>
-                    <div id="item-ingredients" class="sortable-list space-y-2"></div>
                 </div>
-                <div class="col-span-1 sm:col-span-2 flex justify-end space-x-2">
-                    <button type="button" onclick="closeModal('create-item-modal')" class="bg-rose-pale text-rouge-brique px-4 py-2 rounded">Annuler</button>
-                    <button type="submit" class="btn-primary">Créer</button>
+                <div id="reviews-list" class="space-y-4 sm:space-y-6 lg:space-y-8"></div>
+            </div>
+
+            <!-- Statistiques -->
+            <div id="stats-section" class="section hidden fade-in">
+                <div class="mb-6">
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-rouge-brique mb-2">Statistiques</h2>
+                    <p class="text-rouge-doux text-sm sm:text-base lg:text-lg">Analysez les performances de votre établissement</p>
                 </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+                    <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow">
+                        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-rouge-brique mb-4">Scans QR par jour</h3>
+                        <div id="qr-scans-chart" class="h-64 bg-jaune-creme rounded-lg flex items-center justify-center">
+                            <span class="text-rouge-doux">Graphique à implémenter</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow">
+                        <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-rouge-brique mb-4">Items les plus consultés</h3>
+                        <div id="popular-items" class="space-y-3"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Création Item -->
+    <div id="create-item-modal" class="modal hidden fixed inset-0 flex items-center justify-center z-50">
+        <div class="modal-content bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow max-h-[95vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-rouge-brique">Créer un Item</h3>
+                <button onclick="closeModal('create-item-modal')" class="text-rouge-doux text-xl sm:text-2xl lg:text-3xl">×</button>
+            </div>
+            <form id="create-item-form" class="space-y-4 sm:space-y-6 lg:space-y-8">
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Nom</label>
+                    <input type="text" id="item-name" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg" required>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Description</label>
+                    <textarea id="item-description" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme h-24 sm:h-32 text-sm sm:text-base lg:text-lg"></textarea>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Prix (FCFA)</label>
+                    <input type="number" step="0.01" id="item-price" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg" required>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Temps de préparation (min)</label>
+                    <input type="number" id="item-prep-time" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg" required>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Disponibilité</label>
+                    <select id="item-availability" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg">
+                        <option value="true">Oui</option>
+                        <option value="false">Non</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Catégories</label>
+                    <select id="item-categories" multiple class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg"></select>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Tags</label>
+                    <select id="item-tags" multiple class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg"></select>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Jours de disponibilité</label>
+                    <select id="item-days" multiple class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg"></select>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Ingrédients</label>
+                    <div id="item-ingredients" class="sortable-list bg-rose-pale p-4 sm:p-6 rounded-lg"></div>
+                    <select id="ingredient-select" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme mt-2 text-sm sm:text-base lg:text-lg"></select>
+                    <input type="text" id="ingredient-quantity" placeholder="Quantité (ex: 100g)" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme mt-2 text-sm sm:text-base lg:text-lg">
+                    <button type="button" onclick="addIngredient()" class="btn-primary text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg mt-2 text-sm sm:text-base lg:text-lg">Ajouter Ingrédient</button>
+                </div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Images</label>
+                    <div class="drag-drop-area p-4 sm:p-6 lg:p-8 rounded-lg text-center" ondragover="event.preventDefault(); this.classList.add('dragover');" ondragleave="this.classList.remove('dragover');" ondrop="handleDrop(event)">
+                        <p class="text-xs sm:text-sm lg:text-base">Glissez-déposez vos images ici ou cliquez pour sélectionner</p>
+                        <input type="file" id="item-images" accept="image/*" multiple class="hidden" onchange="handleFileSelect(event)">
+                        <button type="button" onclick="document.getElementById('item-images').click()" class="btn-primary text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg mt-2 text-sm sm:text-base lg:text-lg">Choisir</button>
+                    </div>
+                    <div id="image-preview" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 mt-4 max-w-full"></div>
+                </div>
+                <button type="submit" class="w-full btn-primary text-white p-3 sm:p-4 lg:p-5 rounded-lg font-semibold text-sm sm:text-base lg:text-lg">Créer</button>
             </form>
         </div>
     </div>
 
-    <div id="create-menu-modal" class="modal fixed inset-0 flex items-center justify-center z-50 hidden" aria-hidden="true">
-        <div class="modal-content">
-            <div class="flex justify-between items-center p-4 border-b border-rouge-doux">
-                <h2 class="text-xl font-bold">Créer un Menu</h2>
-                <button onclick="closeModal('create-menu-modal')" class="text-rouge-brique focus:outline-none">
-                    <i data-feather="x" class="icon-svg"></i>
-                </button>
+    <!-- Modal Création Menu -->
+    <div id="create-menu-modal" class="modal hidden fixed inset-0 flex items-center justify-center z-50">
+        <div class="modal-content bg-white rounded-xl p-4 sm:p-6 lg:p-8 card-shadow max-h-[95vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-rouge-brique">Créer un Menu</h3>
+                <button onclick="closeModal('create-menu-modal')" class="text-rouge-doux text-xl sm:text-2xl lg:text-3xl">×</button>
             </div>
-            <form id="create-menu-form" class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="form-group">
-                    <i data-feather="edit-3" class="input-icon"></i>
-                    <input id="menu-name" type="text" placeholder="Entrez le nom du menu" required>
-                    <label for="menu-name">Nom</label>
-                    <span class="form-error">Ce champ est requis</span>
+            <form id="create-menu-form" class="space-y-4 sm:space-y-6 lg:space-y-8">
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Nom</label>
+                    <input type="text" id="menu-name" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme text-sm sm:text-base lg:text-lg" required>
                 </div>
-                <div class="form-group col-span-1 sm:col-span-2">
-                    <i data-feather="file-text" class="input-icon"></i>
-                    <textarea id="menu-description" placeholder="Décrivez le menu" rows="4"></textarea>
-                    <label for="menu-description">Description</label>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Description</label>
+                    <textarea id="menu-description" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme h-24 sm:h-32 text-sm sm:text-base lg:text-lg"></textarea>
                 </div>
-                <div class="col-span-1 sm:col-span-2">
-                    <label class="block mb-1">Items</label>
-                    <div class="flex flex-col sm:flex-row gap-2 mb-2">
-                        <div class="form-group flex-1">
-                            <i data-feather="package" class="input-icon"></i>
-                            <select id="item-select" placeholder="Sélectionnez un item">
-                                <!-- Rempli dynamiquement -->
-                            </select>
-                            <label for="item-select">Item</label>
-                        </div>
-                        <button type="button" onclick="addMenuItem()" class="btn-primary">Ajouter</button>
-                    </div>
-                    <div id="menu-items" class="sortable-list space-y-2"></div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Items</label>
+                    <div id="menu-items" class="sortable-list bg-rose-pale p-4 sm:p-6 rounded-lg max-h-64 overflow-y-auto"></div>
+                    <select id="item-select" class="w-full p-2 sm:p-3 lg:p-4 border-2 border-rose-pale rounded-lg bg-jaune-creme mt-2 text-sm sm:text-base lg:text-lg"></select>
+                    <button type="button" onclick="addMenuItem()" class="btn-primary text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg mt-2 text-sm sm:text-base lg:text-lg">Ajouter Item</button>
                 </div>
-                <div class="col-span-1 sm:col-span-2">
-                    <label class="block mb-1">Aperçu</label>
-                    <div id="menu-preview" class="p-4 bg-jaune-creme rounded"></div>
+                <div>
+                    <label class="block text-rouge-brique font-semibold mb-2 text-xs sm:text-sm lg:text-base">Prévisualisation</label>
+                    <div id="menu-preview" class="bg-white p-4 sm:p-6 rounded-lg border-2 border-rose-pale max-h-64 overflow-y-auto"></div>
                 </div>
-                <div class="col-span-1 sm:col-span-2 flex justify-end space-x-2">
-                    <button type="button" onclick="closeModal('create-menu-modal')" class="bg-rose-pale text-rouge-brique px-4 py-2 rounded">Annuler</button>
-                    <button type="submit" class="btn-primary">Créer</button>
-                </div>
+                <button type="submit" class="w-full btn-primary text-white p-3 sm:p-4 lg:p-5 rounded-lg font-semibold text-sm sm:text-base lg:text-lg">Créer</button>
             </form>
         </div>
     </div>
+
 
     <script>
         
@@ -1215,8 +531,7 @@ let token = localStorage.getItem("token");
 let selectedImages = [];
 let selectedIngredients = [];
 let selectedMenuItems = [];
-let allItems = []; // Stockage des items pour le filtrage dynamique
-loadOverview();
+
 // Navigation
 document.querySelectorAll(".nav-item").forEach(item => {
     item.addEventListener("click", () => {
@@ -1227,26 +542,7 @@ document.querySelectorAll(".nav-item").forEach(item => {
         }
     });
 });
- document.addEventListener('DOMContentLoaded', () => {
-            feather.replace();
-            // Micro-interactions pour les boutons
-            document.querySelectorAll('.btn-primary').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    btn.style.transform = 'scale(0.95)';
-                    setTimeout(() => { btn.style.transform = 'scale(1)'; }, 100);
-                });
-            });
-            // Animation des sections au scroll
-            const sections = document.querySelectorAll('.fade-in-section');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.1 });
-            sections.forEach(section => observer.observe(section));
-        });
+
 function showSection(sectionId) {
     document.querySelectorAll(".section").forEach(section => section.classList.add("hidden"));
     document.getElementById(`${sectionId}-section`).classList.remove("hidden");
@@ -1289,6 +585,7 @@ function closeModal(modalId) {
     document.getElementById(modalId).classList.add("hidden");
     if (modalId === "create-item-modal") {
         selectedImages = [];
+
         document.getElementById("image-preview").innerHTML = "";
         document.getElementById("item-ingredients").innerHTML = "";
     }
@@ -1359,66 +656,6 @@ function addItemIngredient() {
         div.innerHTML = `<span>${select.options[select.selectedIndex].text} - ${quantity}</span><button type="button" onclick="this.parentElement.remove(); selectedIngredients = selectedIngredients.filter(i => i.id !== '${select.value}')" class="text-red-500">X</button>`;
         document.getElementById("item-ingredients").appendChild(div);
         document.getElementById("ingredient-quantity").value = "";
-    }
-}
-document.addEventListener('DOMContentLoaded', () => {
-            feather.replace();
-            // Micro-interactions pour les boutons
-            document.querySelectorAll('.btn-primary, .menu-button').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    btn.style.transform = 'scale(0.95)';
-                    setTimeout(() => { btn.style.transform = 'scale(1)'; }, 100);
-                });
-            });
-            // Animation des sections au scroll
-            const sections = document.querySelectorAll('.fade-in-section');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                    }
-                });
-            }, { threshold: 0.1 });
-            sections.forEach(section => observer.observe(section));
-            // Placeholder pour fonctions des boutons
-            window.editItem = (id) => console.log(`Modifier item ${id}`);
-            window.deleteItem = (id) => console.log(`Supprimer item ${id}`);
-            window.editMenu = (id) => console.log(`Modifier menu ${id}`);
-            window.deleteMenu = (id) => console.log(`Supprimer menu ${id}`);
-            window.generateQR = (id) => console.log(`Générer QR pour menu ${id}`);
-        });
-function addIngredient() {
-    const select = document.getElementById("ingredient-select");
-    const quantity = document.getElementById("ingredient-quantity").value;
-    const selectedOption = select.options[select.selectedIndex];
-    const ingredientId = selectedOption.value;
-    const ingredientName = selectedOption.text;
-    if (!ingredientId || !quantity) {
-        alert("Veuillez sélectionner un ingrédient et entrer une quantité.");
-        return;
-    }
-    selectedIngredients.push({
-        id: parseInt(ingredientId),
-        name: ingredientName,
-        quantity: quantity
-    });
-    const container = document.getElementById("item-ingredients");
-    const div = document.createElement("div");
-    div.className = "flex justify-between items-center bg-white p-2 rounded shadow mb-2";
-    div.innerHTML = `
-        <span>${ingredientName} - ${quantity}</span>
-        <button onclick="removeIngredient(${ingredientId}, this)" class="text-red-500 font-bold">×</button>
-    `;
-    container.appendChild(div);
-    select.selectedIndex = 0;
-    document.getElementById("ingredient-quantity").value = "";
-}
-
-function removeIngredient(id, button) {
-    const index = selectedIngredients.findIndex(i => i.id === id);
-    if (index !== -1) {
-        selectedIngredients.splice(index, 1);
-        button.parentElement.remove();
     }
 }
 
@@ -1548,115 +785,105 @@ async function loadItems() {
             fetch(frontendUrls + "api/categories", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
             fetch(frontendUrls + "api/jours").then(r => r.json())
         ]);
-        allItems = items; // Stocker les items pour le filtrage
         const list = document.getElementById("items-list");
-        const renderItems = (filteredItems) => {
-            list.innerHTML = filteredItems.map(item => `
-                <div class="menu-item p-4 rounded-lg card-shadow">
-                    <div class="h-40 bg-rose-pale rounded-lg mb-4 flex items-center justify-center">
-                        ${item.images.length ? `<img src="${item.images[0].url_image}" class="w-full h-full object-cover rounded-lg">` : `<span class="text-4xl">🍕</span>`}
-                    </div>
-                    <h3 class="font-bold text-rouge-brique mb-2">${item.nom_plat}</h3>
-                    <p class="text-rouge-doux text-sm mb-2">${item.description || "Sans description"}</p>
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="font-bold text-rouge-brique">${item.price} FCFA</span>
-                        <span class="text-sm text-rouge-doux">⏱️ ${item.prep_time} min</span>
-                    </div>
-                    <div class="flex space-x-2">
-                        <button class="bg-rouge-doux menu-button" aria-label="Modifier" title="Modifier" onclick="editItem('${item.id_item}')">
-                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-                        </button>
-                        <button class="bg-rose-pale menu-button" aria-label="Dupliquer" title="Dupliquer" onclick="duplicateItem('${item.id_item}')">
-                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                        </button>
-                        <button class="bg-red-500 menu-button" aria-label="Supprimer" title="Supprimer" onclick="deleteItem('${item.id_item}')">
-                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                        </button>
-                    </div>
+        list.innerHTML = items.map(item => `
+            <div class="menu-item p-4 rounded-lg card-shadow">
+                <div class="h-40 bg-rose-pale rounded-lg mb-4 flex items-center justify-center">
+                    ${item.images.length ? `<img src="${item.images[0].url_image}" class="w-full h-full object-cover rounded-lg">` : `<span class="text-4xl">🍕</span>`}
                 </div>
-            `).join("");
-        };
-        renderItems(allItems);
+                <h3 class="font-bold text-rouge-brique mb-2">${item.nom_plat}</h3>
+                <p class="text-rouge-doux text-sm mb-2">${item.description || "Sans description"}</p>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="font-bold text-rouge-brique">${item.price} FCFA</span>
+                    <span class="text-sm text-rouge-doux">⏱️ ${item.prep_time} min</span>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="bg-rouge-doux text-white px-3 py-1 rounded text-sm" onclick="editItem('${item.id_item}')">Modifier</button>
+                    <button class="bg-rose-pale text-rouge-brique px-3 py-1 rounded text-sm" onclick="duplicateItem('${item.id_item}')">Dupliquer</button>
+                    <button class="bg-red-500 text-white px-3 py-1 rounded text-sm" onclick="deleteItem('${item.id_item}')">Supprimer</button>
+                </div>
+            </div>
+        `).join("");
         const catFilter = document.getElementById("item-category-filter");
         catFilter.innerHTML = `<option value="">Toutes catégories</option>` + categories.map(c => `<option value="${c.id_category}">${c.name}</option>`).join("");
         const dayFilter = document.getElementById("item-day-filter");
         dayFilter.innerHTML = `<option value="">Tous les jours</option>` + days.map(d => `<option value="${d.id_jour}">${d.nom}</option>`).join("");
-        // Filtres dynamiques
-        const searchInput = document.getElementById("item-search");
-        const filterItems = () => {
-            let filtered = allItems;
-            const search = searchInput.value.toLowerCase();
-            if (search) {
-                filtered = filtered.filter(item => item.nom_plat.toLowerCase().includes(search));
-            }
-            const category = catFilter.value;
-            if (category) {
-                filtered = filtered.filter(item => item.categories.some(c => c.id_category == category));
-            }
-            const day = dayFilter.value;
-            if (day) {
-                filtered = filtered.filter(item => item.jours_disponibilite.some(d => d.id_jour == day));
-            }
-            renderItems(filtered);
-        };
-        searchInput.addEventListener("input", filterItems);
-        catFilter.addEventListener("change", filterItems);
-        dayFilter.addEventListener("change", filterItems);
     } catch (error) {
         showMessage("Erreur lors du chargement des items", true);
     }
 }
-
 document.getElementById("create-item-form").addEventListener("submit", async e => {
     e.preventDefault();
+
     const formData = new FormData();
+
+    // Ajout des champs de base
     formData.append("nom_plat", document.getElementById("item-name").value);
     formData.append("description", document.getElementById("item-description").value);
     formData.append("price", document.getElementById("item-price").value);
     formData.append("prep_time", document.getElementById("item-prep-time").value);
     formData.append("disponibilite", document.getElementById("item-availability").value === "true");
+
+    // Ajouter les catégories sélectionnées
     Array.from(document.getElementById("item-categories").selectedOptions).forEach(o => {
-        formData.append("category_ids", o.value);
+        formData.append("category_ids", o.value);  // Ajouter chaque catégorie
     });
+
+    // Ajouter les tags sélectionnés
     Array.from(document.getElementById("item-tags").selectedOptions).forEach(o => {
-        formData.append("tag_ids", o.value);
+        formData.append("tag_ids", o.value);  // Ajouter chaque tag
     });
+
+    // Ajouter les jours de disponibilité sélectionnés
     Array.from(document.getElementById("item-days").selectedOptions).forEach(o => {
-        formData.append("jour_ids", o.value);
+        formData.append("jour_ids", o.value);  // Ajouter chaque jour
     });
-    const uniqueIngredients = [];
-    const added = new Set();
-    selectedIngredients.forEach(i => {
-        if (!added.has(i.id)) {
-            added.add(i.id);
-            uniqueIngredients.push(i);
-        }
-    });
-    uniqueIngredients.forEach(i => {
-        formData.append("ingredient_ids", i.id);
-        formData.append("quantites", i.quantity);
-    });
+
+ const uniqueIngredients = [];
+const added = new Set();
+selectedIngredients.forEach(i => {
+    if (!added.has(i.id)) {
+        added.add(i.id);
+        uniqueIngredients.push(i);
+    }
+});
+uniqueIngredients.forEach(i => {
+    formData.append("ingredient_ids", i.id);
+    formData.append("quantites", i.quantity);
+});
+    // Ajouter les images sélectionnées
     selectedImages.forEach(img => {
         formData.append("image_files", img);
     });
+
+    // Afficher ce qui est dans le formData (facultatif pour débogage)
+    for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
+
     try {
         const response = await fetch(frontendUrls + "api/items", {
             method: "POST",
-            headers: { "Authorization": `Bearer ${token}` },
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
             body: formData
         });
+
         if (response.ok) {
             showMessage("Item créé avec succès !");
             closeModal("create-item-modal");
-            showSection("items");
+            showSection("items")
         } else {
             const errorData = await response.json();
             showMessage(errorData.error || "Erreur lors de la création", true);
         }
+
     } catch (err) {
         showMessage("Erreur serveur", true);
     }
 });
+
 
 async function editItem(id) {
     showMessage("Modification non implémentée", true);
@@ -1698,47 +925,130 @@ async function deleteItem(id) {
     if (!confirm("Supprimer cet item ?")) {
         return;
     }
+
     try {
         const response = await fetch(frontendUrls + `api/items/${id}`, {
-            method: "DELETE",
-            headers: { "Authorization": `Bearer ${token}` }
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem("token") // ou ton système d'auth
+            }
         });
+
         if (response.ok) {
             showMessage("Item supprimé avec succès");
-            showSection("items");
+            // Optionnel : actualiser la liste
+            showSection("items")
         } else {
             const data = await response.json();
             showMessage("Erreur : " + (data.error || "suppression échouée"), true);
         }
     } catch (error) {
+        console.error("Erreur réseau :", error);
         showMessage("Erreur réseau pendant la suppression", true);
     }
 }
 
-// Menus
+
+
+function addIngredient() {
+    const select = document.getElementById("ingredient-select");
+    const quantity = document.getElementById("ingredient-quantity").value;
+
+    const selectedOption = select.options[select.selectedIndex];
+    const ingredientId = selectedOption.value;
+    const ingredientName = selectedOption.text;
+
+    if (!ingredientId || !quantity) {
+        alert("Veuillez sélectionner un ingrédient et entrer une quantité.");
+        return;
+    }
+
+    // Ajouter dans la liste globale
+    selectedIngredients.push({
+        id: parseInt(ingredientId),
+        name: ingredientName,
+        quantity: quantity
+    });
+
+
+    // Mettre à jour l'affichage
+    const container = document.getElementById("item-ingredients");
+    const div = document.createElement("div");
+    div.className = "flex justify-between items-center bg-white p-2 rounded shadow mb-2";
+    div.innerHTML = `
+        <span>${ingredientName} - ${quantity}</span>
+        <button onclick="removeIngredient(${ingredientId}, this)" class="text-red-500 font-bold">×</button>
+    `;
+    container.appendChild(div);
+
+    // Reset des champs
+    select.selectedIndex = 0;
+    document.getElementById("ingredient-quantity").value = "";
+}
+
+function removeIngredient(id, button) {
+    const index = selectedIngredients.findIndex(i => i.id === id);
+    if (index !== -1) {
+        selectedIngredients.splice(index, 1);
+        button.parentElement.remove();
+    }
+}
+
 async function loadMenus() {
     try {
         const menus = await fetch(frontendUrls + "api/menus", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
         const list = document.getElementById("menus-list");
-        list.innerHTML = menus.map(menu => `
+        list.innerHTML = `
+            <style>
+                .menu-button svg {
+                    display: inline-block;
+                    vertical-align: middle;
+                    width: 18px;
+                    height: 18px;
+                    fill: currentColor;
+                }
+                .menu-button {
+                    padding: 8px;
+                    line-height: 1;
+                    border-radius: 5px;
+                    font-size: 14px;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .menu-button[aria-label="Modifier"] svg {
+                    fill: #FFFFFF;
+                }
+                .menu-button[aria-label="Générer QR"] svg,
+                .menu-button[aria-label="Exporter PDF"] svg,
+                .menu-button[aria-label="Partager"] svg {
+                    fill: #8B2323; /* --rouge-brique */
+                }
+            </style>
+        ` + menus.map(menu => `
             <div class="bg-white rounded-xl p-6 card-shadow">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-xl font-bold text-rouge-brique">${menu.nom}</h3>
                     <div class="flex space-x-2">
                         <button class="bg-rouge-doux menu-button" aria-label="Modifier" title="Modifier le menu" onclick="editMenu('${menu.id_menu}')">
-                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                            <svg viewBox="0 0 24 24">
+                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                            </svg>
                         </button>
                         <button class="bg-rose-pale menu-button" aria-label="Générer QR" title="Générer un QR code" onclick="generateQR('${menu.id_menu}')">
-                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm8 0h6v6h-6V4zm-8 8h6v6H4v-6zm8 0h6v6h-6v-6zm2-8h2v2h-2V4zm0 4h2v2h-2V8zm-4-4h2v2h-2V4zm0 4h2v2h-2V8zm-4 4h2v2H6v-2zm0 4h2v2H6v-2zm12-4h2v2h-2v-2zm0 4h2v2h-2v-2z"/></svg>
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 4h6v6H4V4zm8 0h6v6h-6V4zm-8 8h6v6H4v-6zm8 0h6v6h-6v-6zm2-8h2v2h-2V4zm0 4h2v2h-2V8zm-4-4h2v2h-2V4zm0 4h2v2h-2V8zm-4 4h2v2H6v-2zm0 4h2v2H6v-2zm12-4h2v2h-2v-2zm0 4h2v2h-2v-2z"/>
+                            </svg>
                         </button>
                         <button class="bg-rose-pale menu-button" aria-label="Exporter PDF" title="Exporter en PDF" onclick="exportPDF('${menu.id_menu}')">
-                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h8v4h4v12zm-6-3h-2v-2h2v2zm0-4h-2v-2h2v2zm-3 4h-2v-2h2v2zm0-4h-2v-2h2v2z"/></svg>
+                            <svg viewBox="0 0 24 24">
+                                <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h8v4h4v12zm-6-3h-2v-2h2v2zm0-4h-2v-2h2v2zm-3 4h-2v-2h2v2zm0-4h-2v-2h2v2z"/>
+                            </svg>
                         </button>
                         <button class="bg-rose-pale menu-button" aria-label="Partager" title="Partager le menu" onclick="shareMenu('${menu.id_menu}')">
-                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/></svg>
-                        </button>
-                        <button class="bg-red-500 menu-button" aria-label="Supprimer" title="Supprimer le menu" onclick="deleteMenu('${menu.id_menu}')">
-                            <svg class="icon-svg" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                            <svg viewBox="0 0 24 24">
+                                <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
+                            </svg>
                         </button>
                     </div>
                 </div>
@@ -1782,27 +1092,6 @@ async function editMenu(id) {
     showMessage("Modification non implémentée", true);
 }
 
-async function deleteMenu(id) {
-    if (!confirm("Supprimer ce menu ?")) {
-        return;
-    }
-    try {
-        const response = await fetch(frontendUrls + `api/menus/${id}`, {
-            method: "DELETE",
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (response.ok) {
-            showMessage("Menu supprimé avec succès");
-            loadMenus();
-        } else {
-            const data = await response.json();
-            showMessage("Erreur : " + (data.error || "suppression échouée"), true);
-        }
-    } catch (error) {
-        showMessage("Erreur réseau pendant la suppression", true);
-    }
-}
-
 async function generateQR(menuId) {
     try {
         const response = await fetch(frontendUrls + "api/qrcodes", {
@@ -1810,6 +1099,7 @@ async function generateQR(menuId) {
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
             body: JSON.stringify({ menu_id: menuId })
         });
+        
         if (response.ok) {
             showMessage("QR Code généré !");
             loadQRCodes();
@@ -1854,11 +1144,13 @@ async function loadQRCodes() {
     try {
         const qrCodes = await fetch(frontendUrls + "api/qrcodes", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
         const list = document.getElementById("qr-codes-list");
+         
         list.innerHTML = qrCodes.map(q => `
             <div class="flex items-center justify-between p-4 bg-jaune-creme rounded-lg">
                 <div class="flex items-center space-x-4">
                     <div class="w-16 h-16 bg-white rounded-lg flex-center border-2 border-rouge-doux">
                         <img src="${q.url}" alt="QR Code" class="w-full h-full">
+
                     </div>
                     <div>
                         <h4 class="font-bold text-rouge-brique">${q.menu_id}</h4>
@@ -1970,50 +1262,39 @@ if (token) {
 } else {
     window.location.href = frontendUrls + "start/";
 }
-const sidebar = document.getElementById('sidebar');
-const backdrop = document.getElementById('backdrop');
-const openSidebarBtn = document.getElementById('open-sidebar');
-const closeSidebarBtn = document.getElementById('close-sidebar');
+// Sidebar toggle functionality
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('backdrop');
+        const openSidebarBtn = document.getElementById('open-sidebar');
+        const closeSidebarBtn = document.getElementById('close-sidebar');
+        const mainContent = document.getElementById('main-content');
 
-function toggleSidebar() {
-    const isHidden = sidebar.classList.toggle('sidebar-hidden');
-    backdrop.classList.toggle('visible', !isHidden);
-    backdrop.classList.toggle('hidden', isHidden);
-}
-
-openSidebarBtn?.addEventListener('click', toggleSidebar);
-closeSidebarBtn?.addEventListener('click', toggleSidebar);
-backdrop?.addEventListener('click', toggleSidebar);
-
-document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', () => {
-        if (window.innerWidth < 768) {
-            toggleSidebar();
+        function toggleSidebar() {
+            sidebar.classList.toggle('sidebar-hidden');
+            backdrop.classList.toggle('hidden');
+            mainContent.classList.toggle('ml-64');
+            mainContent.classList.toggle('lg:ml-72');
+            mainContent.classList.toggle('xl:ml-80');
         }
-        if (item.dataset.section) {
-            showSection(item.dataset.section);
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
-        }
-    });
-});
 
-// Ajoutez ici le code de sidebar.js
-document.getElementById('nav-search')?.addEventListener('input', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    const navItems = document.querySelectorAll('#nav-items .nav-item');
-    navItems.forEach(item => {
-        const text = item.querySelector('span').textContent.toLowerCase();
-        item.style.display = text.includes(searchTerm) ? 'flex' : 'none';
-    });
-});
+        openSidebarBtn?.addEventListener('click', toggleSidebar);
+        closeSidebarBtn?.addEventListener('click', toggleSidebar);
+        backdrop?.addEventListener('click', toggleSidebar);
+
+        // Navigation item click handler
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth < 768) {
+                    toggleSidebar();
+                }
+                if (item.dataset.section) {
+                    showSection(item.dataset.section);
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                }
+            });
+        });
+
     </script>
 </body>
-<footer id="page-footer" class="bg-rouge-brique text-jaune-creme py-4 text-center">
-    <p class="text-sm">© 2025 Daily Menu. Tous droits réservés.</p>
-    <p class="text-sm mt-1">
-        <a href="/contact" class="hover:text-rose-pale transition-colors">Contact</a> | 
-        <a href="/terms" class="hover:text-rose-pale transition-colors">Conditions d'utilisation</a>
-    </p>
-</footer>
 </html>
