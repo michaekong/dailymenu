@@ -1524,8 +1524,8 @@ body.modal-open {
 
 
     <script>
-        //const frontendUrls = "http://127.0.0.1:8000/";
-        const frontendUrls = "https://dailymenu.onrender.com/"; // Assurez-vous que cette URL est correcte
+        const //frontendUrls = "http://127.0.0.1:8000/";
+       const frontendUrls = "https://dailymenu.onrender.com/"; // Assurez-vous que cette URL est correcte
         let token = localStorage.getItem("token");
         let allItems = []; // Stocker tous les items pour les filtres et l'aperçu du menu
         let allMenus = []; // Stocker tous les menus pour les filtres
@@ -1961,6 +1961,7 @@ body.modal-open {
                     fetch(frontendUrls + "api/qrcodes", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json()),
                     fetch(frontendUrls + "api/avis", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json())
                 ]);
+                 
                 document.getElementById("items-count").textContent = items.length;
                 document.getElementById("menus-count").textContent = menus.length;
                 document.getElementById("qr-scans").textContent = qrCodes.reduce((sum, qr) => sum + qr.scans, 0);
@@ -1969,7 +1970,7 @@ body.modal-open {
                 showMessage("Erreur lors du chargement de l'aperçu: " + error.message, true);
             }
         }
-
+         
         // Profile
         async function loadProfile() {
             try {
@@ -2452,7 +2453,7 @@ body.modal-open {
         }
 
         async function shareMenu(menuId) {
-            const url = frontendUrls + `menus/${menuId}`;
+            const url = frontendUrls + `menus/${menuId}/`;
             try {
                 if (navigator.share) {
                     await navigator.share({
@@ -2563,7 +2564,7 @@ body.modal-open {
             try {
                 const reviews = await fetch(frontendUrls + "api/avis", { headers: { "Authorization": `Bearer ${token}` } }).then(r => r.json());
                 const list = document.getElementById("reviews-list");
-
+                
                 if (reviews.length === 0) {
                     list.innerHTML = `<p class="no-data-message">Aucun avis trouvé.</p>`;
                     document.getElementById("avg-rating-stats").textContent = "0.0";
@@ -2572,18 +2573,18 @@ body.modal-open {
                     document.getElementById("improve-reviews").textContent = "0";
                     return;
                 }
-
+                
                 list.innerHTML = reviews.map(r => `
                     <div class="review-card">
                         <div class="review-header">
-                            <div class="reviewer-avatar">${r.id_personne ? r.id_personne.toString().charAt(0).toUpperCase() : 'U'}</div>
+                            <div class="reviewer-avatar">${ 'U'}</div>
                             <div class="reviewer-info">
-                                <h4 class="reviewer-id">Utilisateur #${r.id_personne || 'Inconnu'}</h4>
+                                <h4 class="reviewer-id">Utilisateur #${r.id_item }</h4>
                                 <div class="review-stars">${"★".repeat(r.note)}${"☆".repeat(5-r.note)}</div>
                             </div>
                             <span class="review-date">${new Date(r.date_avis).toLocaleDateString('fr-FR')}</span>
                         </div>
-                        <p class="review-comment">${r.commentaires || "Pas de commentaire."}</p>
+                        <p class="review-comment">${r.description || "Pas de commentaire."}</p>
                         <p class="review-rating-text">Note: <strong>${r.note}/5</strong></p>
                     </div>
                 `).join("");
@@ -2648,7 +2649,7 @@ body.modal-open {
                 });
 
             } else {
-                window.location.href = frontendUrls + "start/";
+                window.location.href = frontendUrls + "";
             }
 
             const sidebar = document.getElementById('sidebar');

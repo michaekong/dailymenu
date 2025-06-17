@@ -201,7 +201,7 @@ def list_categories(request):
             name=c.name,
             parent_id=c.parent_id
         )
-        for c in Category.objects.filter(etablissement=request.auth)
+        for c in Category.objects.filter()
     ]
 @api.get("/categories_client/", response=List[CategoryOut])
 def list_categories_client(request,menu_id:str):
@@ -237,7 +237,7 @@ def delete_tag(request, tag_id: str):
 def list_tags(request):
     return [
         TagOut(id_tag=t.id_tag, name=t.name)
-        for t in Tag.objects.filter(etablissement=request.auth)
+        for t in Tag.objects.filter()
     ]
 @api.post("/ingredients", response={201: IngredientOut, 400: ErrorResponse})
 def create_ingredient(request, data: IngredientIn):
@@ -603,22 +603,51 @@ def create_concerner(request, data: ConcernerIn):
         return 400, {"error": "Invalid personne or allergene ID"}
 
 # Donner_Avis Endpoints
-@api.post("/avis", response={201: DonnerAvisOut, 400: ErrorResponse}, auth=AuthBearer())
+@api.post("/avis", response={201: DonnerAvisOut, 400: ErrorResponse})
 def create_avis(request, data: DonnerAvisIn):
     try:
-        personne = Personne.objects.get(id_personne=data.id_personne)
+        # Récupérer l'item à partir de son ID
+        item = Item.objects.get(id_item=data.id_item)  # Supposons que vous avez ajouté id_item dans DonnerAvisIn
+        
+        # Récupérer l'établissement associé à cet item
+        etablissement = item.etablissement
+        
+        # Créer un nouvel avis
         avis = Donner_Avis.objects.create(
-            id_personne=personne,
-            id_etablissement=request.auth,
-            note=data.note
+            id_etablissement=etablissement,
+            id_item=item,
+            note=data.note,
+            description=data.description
         )
-        return 201, avis
-    except Personne.DoesNotExist:
-        return 400, {"error": "Invalid personne ID"}
+        
+        # Retourner la réponse avec les détails de l'avis
+        return 201, {
+            'id_etablissement': str(avis.id_etablissement),
+            'date_avis': avis.date_avis.strftime('%Y-%m-%d'),
+            'note': avis.note,
+            'description': avis.description,
+            'id_item':data.id_item,
+        }
 
+    except Item.DoesNotExist:
+        return 400, {"error": "Invalid item ID"}  # Gestion de l'erreur pour l'item
+    except Exception as e:
+        return 400, {"error": str(e)}  # Gestion des autres exceptions
 @api.get("/avis", response=List[DonnerAvisOut], auth=AuthBearer())
 def list_avis(request):
-    return Donner_Avis.objects.filter(id_etablissement=request.auth)
+    
+    av=Donner_Avis.objects.filter(id_etablissement=request.auth)
+    l=[]
+    for el in  av:
+        
+        d={}
+        d={"id_etablissement":str(el.id_etablissement),
+        "date_avis":el.date_avis.strftime('%Y-%m-%d'),
+        "note":str(el.note) ,"description":el.description,"id_item":str(el.id_item)}
+        
+        l.append(d)
+    return l
+
 
 # Test Email Endpoint
 @api.post("/test-email", response={200: WarningResponse, 500: ErrorResponse})
@@ -732,7 +761,8 @@ def get_public_menu(request, menu_id: str):
 
         qrcode_url = None
         try:
-            qr_code = QRCode.objects.get(menu=menu)
+            qr_code = QRCode.objects.filter(menu=menu).first()
+            
             qrcode_url = f"{settings.FRONTEND_URL.rstrip('/')}{qr_code.url}"
         except QRCode.DoesNotExist:
             pass

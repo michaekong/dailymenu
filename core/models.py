@@ -143,13 +143,17 @@ class Concerner(models.Model):
         unique_together = ('id_personne', 'id_allergene')
 
 class Donner_Avis(models.Model):
-    id_personne = models.ForeignKey(Personne, on_delete=models.CASCADE)
+    
+    id_avis = models.CharField(max_length=50, primary_key=True, default=generate_uuid)
+    id_item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='avis',blank=True)
+    
     id_etablissement = models.ForeignKey(Etablissement, on_delete=models.CASCADE, related_name='avis')
     date_avis = models.DateField(auto_now_add=True)
     note = models.IntegerField()
+    description=models.TextField(blank=True)
 
     class Meta:
-        unique_together = ('id_personne', 'id_etablissement', 'date_avis')
+        unique_together = ( 'id_etablissement', 'date_avis', 'id_avis','description','id_item')
 
 class QRCode(models.Model):
     id_qrcode = models.CharField(max_length=50, primary_key=True, default=generate_uuid)

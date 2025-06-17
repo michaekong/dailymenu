@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>Menu Restaurant - Interface Client</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -1232,14 +1233,14 @@ body {
 
     <script >(function() {
     // --- Configuration API ---
-    const API_BASE_URL = 'http://127.0.0.1:8000'; // Votre URL de base
-     //const API_BASE_URL = "https://dailymenu.onrender.com"; // Si déployé
+    const //API_BASE_URL = 'http://127.0.0.1:8000'; // Votre URL de base
+     const API_BASE_URL = "https://dailymenu.onrender.com"; // Si déployé
 
     // Extrait menu_id depuis l'URL (amélioré pour être plus robuste)
     const getMenuIdFromUrl = () => {
         const path = window.location.pathname;
         const match = path.match(/\/menus\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i);
-        return match ? match[1] : 'eb95505e-6bc2-439f-be3c-1d8e7f7df721'; // Valeur par défaut
+        return match ? match[1] : '5a4b4b60-b0e8-4c8d-98d5-f93849c4fa32'; // Valeur par défaut
     };
     const MENU_ID = getMenuIdFromUrl();
 
@@ -1328,14 +1329,15 @@ body {
         toggleVisibility(offlineIndicator, false);
 
         try {
-            const data = await fetchWithRetry(`${API_BASE_URL}/api/public/menu/${MENU_ID}`);
+            const data = await fetchWithRetry(`${API_BASE_URL}/api/api/public/menu/${MENU_ID}`);
+           
             menuData = data.menu || {};
             allItems = data.menu.items || [];
             categories = data.categories || [];
             allergenes = data.allergenes || [];
             const etablissement = data.etablissement || {};
             const qrcodeUrl = data.qrcode;
-
+            
             // Stocker dans localStorage pour le mode hors-ligne
             localStorage.setItem('menuCache', JSON.stringify(data));
 
@@ -1411,11 +1413,11 @@ body {
             <p><i class="fas fa-map-marker-alt"></i> <strong>Adresse:</strong> ${adresse}</p>
             <p><i class="fas fa-phone"></i> <strong>Tel:</strong> ${telephone}</p>
             <p><i class="fas fa-envelope"></i> <strong>Email:</strong> ${email}</p>
-        `;
+        `
     }
 
     function updateQRCode(qrcodeUrl) {
-        alert(qrcodeUrl)
+       
         if (qrcodeUrl) {
             qrCodeContainer.innerHTML = `<img src="${qrcodeUrl}" alt="QR Code du menu">`;
         } else {
@@ -1802,97 +1804,127 @@ body {
         }
     });
 
-    // --- Système de Notation et Commentaires ---
-    function setupRatingForCard(container) { // Prend le conteneur (carte ou modale)
-        let reviews = JSON.parse(localStorage.getItem('reviews')) || [];
-        const starsContainer = container.querySelector('.stars');
-        const itemId = starsContainer.dataset.itemId;
-        const stars = starsContainer.querySelectorAll('.star');
-        const commentBox = container.querySelector('.comment-box');
-        const submitBtn = container.querySelector('.submit-comment');
+   // --- Système de Notation et Commentaires ---
+function setupRatingForCard(container) { // Prend le conteneur (carte ou modale)
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    let reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+    const starsContainer = container.querySelector('.stars');
+    const itemId = starsContainer.dataset.itemId;
+    const stars = starsContainer.querySelectorAll('.star');
+    const commentBox = container.querySelector('.comment-box');
+    const submitBtn = container.querySelector('.submit-comment');
 
-        let currentRating = 0;
+    let currentRating = 0;
 
-        const existingReview = reviews.find(r => r.itemId === itemId);
-        if (existingReview) {
-            currentRating = existingReview.rating;
-            commentBox.value = existingReview.comment;
-            stars.forEach((star, index) => {
-                star.querySelector('i').className = index < currentRating ? 'fas fa-star' : 'far fa-star';
-            });
-            commentBox.readOnly = true;
-            submitBtn.disabled = true;
-        } else {
-            commentBox.readOnly = false;
-            submitBtn.disabled = false;
-            commentBox.value = '';
-            currentRating = 0; // Réinitialiser pour les nouvelles cartes
-            stars.forEach(s => s.querySelector('i').className = 'far fa-star');
-        }
-
-
-        starsContainer.onmouseover = (event) => {
-            if (commentBox.readOnly) return;
-            const hoveredStar = event.target.closest('.star');
-            if (hoveredStar) {
-                const value = parseInt(hoveredStar.dataset.value);
-                stars.forEach((star, index) => {
-                    star.querySelector('i').className = index < value ? 'fas fa-star' : 'far fa-star';
-                });
-            }
-        };
-
-        starsContainer.onmouseout = () => {
-            if (commentBox.readOnly) return;
-            stars.forEach((star, index) => {
-                star.querySelector('i').className = index < currentRating ? 'fas fa-star' : 'far fa-star';
-            });
-        };
-
-        stars.forEach((star) => {
-            star.onclick = null; // Supprimer les anciens listeners
-            star.addEventListener('click', function() {
-                if (commentBox.readOnly) return;
-                currentRating = parseInt(this.dataset.value);
-                stars.forEach((s, i) => {
-                    s.querySelector('i').className = i < currentRating ? 'fas fa-star' : 'far fa-star';
-                });
-            });
+    const existingReview = reviews.find(r => r.itemId === itemId);
+    if (existingReview) {
+        currentRating = existingReview.rating;
+        commentBox.value = existingReview.comment;
+        stars.forEach((star, index) => {
+            star.querySelector('i').className = index < currentRating ? 'fas fa-star' : 'far fa-star';
         });
-
-        submitBtn.onclick = null; // Supprimer les anciens listeners
-        submitBtn.addEventListener('click', () => {
-            const comment = commentBox.value.trim();
-
-            if (currentRating === 0 && !comment) {
-                alert('Veuillez donner une note ou un commentaire.');
-                return;
-            }
-
-            const existingReviewIndex = reviews.findIndex(r => r.itemId === itemId);
-            if (existingReviewIndex !== -1) {
-                alert('Vous avez déjà laissé un avis pour ce plat. Vous ne pouvez pas le modifier.');
-                return;
-            }
-
-            const now = new Date();
-            reviews.push({
-                itemId,
-                rating: currentRating,
-                comment,
-                timestamp: now.toISOString()
-            });
-            localStorage.setItem('reviews', JSON.stringify(reviews));
-
-            alert(`Merci pour votre note de ${currentRating} étoile(s) et votre commentaire !`);
-            commentBox.value = '';
-            currentRating = 0;
-            stars.forEach(s => s.querySelector('i').className = 'far fa-star');
-            commentBox.readOnly = true;
-            submitBtn.disabled = true;
-        });
+        commentBox.readOnly = true;
+        submitBtn.disabled = true;
+    } else {
+        commentBox.readOnly = false;
+        submitBtn.disabled = false;
+        commentBox.value = '';
+        currentRating = 0; // Réinitialiser pour les nouvelles cartes
+        stars.forEach(s => s.querySelector('i').className = 'far fa-star');
     }
 
+    starsContainer.onmouseover = (event) => {
+        if (commentBox.readOnly) return;
+        const hoveredStar = event.target.closest('.star');
+        if (hoveredStar) {
+            const value = parseInt(hoveredStar.dataset.value);
+            stars.forEach((star, index) => {
+                star.querySelector('i').className = index < value ? 'fas fa-star' : 'far fa-star';
+            });
+        }
+    };
+
+    starsContainer.onmouseout = () => {
+        if (commentBox.readOnly) return;
+        stars.forEach((star, index) => {
+            star.querySelector('i').className = index < currentRating ? 'fas fa-star' : 'far fa-star';
+        });
+    };
+
+    stars.forEach((star) => {
+        star.onclick = null; // Supprimer les anciens listeners
+        star.addEventListener('click', function() {
+            if (commentBox.readOnly) return;
+            currentRating = parseInt(this.dataset.value);
+            stars.forEach((s, i) => {
+                s.querySelector('i').className = i < currentRating ? 'fas fa-star' : 'far fa-star';
+            });
+        });
+    });
+
+    submitBtn.onclick = null; // Supprimer les anciens listeners
+    submitBtn.addEventListener('click', async () => {
+        const comment = commentBox.value.trim();
+
+        if (currentRating === 0 && !comment) {
+            alert('Veuillez donner une note ou un commentaire.');
+            return;
+        }
+
+        const existingReviewIndex = reviews.findIndex(r => r.itemId === itemId);
+        if (existingReviewIndex !== -1) {
+            alert('Vous avez déjà laissé un avis pour ce plat. Vous ne pouvez pas le modifier.');
+            return;
+        }
+
+        const now = new Date();
+        reviews.push({
+            itemId,
+            rating: currentRating,
+            comment,
+            timestamp: now.toISOString()
+        });
+
+        localStorage.setItem('reviews', JSON.stringify(reviews));
+
+        // Préparer les données pour l'API
+        const avisData = {
+            id_item: itemId,                // ID de l'item
+            note: currentRating,            // Note
+            description: comment            // Commentaire
+        };
+
+        // Appel API pour soumettre l'avis
+        try {
+          const response = await fetch('/api/avis', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken  // Ajoutez cette ligne
+    },
+    body: JSON.stringify(avisData),
+});
+            if (response.ok) {
+                const result = await response.json();
+                alert(`Merci pour votre note de ${result.note} étoile(s) et votre commentaire !`);
+            } else {
+                const errorData = await response.json();
+                alert('Erreur lors de l\'ajout de l\'avis: ' + errorData.error);
+            }
+        } catch (error) {
+            console.error('Erreur de réseau:', error);
+            alert('Erreur de réseau: ' + error.message);
+        }
+
+        // Réinitialiser le formulaire
+        commentBox.value = '';
+        currentRating = 0;
+        stars.forEach(s => s.querySelector('i').className = 'far fa-star');
+        commentBox.readOnly = true;
+        submitBtn.disabled = true;
+          location.reload();
+    });
+}
     // --- Détection du Réseau ---
     function setupNetworkDetection() {
         window.addEventListener('online', () => {

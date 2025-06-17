@@ -95,7 +95,7 @@ class ConcernerAdmin(admin.ModelAdmin):
 
 @admin.register(Donner_Avis)
 class DonnerAvisAdmin(admin.ModelAdmin):
-    list_display = ("id_personne", "id_etablissement", "date_avis", "note")
+    list_display = ( "id_etablissement", "date_avis", "note")
     list_filter = ("note", "date_avis", "id_etablissement")
 
 

@@ -281,18 +281,25 @@ class ConcernerIn(BaseModel):
        from_attributes = True
 
 # Donner_Avis Schemas
+from pydantic import BaseModel
+
 class DonnerAvisIn(BaseModel):
-    id_personne: int
+    id_item: int  # Ajout de l'ID de l'item
     note: int
+    description: str
+
     class Config:
-       from_attributes = True
+        from_attributes = True
 
 class DonnerAvisOut(BaseModel):
-    id_personne: int
     id_etablissement: str
     date_avis: str
     note: int
+    description: str
+    id_item:str
 
+    class Config:
+        from_attributes = True
 # QRCode Schema
 class QRCodeOut(BaseModel):
     id_qrcode: str
