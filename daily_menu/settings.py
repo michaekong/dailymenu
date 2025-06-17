@@ -106,7 +106,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-#FRONTEND_URL="https://dailymenu.onrender.com/"
+FRONTEND_URL="https://dailymenu.onrender.com/"
 FRONTEND_URL="http://127.0.0.1:8000/"
 
 # Password validation
