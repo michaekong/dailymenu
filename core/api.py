@@ -331,11 +331,11 @@ def create_item(
         )
 
         for category_id in category_ids:
-            category = Category.objects.get(id_category=category_id, etablissement=request.auth)
+            category = Category.objects.get(id_category=category_id)
             item.categories.add(category)
 
         for tag_id in tag_ids:
-            tag = Tag.objects.get(id_tag=tag_id, etablissement=request.auth)
+            tag = Tag.objects.get(id_tag=tag_id)
             item.tags.add(tag)
 
         for jour_id in jour_ids:
