@@ -306,3 +306,4 @@ class QRCodeOut(BaseModel):
     menu_id: str
     url: str
     scans: int
+    menu_nom:str
