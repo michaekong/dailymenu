@@ -1524,8 +1524,8 @@ body.modal-open {
 
 
     <script>
-       // const frontendUrls = "http://127.0.0.1:8000/";
-       const frontendUrls = "https://dailymenu.onrender.com/";     // Assurez-vous que cette URL est correcte
+       const frontendUrls = "http://127.0.0.1:8000/";
+       // const frontendUrls = "https://dailymenu.onrender.com/";     // Assurez-vous que cette URL est correcte
         let token = localStorage.getItem("token");
         let allItems = []; // Stocker tous les items pour les filtres et l'aperçu du menu
         let allMenus = []; // Stocker tous les menus pour les filtres
@@ -2485,7 +2485,7 @@ body.modal-open {
                                 <img src="${frontendUrls}${q.url}" alt="QR Code pour ${q.menu_id}" class="qr-code-image">
                             </div>
                             <div class="qr-code-details">
-                                <h4 class="qr-code-title">Menu ID: ${q.menu_id}</h4>
+                                <h4 class="qr-code-title">Menu ID: ${q.menu_nom}</h4>
                                 <p class="qr-code-scans"><i class="fas fa-qrcode"></i> ${q.scans} scans</p>
                                 <p class="qr-code-link"><a href="${frontendUrls}menus/${q.menu_id}" target="_blank">Voir le Menu</a></p>
                             </div>

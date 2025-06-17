@@ -563,7 +563,7 @@ def list_qrcodes(request):
         QRCodeOut(
             id_qrcode=qr.id_qrcode,
             menu_id=str(qr.menu.id_menu),
-            menu_name=str(qr.menu.nom),
+            menu_nom=str(qr.menu.nom),
             url=qr.url,
             scans=qr.scans
         )
