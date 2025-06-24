@@ -492,7 +492,16 @@ def get_menu_by_id(request, menu_id: str):
         return  {"error": "Menu not found"}, 404
 
     return menu
-   
+
+@api.delete("/menus/{menu_id}", response={204: None, 404: ErrorResponse})
+def delete_menu(request, menu_id: str):
+    menu=Menu.objects.get(id_menu=menu_id)
+    try:
+        menu.delete()
+        return 204, None
+    except Menu.DoesNotExist:
+        return 404, {"error": "ERREUR LORS DE LA SUPRESSION DU MENU"}
+    
 @api.get("/menus/{menu_id}/export-pdf", auth=AuthBearer())
 def export_menu_pdf(request, menu_id: str):
     try:
@@ -550,7 +559,8 @@ def create_qrcode(request, data: QRCodeIn):
             menu_id=str(menu.id_menu),
             
             url=qr_code.url,
-            scans=qr_code.scans
+            scans=qr_code.scans,
+            menu_nom=menu.nom
         )
 
     except Menu.DoesNotExist:
@@ -569,7 +579,16 @@ def list_qrcodes(request):
         )
         for qr in qrcodes
     ]
-
+@api.delete("/qrcodes/{qrcodes_id}", response={204: None, 404: ErrorResponse})
+def delete_qrcodes(request, qrcodes_id: str):
+    
+    try:
+        qr=QRCode.objects.get(id_qrcode=qrcodes_id)
+        qr.delete()
+        return 204, None
+    except Menu.DoesNotExist:
+        return 404, {"error": "ERREUR LORS DE LA SUPRESSION DU qr code "}
+    
 # Contenir Endpoints
 @api.post("/contenir", response={201: ContenirOut, 400: ErrorResponse}, auth=AuthBearer())
 def create_contenir(request, data: ContenirIn):
